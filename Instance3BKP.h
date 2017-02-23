@@ -2,12 +2,21 @@
 #include <fstream>
 #include <vector>
 #include <numeric>
+
+
+
 class Instance3BKP {
 	Instance3BKP() : s(0, std::vector<double>(0)),mass(0) , profit(0) { }
 	public:
 		/* Size of the 3D Box */
 		double S[3];
 		double W, D, H;
+		
+		//Used only if the center of mass constraints are enabled
+		double L[3];
+		double U[3];
+		
+		
 		
 		double M;
 		
@@ -31,10 +40,15 @@ class Instance3BKP {
 		};
 		
 	public:
+		/**
+		 * @return the volume of the box
+		 */
 		double getBoxVolume(){
 			return W*D*H;
 		}
-		
+		/**
+		 * @return the volume of the i-th item
+		 */
 		double getVolume(int i){
 			return s[i][0]*s[i][1]*s[i][2];
 		}

@@ -3,6 +3,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[italian]{babel}
 \begin{document}
+\section{Formato file}
 Il formato di input è il seguente:
 \begin{itemize}
 	\item la prima riga contiene le dimensioni della scatola $(S^1, S^2, S^3) = (W, D, H)$
@@ -17,5 +18,18 @@ Il formato di input è il seguente:
 	\end{itemize}
 \end{itemize}
 
-
+\section{Constraint}
+\begin{itemize}
+	\item 
+	Il constraint numero (7) è stato trasformato
+	$$
+	\begin{array}{l}
+	\sum_{\delta \in \Delta}(b_{ij}^\delta + b_{ji}^\delta) \geq t_i + t_j - 1 \iff \\
+	\sum_{\delta \in \Delta}(b_{ij}^\delta + b_{ji}^\delta) - t_i - t_j \geq - 1 \iff \\
+	-(\sum_{\delta \in \Delta}(b_{ij}^\delta + b_{ji}^\delta)) + t_i + t_j \leq  1 \iff \\
+	(\sum_{\delta \in \Delta}(-b_{ij}^\delta - b_{ji}^\delta)) + t_i + t_j \leq  1 \iff \\
+	- b_{ij}^1 - b_{ji}^1 - b_{ij}^2 - b_{ji}^2 - b_{ij}^3 - b_{ji}^3 + t_i + t_j \leq  1
+	\end{array}
+	$$
+\end{itemize}
 \end{document}

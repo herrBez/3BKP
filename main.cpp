@@ -38,37 +38,53 @@ static struct option long_options[] = {
 
 
 
-
+struct _map {
+	private : 
+	_map() : T(0), B(0, vector<vector<int>>(0, vector<int>(0))) , Rho(0, vector< int >(0)), Chi(0, vector< int >(0)) { }
+	public : 
+	vector< int > T;
+	vector< vector < vector < int > > > B;
+	vector< vector < int > > Rho;
+	vector< vector < int > > Chi;
+	
+	_map(int N, int R){
+		T.resize(N);
+		B.resize(N);
+		for(auto &i : B) {
+			i.resize(N);
+			for(auto &j : i) {
+				j.resize(3);
+			}
+		}
+		Rho.resize(N);
+		for(auto &i : Rho){
+			i.resize(R);
+		}
+		Chi.resize(N);
+		for(auto &i : Chi){
+			i.resize(3);
+		}
+		
+		
+	}
+};
 
 
 /**
- * set up the model for CPLEX
- * @param env the cplex enviroment
- * @param lp the cplex problem
- * @param N the number of nodes of the TSP
- * @param C the matrix containing the costs from i to j
- * @param mapY used in order to have the result outside the setup function.
- */	
-void setupLP(CEnv env, Prob lp, Instance3BKP instance)
-{	
-	
+ * set up the variables
+ * @param env
+ * @param lp
+ * @param instance
+ * @param map the map that is filled up with the indexes
+ * 
+ */
+void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, _map &map){
 	int current_var_position 	= 0;
 	int N = instance.N;
-	int R = 6;
-	vector< int > mapT(N);
-	vector< vector < vector < int > > > mapB(N, vector<vector<int>>(N, vector<int>(3)));
-	vector< vector < int > > mapRho(N, vector< int >(R));
-	vector< vector < int > > mapChi(N, vector < int >(3));
 	
-	
-	/********************************************************
-	 * 
-	 * Setting up the variables
-	 * 
-	 ********************************************************/
 	/* 
 	 * adding t variables
-	 * t_i := binary value that is one if item is loaded in the KP 
+	 * t_i := binary value {1 if i-th item is loaded in the KP 0 otherwise} 
 	 */ 
 	for(int i = 0; i < N; i++){
 			char xtype = 'B';
@@ -78,7 +94,7 @@ void setupLP(CEnv env, Prob lp, Instance3BKP instance)
 			sprintf(name, "t_%d", i);
 			char* xname = (char*)(&name[0]);
 			CHECKED_CPX_CALL( CPXnewcols, env, lp, 1, &obj, &lb, &ub, &xtype, &xname );
-			mapT[i] = current_var_position++;
+			map.T[i] = current_var_position++;
 	}
 	/* 
 	 * adding b_ij^\delta variables
@@ -92,17 +108,17 @@ void setupLP(CEnv env, Prob lp, Instance3BKP instance)
 				double obj = 0;
 				double lb = 0.0;
 				double ub = 1.0;
-				snprintf(name, NAME_SIZE, "b(%d,%d,%d)", i, j, delta);
+				snprintf(name, NAME_SIZE, "b %d %d %d", i, j, delta);
 				char* xname = (char*)(&name[0]);
 				CHECKED_CPX_CALL( CPXnewcols, env, lp, 1, &obj, &lb, &ub, &xtype, &xname );
-				mapB[i][j][delta] = current_var_position++;
+				map.B[i][j][delta] = current_var_position++;
 			}
 		}
 	}
 	
 	/* 
-	 * adding b_ij^\delta variables
-	 * b_{ij}^\delta 1 if item i comes before item j in dimension \delta.
+	 * adding rho_{ir} variables
+	 * rho_{ir} {1 if item i is rotated with rotation r, 0 otherwise}.
 	 * 
 	 */ 
 	for(int i = 0; i < N; i++){
@@ -111,15 +127,16 @@ void setupLP(CEnv env, Prob lp, Instance3BKP instance)
 			double obj = 0.0;
 			double lb = 0.0;
 			double ub = 1.0;
-			snprintf(name, NAME_SIZE, "rho_%d_%d", i, r);
+			snprintf(name, NAME_SIZE, "rho %d %d", i, r);
 			char* xname = (char*)(&name[0]);
 			CHECKED_CPX_CALL( CPXnewcols, env, lp, 1, &obj, &lb, &ub, &xtype, &xname );
-			mapRho[i][r] = current_var_position++;
+			map.Rho[i][r] = current_var_position++;
 		}
 	}
 	/*
 	 * 
 	 * adding \chi_i^\delta variables
+	 * the coordinate of the bottom-left-back point of itme i along dimension \delta
 	 * 
 	 */
 	 
@@ -129,19 +146,29 @@ void setupLP(CEnv env, Prob lp, Instance3BKP instance)
 			double obj = 0.0;
 			double lb = 0.0;
 			double ub = CPX_INFBOUND;
-			snprintf(name, NAME_SIZE, "CHI_%d^%d", i, delta);
+			snprintf(name, NAME_SIZE, "CHI_%d %d", i, delta);
 			char * xname = (char*)(&name[0]);
 			CHECKED_CPX_CALL( CPXnewcols, env, lp, 1, &obj, &lb, &ub, &xtype, &xname );
-			mapChi[i][delta] = current_var_position++;
+			map.Chi[i][delta] = current_var_position++;
 		}
 	 }
 
 	 cout << "Number of variables: " << current_var_position << endl;
-	/**************************************************
-	 * 
-	 * Setting up the constraints
-	 * 
-	 **************************************************/
+}
+
+
+/**
+ * Set up the constraints 
+ * @param env
+ * @param lp
+ * @param instance
+ * @param map
+ * 
+ */
+void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, _map map){
+	int N = instance.N;
+	int R = 6;
+	
 	
 	//Constraint (6): sum_{j \in J} w_j*d_j*h_j*t_j <= WDH
 	//Creating additional scope in order to avoid future name conflicts (I will use idx other times)
@@ -156,13 +183,13 @@ void setupLP(CEnv env, Prob lp, Instance3BKP instance)
 		double rhs = instance.getBoxVolume();
 		snprintf(name, NAME_SIZE, "(6)");
 		char* cname = (char*)(&name[0]);
-		CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, N, &rhs, &sense, &matbeg, &mapT[0], &coef[0], 0, &cname);
+		CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, N, &rhs, &sense, &matbeg, &map.T[0], &coef[0], 0, &cname);
 	}
 	
 	//Constraint (7) : (\sum_{\delta \in \Delta} b_ij^\delta + b_ij^\delta) -t_i -t_j >= -1
 	// quindi -(\sum_{\delta \in \Delta} b_ij^\delta + b_ij^\delta) +t_i +t_j <= 1
 	for(int i = 0; i < N; i++){
-		for(int j = 0; j < N; j++){//Add i < j
+		for(int j = 0; j < N; j++){
 			if(i >= j)
 				continue;
 			//|\Delta|*2 + 2
@@ -170,14 +197,14 @@ void setupLP(CEnv env, Prob lp, Instance3BKP instance)
 			vector < double > coeff(8);
 			int index = 0;
 			for(int delta = 0; delta < 3; delta++){
-				idx[index] = mapB[i][j][delta];
-				idx[index+1] = mapB[j][i][delta];
+				idx[index] = map.B[i][j][delta];
+				idx[index+1] = map.B[j][i][delta];
 				coeff[index] = -1.0;
 				coeff[index+1] = -1.0;
 				index += 2;
 			}
-			idx[index] = mapT[i];
-			idx[index+1] = mapT[j];
+			idx[index] = map.T[i];
+			idx[index+1] = map.T[j];
 			coeff[index] = 1.0;
 			coeff[index+1] = 1.0;
 			
@@ -188,7 +215,6 @@ void setupLP(CEnv env, Prob lp, Instance3BKP instance)
 			char* cname = (char*)(&name[0]);
 			
 			CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idx.size(), &rhs, &sense, &matbeg, &idx[0], &coeff[0], 0, &cname);
-
 		}
 	}
 		
@@ -198,10 +224,11 @@ void setupLP(CEnv env, Prob lp, Instance3BKP instance)
 			vector< int > idx(7);
 			vector< double > coeff(7);
 			int index = 0;
-			idx[index] = mapChi[i][delta];
+			idx[index] = map.Chi[i][delta];
 			coeff[index] = 1.0;
+			index++;
 			for(int r = 0; r < R; r++){
-				idx[index] = mapRho[i][r];
+				idx[index] = map.Rho[i][r];
 				coeff[index] = instance.s[i][instance.R[r][delta]];
 				index++;
 			}
@@ -224,17 +251,18 @@ void setupLP(CEnv env, Prob lp, Instance3BKP instance)
 				vector< double > coeff(9);
 				
 				int index = 0;
-				idx[index] = mapChi[i][delta];
+				idx[index] = map.Chi[i][delta];
 				coeff[index] = 1.0;
+				index++;
 				for(int r = 0; r < R; r++){
-					idx[index] = mapRho[i][r];
+					idx[index] = map.Rho[i][r];
 					coeff[index] = instance.s[i][instance.R[r][delta]];
 					index++;
 				}
-				idx[index] = mapChi[j][delta];
+				idx[index] = map.Chi[j][delta];
 				coeff[index] = -1.0;
 				index++;
-				idx[index] = mapB[i][j][delta];
+				idx[index] = map.B[i][j][delta];
 				coeff[index] = instance.M;
 				
 				char sense = 'L';
@@ -258,17 +286,18 @@ void setupLP(CEnv env, Prob lp, Instance3BKP instance)
 				vector< double > coeff(9);
 				
 				int index = 0;
-				idx[index] = mapChi[j][delta];
+				idx[index] = map.Chi[j][delta];
 				coeff[index] = 1.0;
+				index++;
 				for(int r = 0; r < R; r++){
-					idx[index] = mapRho[i][r];
+					idx[index] = map.Rho[i][r];
 					coeff[index] = instance.s[i][instance.R[r][delta]];
 					index++;
 				}
-				idx[index] = mapChi[i][delta];
+				idx[index] = map.Chi[i][delta];
 				coeff[index] = -1.0;
 				index++;
-				idx[index] = mapB[i][j][delta];
+				idx[index] = map.B[j][i][delta];
 				coeff[index] = instance.M;
 				
 				char sense = 'L';
@@ -287,9 +316,9 @@ void setupLP(CEnv env, Prob lp, Instance3BKP instance)
 		for(int delta = 0; delta < 3; delta++){
 			vector< int > idx(2);
 			vector< double > coeff(2);
-			idx[0] = mapChi[i][delta];
+			idx[0] = map.Chi[i][delta];
 			coeff[0] = 1.0;
-			idx[1] = mapT[i];
+			idx[1] = map.T[i];
 			coeff[1] = -instance.M;
 			char sense = 'L';
 				int matbeg = 0;
@@ -306,8 +335,8 @@ void setupLP(CEnv env, Prob lp, Instance3BKP instance)
 				for(int delta = 0; delta < 3; delta++){
 					vector <int> idVar(2);
 					vector <double> coef(2);
-					idVar[0] = mapB[i][j][delta];
-					idVar[1] = mapT[i];
+					idVar[0] = map.B[i][j][delta];
+					idVar[1] = map.T[i];
 					coef[0] = 1.0;
 					coef[1] = -1.0;
 					char sense = 'L';
@@ -328,8 +357,8 @@ void setupLP(CEnv env, Prob lp, Instance3BKP instance)
 				for(int delta = 0; delta < 3; delta++){
 					vector <int> idVar(2);
 					vector <double> coeff(2);
-					idVar[0] = mapB[j][i][delta];
-					idVar[1] = mapT[j];
+					idVar[0] = map.B[j][i][delta];
+					idVar[1] = map.T[j];
 					coeff[0] = 1.0;
 					coeff[1] = -1.0;
 					char sense = 'L';
@@ -349,11 +378,11 @@ void setupLP(CEnv env, Prob lp, Instance3BKP instance)
 		vector < int > idx(R);
 		vector < double > coeff(R);
 		for(int r = 0; r < R; r++){
-			idx[r] = mapRho[i][r];
+			idx[r] = map.Rho[i][r];
 			coeff[r] = 1.0;
 		}
 		double rhs = 1.0;
-		char sense = 'L';
+		char sense = 'E';
 		int matbeg = 0;
 		
 		snprintf(name, NAME_SIZE, "(16) %d", i);
@@ -361,12 +390,38 @@ void setupLP(CEnv env, Prob lp, Instance3BKP instance)
 		CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idx.size(), &rhs, &sense, &matbeg, &idx[0], &coeff[0], 0, &cname);
 
 	}
+}
+
+
+/**
+ * set up the model for CPLEX
+ * @param env the cplex enviroment
+ * @param lp the cplex problem
+ * @param N the number of nodes of the TSP
+ * @param C the matrix containing the costs from i to j
+ * @param mapY used in order to have the result outside the setup function.
+ */	
+_map setupLP(CEnv env, Prob lp, Instance3BKP instance)
+{	
+	
+	
+	int N = instance.N;
+	int R = 6;
+	_map map(N, R);
+	
+	/* We deal with a maximization problem */
+	CHECKED_CPX_CALL( CPXchgobjsen, env, lp, CPX_MAX); 
+	/* Set up the variables */
+	setupLPVariables(env, lp, instance, map);
+	/* Set up the constraints */
+	setupLPConstraints(env, lp, instance, map);
+	
 	if(output_required){
 		cout << "OKI" << endl;
 		CHECKED_CPX_CALL( CPXwriteprob, env, lp, "/tmp/Model.lp", NULL ); 
 	}
 	
-	
+	return map;
 }
 
 /**
@@ -384,7 +439,6 @@ double solve( CEnv env, Prob lp, Instance3BKP instance) {
     t1 = clock();
     struct timeval  tv1, tv2;
     gettimeofday(&tv1, NULL);
-	//TODO change mipopt with corresponding max
 	CHECKED_CPX_CALL( CPXmipopt, env, lp );
 	t2 = clock();
     gettimeofday(&tv2, NULL);
@@ -396,7 +450,7 @@ double solve( CEnv env, Prob lp, Instance3BKP instance) {
 	
 	
 	if(output_required){	
-		CHECKED_CPX_CALL( CPXsolwrite, env, lp, "Model.sol");
+		CHECKED_CPX_CALL( CPXsolwrite, env, lp, "/tmp/Model.sol");
 	}
 	if(benchmark){
 		printf("%4d\t%12.6f\t%12.6f\n", N, cpu_time, objval);//, user_time, objval);
@@ -480,10 +534,10 @@ int main (int argc, char *argv[])
 		
 		DECL_ENV( env );
 		DECL_PROB( env, lp );
-		setupLP(env, lp, instance);
+		_map map = setupLP(env, lp, instance);
 		
 		// find the solution
-		//solve(env, lp, instance);
+		solve(env, lp, instance);
 		// free-allocated resolve
 		CPXfreeprob(env, &lp);
 		CPXcloseCPLEX(&env);

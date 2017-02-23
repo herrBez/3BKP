@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/TeX Live for SUSE Linux) (format=pdflatex 2014.11.7)  23 FEB 2017 11:24
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/TeX Live for SUSE Linux) (format=pdflatex 2014.11.7)  23 FEB 2017 22:17
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -318,8 +318,7 @@ File: babel.def 2013/05/16 v3.9f Babel common definitions
 \U@D=\dimen103
 )
 Package babel Info: Making " an active character on input line 94.
-))
-No file formatofile.aux.
+)) (./formatofile.aux)
 \openout1 = `formatofile.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 5.
@@ -334,38 +333,42 @@ LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 5.
 LaTeX Font Info:    ... okay on input line 5.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 5.
 LaTeX Font Info:    ... okay on input line 5.
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 8.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 9.
+
 (/usr/share/texmf/tex/latex/base/omscmr.fd
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 8.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 9.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 8.
+(Font)              <10.95> on input line 9.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 8.
+(Font)              <8> on input line 9.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 8.
+(Font)              <6> on input line 9.
  [1
 
 {/usr/share/texmf/fonts/map/pdftex/updmap/pdftex.map}] (./formatofile.aux) ) 
 Here is how much of TeX's memory you used:
- 1910 strings out of 493315
- 26478 string characters out of 6145893
- 111110 words of memory out of 5000000
- 5390 multiletter control sequences out of 15000+600000
- 6687 words of font info for 24 fonts, out of 8000000 for 9000
+ 1917 strings out of 493315
+ 26579 string characters out of 6145893
+ 113110 words of memory out of 5000000
+ 5393 multiletter control sequences out of 15000+600000
+ 7580 words of font info for 27 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
- 35i,6n,35p,225b,165s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 35i,6n,35p,225b,167s stack positions out of 5000i,500n,10000p,200000b,80000s
 </u
 sr/share/texmf/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texmf/font
-s/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf/fonts/type1/public/amsf
-onts/cm/cmr10.pfb></usr/share/texmf/fonts/type1/public/amsfonts/cm/cmr8.pfb></u
-sr/share/texmf/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
-Output written on formatofile.pdf (1 page, 47095 bytes).
+s/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texmf/fonts/type1/public/amsf
+onts/cm/cmmi10.pfb></usr/share/texmf/fonts/type1/public/amsfonts/cm/cmmi8.pfb><
+/usr/share/texmf/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf/fon
+ts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texmf/fonts/type1/public/amsfo
+nts/cm/cmssbx10.pfb></usr/share/texmf/fonts/type1/public/amsfonts/cm/cmsy10.pfb
+></usr/share/texmf/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
+Output written on formatofile.pdf (1 page, 80886 bytes).
 PDF statistics:
- 28 PDF objects out of 1000 (max. 8388607)
- 19 compressed objects within 1 object stream
+ 44 PDF objects out of 1000 (max. 8388607)
+ 31 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
