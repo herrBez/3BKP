@@ -25,20 +25,20 @@ char errmsg[BUF_SIZE];
 const int NAME_SIZE = 512;
 char name[NAME_SIZE];
 bool output_required = true;
-bool print = false;
-bool benchmark = false;
 
+bool extended = false;
 /** Struct containing the long options */
 static struct option long_options[] = {	
 	{"help", no_argument, 0, 'h'},
-	{"print", no_argument, 0, 'p'},
-	{"output", no_argument, 0, 'o'},
-	{"benchmark-output", no_argument, 0, 'b'},
+	{"quiet", no_argument, 0, 'q'},
+	{"extended", no_argument, 0, 'e'},
 	{0, 0, 0, 0},
 };
 
 
-
+/**
+ * Struct that contains all the vectors used to keep track of the variables
+ */
 struct mapVar {
 	private : 
 	mapVar() : T(0), B(0, vector<vector<int>>(0, vector<int>(0))) , Rho(0, vector< int >(0)), Chi(0, vector< int >(0)) { }
@@ -401,6 +401,71 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 }
 
 
+void setupLPBalancingConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
+	int N = instance.N;
+	for(int delta = 0; delta < 3; delta++){
+		vector< int > idVar(N + N*6 + N);
+		vector< double > coeff(N + N*6 + N);
+		int index = 0;
+		for(int i = 0; i < N; i++){
+			idVar[index] = map.Chi[i][delta];
+			coeff[index] = -instance.mass[i];
+			index++;
+		} 
+		for(int i = 0; i < N; i++){
+			for(int r = 0; r < 6; r++){
+				idVar[index] = map.Rho[i][r];
+				coeff[index] = instance.mass[i]*instance.gamma[i][r][delta];
+				index++;
+			}
+		}
+		for(int i = 0; i < N; i++){
+			idVar[index] = map.T[i];
+			coeff[index] = -instance.L[delta]*instance.mass[i];  
+			index++;
+		}
+		double rhs = 0.0;
+		char sense = 'G';
+		int matbeg = 0;
+		
+		snprintf(name, NAME_SIZE, "(14) %d", delta);
+		char * cname = (char*) (&name[0]);
+		CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
+	}
+	
+	// (15)
+	for(int delta = 0; delta < 3; delta++){
+		vector< int > idVar(N + N*6 + N);
+		vector< double > coeff(N + N*6 + N);
+		int index = 0;
+		for(int i = 0; i < N; i++){
+			idVar[index] = map.Chi[i][delta];
+			coeff[index] = -instance.mass[i];
+			index++;
+		} 
+		for(int i = 0; i < N; i++){
+			for(int r = 0; r < 6; r++){
+				idVar[index] = map.Rho[i][r];
+				coeff[index] = instance.mass[i]*instance.gamma[i][r][delta];
+				index++;
+			}
+		}
+		for(int i = 0; i < N; i++){
+			idVar[index] = map.T[i];
+			coeff[index] = -instance.U[delta]*instance.mass[i];
+			index++;
+		}
+		snprintf(name, NAME_SIZE, "(15) %d", delta);
+		double rhs = 0.0;
+		char sense = 'L';
+		int matbeg = 0;
+		
+		char * cname = (char*) (&name[0]);
+		CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
+	}
+}
+
+
 /**
  * set up the model for CPLEX
  * @param env the cplex enviroment
@@ -424,8 +489,12 @@ mapVar setupLP(CEnv env, Prob lp, Instance3BKP instance)
 	/* Set up the constraints */
 	setupLPConstraints(env, lp, instance, map);
 	
+	/* If the problem is extended */
+	if(instance.extended)
+		setupLPBalancingConstraints(env, lp, instance, map);
+	
+	
 	if(output_required){
-		cout << "OKI" << endl;
 		CHECKED_CPX_CALL( CPXwriteprob, env, lp, "/tmp/Model.lp", NULL ); 
 	}
 	
@@ -460,14 +529,12 @@ double solve( CEnv env, Prob lp, Instance3BKP instance) {
 	if(output_required){	
 		CHECKED_CPX_CALL( CPXsolwrite, env, lp, "/tmp/Model.sol");
 	}
-	if(benchmark){
-		printf("%4d\t%12.6f\t%12.6f\n", N, cpu_time, objval);//, user_time, objval);
-	} else {
-		cout << "Problem Size N" << N << endl;
-		cout << "in " << user_time << " seconds (user time)\n";
-		cout << "in " << cpu_time << " seconds (CPU time)\n";
-		cout << "Objval: " << objval << endl;
-	}
+	
+	cout << "Problem Size N" << N << endl;
+	cout << "in " << user_time << " seconds (user time)\n";
+	cout << "in " << cpu_time << " seconds (CPU time)\n";
+	cout << "Objval: " << objval << endl;
+	
 	return objval;
 }
 
@@ -481,8 +548,8 @@ void print_help(char * argv[]){
 	cout << "Usage : " << argv[0] << " <instance.dat> " << " [OPT]... " << endl;
 	cout << endl;
 	cout << "-h, --help\t\t\tprint this message and exit" << endl;
-	cout << "-o, --output\t\t\twrite the solved problem in a file name Model.sol" << endl;
-	cout << "-p, --print\t\t\tat the end print the list of cities, e.g. 0 1 2 3 4 0" << endl;
+	cout << "-q, --quiet\t\t\tdo not write the solved problem in a file named /tmp/Model.sol" << endl;
+	cout << "-e, --extended\t\t\t use also the balancing constraint. (Yet is dummy because gammas are not computed)" << endl;
 	cout << endl;
 }
 
@@ -504,19 +571,19 @@ Instance3BKP get_option(int argc,  char * argv[]){
 	// One can specify only the help flag without the instance file.
 	if(strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
 		print_help(argv);
+		exit(EXIT_SUCCESS);
 	}
 	optind = 2; //Starting from index 2, because the first place is destinated to the istance file.
 	int option_index;
-	while((c = getopt_long (argc, argv, "hopb", long_options, &option_index)) != EOF) {
+	while((c = getopt_long (argc, argv, "hqe", long_options, &option_index)) != EOF) {
 		switch(c){
 			case 'h': print_help(argv); exit(EXIT_SUCCESS); break;
-			case 'o': output_required=true; break;
-			case 'p': print = true; break;
-			case 'b': benchmark = true; break;
+			case 'q': output_required=false; break;
+			case 'e': extended = true; break;
 			 
 		}
     }
-    Instance3BKP instance(argv[1]);
+    Instance3BKP instance(argv[1], extended);
 	instance.print();
     return instance;
 }

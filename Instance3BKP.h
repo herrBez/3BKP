@@ -2,11 +2,23 @@
 #include <fstream>
 #include <vector>
 #include <numeric>
-
+#include <stdexcept>
 
 
 class Instance3BKP {
-	Instance3BKP() : s(0, std::vector<double>(0)),mass(0) , profit(0) { }
+	private : 
+	Instance3BKP() : s(0, std::vector<double>(0)),mass(0) , profit(0), gamma(0, std::vector<std::vector<double>>(0, std::vector<double>(0))) { }
+	
+	/**
+	 * TODO
+	 * Computes gamma the center of mass with respect to bottom-left-back point of the item.
+	 * It is called by the constructor
+	 */
+	void calculateGamma(){
+		
+	}
+	
+	
 	public:
 		/* Size of the 3D Box */
 		double S[3];
@@ -16,6 +28,8 @@ class Instance3BKP {
 		double L[3];
 		double U[3];
 		
+		//True if centroid are considered, False othw.
+		bool extended;
 		
 		
 		double M;
@@ -25,7 +39,7 @@ class Instance3BKP {
 		std::vector< double > mass;
 		std::vector< double > profit;
 		
-		
+		std::vector< std::vector< std::vector< double > > > gamma;
 		
 		
 		
@@ -60,8 +74,12 @@ class Instance3BKP {
 		 * @param filename name of the file to parse
 		 * 
 		 */
-		Instance3BKP(const char * filename){
+		Instance3BKP(const char * filename, bool _extended){
+			extended = _extended;
 			std::ifstream infile(filename);
+			if(!infile.good()) {
+				throw std::runtime_error("The given file does not exist");
+			}
 			infile >> S[0] >> S[1] >> S[2];
 			W = S[0];
 			D = S[1];
@@ -82,6 +100,21 @@ class Instance3BKP {
 									[](double a, double b) {
 											return a + b;
 									});
+			
+			
+			if(extended){
+				infile >> L[0] >> L[1] >> L[2];
+				infile >> U[0] >> U[1] >> U[2];
+				
+				gamma.resize(N);
+				for(auto &i : gamma) {
+					i.resize(6);
+					for(auto &j : i){
+						j.resize(3);
+					}
+				}
+				calculateGamma();		
+			} else 
 			
 			infile.close();
 		}

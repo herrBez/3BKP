@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/TeX Live for SUSE Linux) (format=pdflatex 2014.11.7)  24 FEB 2017 09:04
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/TeX Live for SUSE Linux) (format=pdflatex 2014.11.7)  24 FEB 2017 10:23
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -333,28 +333,28 @@ LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 5.
 LaTeX Font Info:    ... okay on input line 5.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 5.
 LaTeX Font Info:    ... okay on input line 5.
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 9.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 11.
 
 (/usr/share/texmf/tex/latex/base/omscmr.fd
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 9.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 11.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 9.
+(Font)              <10.95> on input line 11.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 9.
+(Font)              <8> on input line 11.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 9.
+(Font)              <6> on input line 11.
  [1
 
 {/usr/share/texmf/fonts/map/pdftex/updmap/pdftex.map}] (./formatofile.aux) ) 
 Here is how much of TeX's memory you used:
- 1917 strings out of 493315
- 26579 string characters out of 6145893
- 113110 words of memory out of 5000000
- 5393 multiletter control sequences out of 15000+600000
- 7580 words of font info for 27 fonts, out of 8000000 for 9000
+ 1920 strings out of 493315
+ 26619 string characters out of 6145893
+ 116110 words of memory out of 5000000
+ 5395 multiletter control sequences out of 15000+600000
+ 8042 words of font info for 29 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
  35i,6n,35p,225b,167s stack positions out of 5000i,500n,10000p,200000b,80000s
 </u
@@ -364,11 +364,12 @@ onts/cm/cmmi10.pfb></usr/share/texmf/fonts/type1/public/amsfonts/cm/cmmi8.pfb><
 /usr/share/texmf/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf/fon
 ts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texmf/fonts/type1/public/amsfo
 nts/cm/cmssbx10.pfb></usr/share/texmf/fonts/type1/public/amsfonts/cm/cmsy10.pfb
-></usr/share/texmf/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
-Output written on formatofile.pdf (1 page, 80631 bytes).
+></usr/share/texmf/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texmf/f
+onts/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on formatofile.pdf (1 page, 97072 bytes).
 PDF statistics:
- 44 PDF objects out of 1000 (max. 8388607)
- 31 compressed objects within 1 object stream
+ 48 PDF objects out of 1000 (max. 8388607)
+ 34 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
