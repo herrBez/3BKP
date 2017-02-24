@@ -4,8 +4,11 @@
 \usepackage[italian]{babel}
 \begin{document}
 \section{Note}
-Il modello è stato implementato (per ora) tralasciando i vincoli del centro di massa.
-Nella prossima sezione segue una descrizione di come possano essere aggiunti.
+
+\paragraph{Vincoli 9-10} I vincoli 9 e 10 richiedono l'utilizzo di un $M$. Per questo
+valore è stato scelto $10^6$, ma probabilmente con altre istanze il numero deve essere cambiato.
+
+
 \paragraph{Formato di file}
 Il formato di input è il seguente:
 \begin{itemize}
@@ -22,13 +25,9 @@ Il formato di input è il seguente:
 \end{itemize}
 
 \paragraph{Note sui constraint}
+Di seguito vengono riportate alcune modifiche ai constraint in modo da portare
+tutte le variabili nella parte sinistra della dis/equazione.
 \begin{itemize}
-	\item I vincoli 9 e 10 richiedono l'utilizzo di un $M$. Per questo
-	valore è stato scelto $10^6$, ma probabilmente con altre istanze il numero deve essere cambiato.
-	
-	\item Di seguito vengono riportate alcune modifiche ai constraint in modo da portare
-	tutte le variabili nella parte sinistra della dis/equazione.
-	\begin{itemize}
 	\item 
 	Il constraint numero (7) è stato riscritto come:
 	$$
@@ -55,15 +54,11 @@ Il formato di input è il seguente:
 	\end{array}
 	$$
 \end{itemize}
-\end{itemize}
-\section{Per aggiungere i balancing constraint (14/15)}
-Per aggiungere i vincoli del centro di massa bisogna:
-\begin{itemize}
-	\item implementare il metodo \verb|calculateGamma| nella classe \verb|instance3BKP|.
-	Questo metodo dovrebbe calcolare i valori di $\gamma_{ir}^\delta$.
-	\item Aggiungere ai file delle istanze due righe contenenti $L^0, L^1, L^2$ e $U^0, U^1, U^2$
-	\item 
-\end{itemize}
+
+\subsection{Per aggiungere i balancing constraint (14/15)}
+Bisogna implementare il metodo \verb|calculateGamma| che dovrebbe calcolare i valori di $\gamma_{ir}^\delta$ nella classe \verb|Instance3BKP| e  
+e inoltre aggiungere nel parsing del file due righe extra che contengono i valori
+$L^0, L^1, L^2$ e $U^0, U^1, U^2$.
 
 Per usare la versione estesa del programma si deve usare l'opzione \verb|--extended| o per brevità \verb|-e|.
 \end{document}
