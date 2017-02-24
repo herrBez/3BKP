@@ -375,12 +375,6 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	}
 	
 	
-	/*******************************************************
-	 * 
-	 * Constraint 14/15 not yet implemented
-	 * 
-	 *******************************************************/
-	
 	/* Constraint (16) */
 	for(int i = 0; i < N; i++){
 		vector < int > idVar(R);
@@ -537,7 +531,6 @@ double solve( CEnv env, Prob lp, Instance3BKP instance) {
 	
 	return objval;
 }
-
 
 
 /** 
