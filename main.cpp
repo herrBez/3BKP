@@ -82,10 +82,31 @@ struct mapVar {
 void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 	int current_var_position = 0;
 	int N = instance.N;
-	
+	/*
+	 * 
+	 * adding \chi_i^\delta variables
+	 * the coordinate of the bottom-left-back point of itme i along dimension \delta
+	 * + constraint(17)
+	 * 
+	 */
+	 
+	 for(int i = 0; i < N; i++){
+		for(int delta = 0; delta < 3; delta++){
+			char xtype = 'C';
+			double obj = 0.0;
+			double lb = 0.0;
+			double ub = CPX_INFBOUND;
+			snprintf(name, NAME_SIZE, "chi %d %d", i, delta);
+			char * xname = (char*)(&name[0]);
+			CHECKED_CPX_CALL( CPXnewcols, env, lp, 1, &obj, &lb, &ub, &xtype, &xname );
+			map.Chi[i][delta] = current_var_position++;
+		}
+	 }
+
 	/* 
 	 * adding t variables
 	 * t_j := binary value {1 if j-th item is loaded in the KP 0 otherwise} 
+	 * + constraint(18)
 	 */ 
 	for(int j = 0; j < N; j++){
 			char xtype = 'B';
@@ -100,7 +121,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 	/* 
 	 * adding b_ij^\delta variables
 	 * b_{ij}^\delta 1 if item i comes before item j in dimension \delta.
-	 * 
+	 * + constraint(19)
 	 */ 
 	for(int i = 0; i < N; i++){
 		for(int j = 0; j < N; j++){
@@ -120,7 +141,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 	/* 
 	 * adding rho_{ir} variables
 	 * rho_{ir} {1 if item i is rotated with rotation r, 0 otherwise}.
-	 * 
+	 * + constraint 20
 	 */ 
 	for(int i = 0; i < N; i++){
 		for(int r = 0; r < 6; r++){
@@ -134,26 +155,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 			map.Rho[i][r] = current_var_position++;
 		}
 	}
-	/*
-	 * 
-	 * adding \chi_i^\delta variables
-	 * the coordinate of the bottom-left-back point of itme i along dimension \delta
-	 * 
-	 */
-	 
-	 for(int i = 0; i < N; i++){
-		for(int delta = 0; delta < 3; delta++){
-			char xtype = 'C';
-			double obj = 0.0;
-			double lb = 0.0;
-			double ub = CPX_INFBOUND;
-			snprintf(name, NAME_SIZE, "chi %d %d", i, delta);
-			char * xname = (char*)(&name[0]);
-			CHECKED_CPX_CALL( CPXnewcols, env, lp, 1, &obj, &lb, &ub, &xtype, &xname );
-			map.Chi[i][delta] = current_var_position++;
-		}
-	 }
-
+	
 	 cout << "Number of variables: " << current_var_position << endl;
 }
 
@@ -168,13 +170,13 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
  */
 void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	int N = instance.N;
-	int R = 6;
+	int R = 6; //Cardinality of the set R
+	//int DELTA = 3; //Cardinality of the set \Delta
 	int M = 1e6; //Used in constraint 9-10 
 	
 	//Constraint (6): sum_{j \in J} w_j*d_j*h_j*t_j <= WDH
 	{
 		vector<double> coef(N);
-		//starting from without considering j
 		for(int j = 0; j < N; j++){
 			coef[j] = instance.getVolume(j);
 		}
@@ -187,15 +189,14 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	}
 	
 	//Constraint (7) : (\sum_{\delta \in \Delta} b_ij^\delta + b_ij^\delta) -t_i -t_j >= -1
-	// quindi -(\sum_{\delta \in \Delta} b_ij^\delta + b_ij^\delta) +t_i +t_j <= 1
 	for(int i = 0; i < N; i++){
 		for(int j = 0; j < N; j++){
 			if(i >= j)
 				continue;
-			//|\Delta|*2 + 2 variables
+					
 			vector < int > idVar(8);
 			vector < double > coeff(8);
-			int index = 0;
+			unsigned int index = 0;
 			for(int delta = 0; delta < 3; delta++){
 				idVar[index] = map.B[i][j][delta];
 				coeff[index] = +1.0;
@@ -209,7 +210,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 			index++;
 			idVar[index] = map.T[j];
 			coeff[index] = -1.0;
-			
+			index++;
 			char sense = 'G';
 			int matbeg = 0;
 			double rhs = -1.0;
@@ -217,6 +218,8 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 			char* cname = (char*)(&name[0]);
 			
 			CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
+			/* Checking that the vector is correctly initialized */
+			assert(index == idVar.size());
 		}
 	}
 		
@@ -225,7 +228,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 		for(int delta = 0; delta < 3; delta++){
 			vector< int > idVar(7);
 			vector< double > coeff(7);
-			int index = 0;
+			unsigned int index = 0;
 			idVar[index] = map.Chi[i][delta];
 			coeff[index] = 1.0;
 			index++;
@@ -240,6 +243,8 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 			snprintf(name, NAME_SIZE, "(8) %d %d",i,delta);
 			char* cname = (char*)(&name[0]);
 			CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
+			/* Checking that the vector is correctly initialized */
+			assert(index == idVar.size());
 		}
 	}
 	
@@ -251,8 +256,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 			for(int delta = 0; delta < 3; delta++){
 				vector< int > idVar(9);
 				vector< double > coeff(9);
-				
-				int index = 0;
+				unsigned int index = 0;
 				idVar[index] = map.Chi[i][delta];
 				coeff[index] = 1.0;
 				index++;
@@ -266,13 +270,16 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 				index++;
 				idVar[index] = map.B[i][j][delta];
 				coeff[index] = M;
-				
+				index++;
 				char sense = 'L';
 				int matbeg = 0;
 				double rhs = M;
-				snprintf(name, NAME_SIZE, "(9) %d %d",i,delta);
+				snprintf(name, NAME_SIZE, "(9) %d %d %d",i, j, delta);
 				char* cname = (char*)(&name[0]);
 				CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
+			
+				/* Checking that the vector is correctly initialized */
+				assert(index == idVar.size());
 			}
 		}
 	}
@@ -287,13 +294,13 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 				vector< int > idVar(9);
 				vector< double > coeff(9);
 				
-				int index = 0;
+				unsigned int index = 0;
 				idVar[index] = map.Chi[j][delta];
 				coeff[index] = 1.0;
 				index++;
 				for(int r = 0; r < R; r++){
-					idVar[index] = map.Rho[j][r];
-					coeff[index] = instance.s[i][instance.R[r][delta]];
+					idVar[index] = map.Rho[i][r];
+					coeff[index] = instance.s[j][instance.R[r][delta]];
 					index++;
 				}
 				idVar[index] = map.Chi[i][delta];
@@ -301,13 +308,16 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 				index++;
 				idVar[index] = map.B[j][i][delta];
 				coeff[index] = M;
-				
+				index++;
 				char sense = 'L';
 				int matbeg = 0;
 				double rhs = M;
-				snprintf(name, NAME_SIZE, "(10) %d %d",i,delta);
+				snprintf(name, NAME_SIZE, "(10) %d %d %d",i, j, delta);
 				char* cname = (char*)(&name[0]);
 				CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
+			
+				/* Checking that the vector is correctly initialized */
+				assert(index == idVar.size());
 			}
 		}
 	}
@@ -325,7 +335,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 			char sense = 'L';
 			int matbeg = 0;
 			double rhs = 0;
-			snprintf(name, NAME_SIZE, "(10) %d %d",i,delta);
+			snprintf(name, NAME_SIZE, "(11) %d %d",i,delta);
 			char* cname = (char*)(&name[0]);
 			CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
 		}
@@ -394,7 +404,14 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	}
 }
 
-
+/**
+ * Set up the constraints 
+ * @param env
+ * @param lp
+ * @param instance
+ * @param map
+ * 
+ */
 void setupLPBalancingConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	int N = instance.N;
 	for(int delta = 0; delta < 3; delta++){
@@ -489,7 +506,7 @@ mapVar setupLP(CEnv env, Prob lp, Instance3BKP instance)
 	
 	
 	if(output_required){
-		CHECKED_CPX_CALL( CPXwriteprob, env, lp, "/tmp/Model.lp", NULL ); 
+		CHECKED_CPX_CALL( CPXwriteprob, env, lp, "Model.lp", NULL ); 
 	}
 	
 	return map;
@@ -521,7 +538,7 @@ double solve( CEnv env, Prob lp, Instance3BKP instance) {
 	
 	
 	if(output_required){	
-		CHECKED_CPX_CALL( CPXsolwrite, env, lp, "/tmp/Model.sol");
+		CHECKED_CPX_CALL( CPXsolwrite, env, lp, "Model.sol");
 	}
 	
 	cout << "Problem Size N" << N << endl;
@@ -582,6 +599,78 @@ Instance3BKP get_option(int argc,  char * argv[]){
 }
 
 /**
+ * Print a human readable output in the file named output.txt
+ * @param env
+ * @param lp
+ * @param instance
+ * @param map
+ * 
+ */
+void output(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
+	int N = instance.N;
+	int begin = map.T[0];
+	int end = map.T[N - 1];
+	vector< double > t = vector< double >(N);
+	vector< vector < double > > chi(N, vector< double >(3));
+	vector< vector < double > > rho(N, vector< double >(6));
+	
+	CHECKED_CPX_CALL( CPXgetx, env, lp, &t[0], begin, end);
+	for(int i = 0; i < N; i++){
+		int begin = map.Chi[i][0];
+		int end = map.Chi[i][2];
+		CHECKED_CPX_CALL( CPXgetx, env, lp, &(chi[i][0]), begin, end);
+	}
+	for(int i = 0; i < N; i++){
+		int begin = map.Rho[i][0];
+		int end = map.Rho[i][5];
+		CHECKED_CPX_CALL( CPXgetx, env, lp, &(rho[i][0]), begin, end);
+	}
+	vector< vector< int > > rotation(N, vector< int >(3));
+	for(int i = 0; i < N; i++){
+		
+		for(int r = 0; r < 6; r++){
+			if(rho[i][r] >= 0.9) { //Taking into account round errors due to the double representation
+				for(int delta = 0; delta < 3; delta++){
+					rotation[i][delta] = instance.R[r][delta];
+				}
+				break;
+			}
+		}
+	}
+	
+	ofstream outfile("output.txt");
+	if(!outfile.good()) {
+		throw std::runtime_error("Cannot open the file");
+	}
+	
+	outfile << "#Vengono inclusi solo gli oggetti messi nello zaino" << endl;
+	outfile << "#Dimensione Zaino " << instance.S[0] << " " << instance.S[1] <<" "<< instance.S[2] << endl; 
+	outfile << "#Formato: i pos_i_x pos_i_y pos_i_z rot_dim_i_x rot_dim_i_y rot_dim_i_z" << endl;
+	
+	for(int i = 0; i < N; i++){
+		if(t[i] < 0.1)
+			continue;
+		//Print only inserted objects 
+		outfile << i << "\t";
+		
+		for(int delta = 0; delta < 3; delta++){
+			outfile << chi[i][delta];
+			outfile << " ";
+		}
+		outfile << "\t";
+		for(int delta = 0; delta < 3; delta++){
+			outfile << instance.s[i][rotation[i][delta]] << " ";
+		}
+		
+		outfile << endl;
+		
+	}
+	outfile.close();
+}	
+
+
+
+/**
  * the main function
  * @param argc
  * @param argv
@@ -606,6 +695,10 @@ int main (int argc, char *argv[])
 		
 		// find the solution
 		solve(env, lp, instance);
+		
+		// print output
+		output(env, lp, instance, map);
+		
 		// free-allocated resolve
 		CPXfreeprob(env, &lp);
 		CPXcloseCPLEX(&env);

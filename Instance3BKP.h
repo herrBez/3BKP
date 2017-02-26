@@ -32,8 +32,6 @@ class Instance3BKP {
 		bool extended;
 		
 		
-		double M;
-		
 		std::vector< std::vector< double > > s;
 		
 		std::vector< double > mass;
@@ -46,7 +44,7 @@ class Instance3BKP {
 		/* Set of rotation of the object. i.e. permutation of 1,2,3 */
 		double R [6][3] = {
 			{0,1,2},
-			{0,2,2},
+			{0,2,1},
 			{1,0,2},
 			{1,2,0},
 			{2,0,1},
@@ -95,11 +93,7 @@ class Instance3BKP {
 				infile >> s[i][0] >> s[i][1] >> s[i][2] >> mass[i] >> profit[i];
 			}
 			
-			/* Initialize M as the sum over all masses */
-			M = std::accumulate(mass.begin(), mass.end(), 0.0, 
-									[](double a, double b) {
-											return a + b;
-									});
+			
 			
 			
 			if(extended){
@@ -114,7 +108,7 @@ class Instance3BKP {
 					}
 				}
 				calculateGamma();		
-			} else 
+			}
 			
 			infile.close();
 		}
