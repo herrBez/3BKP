@@ -8,6 +8,7 @@ var cubeVerticesColor;
 
 
 var VerticesBuffer;
+var ColorBuffer;
 
 
 
@@ -23,25 +24,28 @@ var perspectiveMatrix;
 
 
 var move_camera = false;
-var camera_z = -10;
+var camera_z = -20;
 
 
 var vertices;
+var boxVertices;
 
+
+var colorInformation;
 
 function initMatrix(){
 	ViewMatrix = Matrix.I(4);
 	ViewMatrix.elements[0][3] = 1.0;
-	ViewMatrix.elements[1][3] = 1.0;
+	ViewMatrix.elements[1][3] = 0.0;
 	ViewMatrix.elements[2][3] = camera_z;
 		
 	ModelMatrix = Matrix.I(4);
 	ModelMatrix.elements[0][0] = 1.0;
 	ModelMatrix.elements[1][1] = 1.0;
 	ModelMatrix.elements[2][2] = 1.0;
-	ModelMatrix.elements[0][3] = -2.0;
-	ModelMatrix.elements[1][3] = -2.0;
-	ModelMatrix.elements[2][3] = -5.0;
+	ModelMatrix.elements[0][3] = 0.0;
+	ModelMatrix.elements[1][3] = 0.0;
+	ModelMatrix.elements[2][3] = 0.0;
 }
 
 //
@@ -50,9 +54,9 @@ function initMatrix(){
 // Called when the canvas is created to get the ball rolling.
 // Figuratively, that is. There's nothing moving in this demo.
 //
-function start(_vertices) {
-	console.log("Start");
-	
+function start(_boxVertices, _vertices) {
+  console.log("Start");
+  boxVertices = _boxVertices;
   vertices = _vertices; 	
 	
   canvas = document.getElementById("glcanvas");
@@ -121,7 +125,7 @@ function initWebGL() {
 function initBuffers() {
 
 
-  var BoxVertices = [
+  /*var BoxVertices = [
      0,  0,  0, 
      1,  0,  0,
      1,  1,  0,
@@ -130,17 +134,36 @@ function initBuffers() {
      1,  0, 1,
      1,  1, 1,
      0,  1, 1,
-  ];
+  ];*/
   
+  colorInformation = new Array();
+  for(var i = 0; i < vertices.length; i++){
+	 var r = Math.random();
+	 var g = Math.random();
+	 var b = Math.random();
+	 colorInformation.push(
+		[
+		r, g, b,
+		r, g, b,
+		r, g, b,
+		r, g, b,
+		r, g, b,
+		r, g, b,
+		r, g, b,
+		r, g, b,
+		]
+	 );
+  }
   var colorBuffer = [
-	1.0, 1.0, 1.0,
-	1.0, 0.0, 1.0,
-	0.0, 1.0, 1.0,
-	1.0, 1.0, 0.0,
-	0.5, 0.5, 0.5,
-	0.2, 0.0, 1.0,
-	0.2, 0.5, 1.0,
-	0.2, 0.7, 1.0,
+	1.0, 0.0, 0.0,
+	1.0, 0.0, 0.0,
+	1.0, 0.0, 0.0,
+	1.0, 0.0, 0.0,
+	1.0, 0.0, 0.0,
+	1.0, 0.0, 0.0,
+	1.0, 0.0, 0.0,
+	1.0, 0.0, 0.0,
+	
 	];
 	
 	
@@ -167,6 +190,7 @@ function initBuffers() {
     6, 7, 3,
   ];
   VerticesBuffer = new Array();
+  ColorBuffer = new Array();
   // Now pass the list of vertices into WebGL to build the shape. We
   // do this by creating a Float32Array from the JavaScript array,
   // then use it to fill the current vertex buffer.
@@ -176,14 +200,16 @@ function initBuffers() {
 		gl.bindBuffer(gl.ARRAY_BUFFER, VerticesBuffer[i]);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices[i]), gl.STATIC_DRAW);
 		
-		
+		ColorBuffer.push(gl.createBuffer());
+		gl.bindBuffer(gl.ARRAY_BUFFER, ColorBuffer[i]);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorInformation[i]), gl.STATIC_DRAW);
 	}
 	
 	
 	
 	cubeVerticesBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(BoxVertices), gl.STATIC_DRAW);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(boxVertices), gl.STATIC_DRAW);
 
 	cubeVerticesColor = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesColor);
@@ -192,11 +218,14 @@ function initBuffers() {
 	//cubeVerticesIndexBuffer = gl.createBuffer();
 	//gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer);
 	//gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
-	
-	cubeVerticesIndexBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer);
+	cubeVerticesIndexBuffer = new Array();
+	cubeVerticesIndexBuffer.push(gl.createBuffer());
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer[0]);
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndicesTriangles), gl.STATIC_DRAW);
-
+	
+	cubeVerticesIndexBuffer.push(gl.createBuffer());
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer[1]);
+	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndicesLines), gl.STATIC_DRAW);
 }
 
 //
@@ -225,20 +254,28 @@ function drawScene() {
   // array, setting attributes, and pushing it to GL.
 
 	var RotationMatrixY = getRotationY(0.2);
-	console.log(RotationMatrixY.elements);
 	ViewMatrix = MultiplyMatrix(ViewMatrix, RotationMatrixY);
 	setMatrixUniforms();
 	
 	for(var i = 0; i < vertices.length; i++){
-		gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesColor);
+		gl.bindBuffer(gl.ARRAY_BUFFER, ColorBuffer[i]);
 		gl.vertexAttribPointer(vertexColorAttribute, 3, gl.FLOAT, false, 0, 0);
 	
 		gl.bindBuffer(gl.ARRAY_BUFFER, VerticesBuffer[i]);
 		gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 	
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer);
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer[0]);
 		gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 	}
+	
+	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesColor);
+	gl.vertexAttribPointer(vertexColorAttribute, 3, gl.FLOAT, false, 0, 0);
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesBuffer);
+	gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer[1]);
+	gl.drawElements(gl.LINES, 24, gl.UNSIGNED_SHORT, 0);
 	
 	
   

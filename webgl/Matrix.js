@@ -25,7 +25,6 @@ function MultiplyMatrix(A, B){
 		0,0,0,0,
 		0,0,0,0,
 	];
-	console.log(m1[0]);
     temp[0] = m1[0]*m2[0] + m1[1]*m2[4] + m1[2]*m2[8] + m1[3]*m2[12];
     temp[1] = m1[0]*m2[1] + m1[1]*m2[5] + m1[2]*m2[9] + m1[3]*m2[13];
     temp[2] = m1[0]*m2[2] + m1[1]*m2[6] + m1[2]*m2[10] + m1[3]*m2[14];
@@ -60,7 +59,6 @@ function getRotationY(angle)
 {
 	
     anglex = Math.PI/180 * angle;   /* Conversion angle from degree to radians */
-    console.log(anglex);
     return $M([[Math.cos(anglex),  0.0, Math.sin(anglex), 0.0],
 			   [0.0, 1, 0.0, 0.0],
 			   [-Math.sin(anglex), 0,  Math.cos(anglex), 0.0],
