@@ -56,13 +56,13 @@ function MultiplyMatrix(A, B){
 }
 	
 
-function getRotationX(angle)
+function getRotationY(angle)
 {
 	
     anglex = Math.PI/180 * angle;   /* Conversion angle from degree to radians */
     console.log(anglex);
-    return $M([[1.0,           0.0,          0.0, 0.0],
-			   [0.0,  Math.cos(anglex), Math.sin(anglex), 0.0],
-			   [0.0, -Math.sin(anglex), Math.cos(anglex), 0.0],
+    return $M([[Math.cos(anglex),  0.0, Math.sin(anglex), 0.0],
+			   [0.0, 1, 0.0, 0.0],
+			   [-Math.sin(anglex), 0,  Math.cos(anglex), 0.0],
 			   [0.0, 0.0, 0.0, 1.0]]);
 }
