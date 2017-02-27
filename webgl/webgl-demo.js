@@ -23,21 +23,32 @@ var vertexColorAttribute;
 var perspectiveMatrix;
 
 
-var move_camera = false;
-var camera_z = -20;
+var X = 0;
+var Y = 1;
+var Z = 2;
 
 
 var vertices;
 var boxVertices;
 
+var CAMERA_STANDARD_Z = -20;
+
+var move_camera = false;
+var camerapos = [0, 0, CAMERA_STANDARD_Z];
+
+var rotationEnabled = [false, false, false];
+var rotationCoefficient = [1, 1, 1];
+
 
 var colorInformation;
 
 function initMatrix(){
+	camerapos[Z] = CAMERA_STANDARD_Z;
+	rotationEnabled = [false,false,false];
 	ViewMatrix = Matrix.I(4);
-	ViewMatrix.elements[0][3] = 1.0;
-	ViewMatrix.elements[1][3] = 0.0;
-	ViewMatrix.elements[2][3] = camera_z;
+	ViewMatrix.elements[0][3] = camerapos[X];
+	ViewMatrix.elements[1][3] = camerapos[Y];
+	ViewMatrix.elements[2][3] = camerapos[Z];
 		
 	ModelMatrix = Matrix.I(4);
 	ModelMatrix.elements[0][0] = 1.0;
@@ -124,17 +135,6 @@ function initWebGL() {
 //
 function initBuffers() {
 
-
-  /*var BoxVertices = [
-     0,  0,  0, 
-     1,  0,  0,
-     1,  1,  0,
-     0,  1,  0,
-     0,  0, 1,
-     1,  0, 1,
-     1,  1, 1,
-     0,  1, 1,
-  ];*/
   
   colorInformation = new Array();
   for(var i = 0; i < vertices.length; i++){
@@ -228,6 +228,22 @@ function initBuffers() {
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndicesLines), gl.STATIC_DRAW);
 }
 
+function rotation(){
+	
+	if(rotationEnabled[0]){
+		var RotationMatrixX = getRotationX(0.2*rotationCoefficient[0]);
+		ViewMatrix = MultiplyMatrix(ViewMatrix, RotationMatrixX);
+	}
+	if(rotationEnabled[1]){
+		var RotationMatrixY = getRotationY(0.2*rotationCoefficient[1]);
+		ViewMatrix = MultiplyMatrix(ViewMatrix, RotationMatrixY);
+	}
+	if(rotationEnabled[2]){
+		var RotationMatrixZ = getRotationZ(0.2*rotationCoefficient[2]);
+		ViewMatrix = MultiplyMatrix(ViewMatrix, RotationMatrixZ);
+	}
+}
+
 //
 // drawScene
 //
@@ -252,9 +268,11 @@ function drawScene() {
 	
   // Draw the square by binding the array buffer to the square's vertices
   // array, setting attributes, and pushing it to GL.
-
-	var RotationMatrixY = getRotationY(0.2);
-	ViewMatrix = MultiplyMatrix(ViewMatrix, RotationMatrixY);
+		
+	ViewMatrix.elements[0][3] = camerapos[X];
+	ViewMatrix.elements[1][3] = camerapos[Y];
+	ViewMatrix.elements[2][3] = camerapos[Z];
+	rotation();
 	setMatrixUniforms();
 	
 	for(var i = 0; i < vertices.length; i++){
@@ -399,3 +417,37 @@ function setMatrixUniforms() {
   var viewUniform =  gl.getUniformLocation(shaderProgram, "ViewMatrix");
   gl.uniformMatrix4fv(viewUniform, false, new Float32Array(ViewMatrix.flatten()));
 }
+
+
+function KeyBoard(code){
+	switch(code){
+		case "X".charCodeAt(0): rotationEnabled[0] = !rotationEnabled[0]; break; 
+		case "Y".charCodeAt(0): rotationEnabled[1] = !rotationEnabled[1]; break;
+		case "Z".charCodeAt(0): rotationEnabled[2] = !rotationEnabled[2]; break;
+		case 187: //+ in CHROME
+		case 171: camerapos[Z]++; break; //+ in Firefox
+		case 189:
+		case 173: camerapos[Z]--; break; //-
+		
+		case 38: camerapos[Y]++; break; //KEYUP
+		case 40: camerapos[Y]--; break; //KEYDOWN
+		case 39: camerapos[X]--; break; //KEYLEFT
+		case 37: camerapos[X]++; break; //KEYRIGHT
+		case "R".charCodeAt(0): initMatrix(); break; //RESET
+		default: console.log("Error: code " + code + " not recognized ");
+	}
+}
+
+var description = ""+
+	"X -> Rotation around X axis</br>"+
+	"Y -> Rotation around Y axis</br>"+
+	"Z -> Rotaiton around Z axis</br>"+
+	"+ -> Zoom in</br>" +
+	"- -> Zoom out</br>"+
+	"up -> Move camera up</br>"+
+	"down -> Move camera down</br>"+
+	"right -> Move camera right</br>"+
+	"left -> Move camera left</br>"+
+	"R -> Reset</br>";
+	
+

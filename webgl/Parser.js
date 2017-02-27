@@ -92,7 +92,7 @@ function calculateVertices(BoxDimension, position, dimension){
 			x, 		y+dy,	z+dz,
 		
 	];
-	alert(BoxVertices);
+	//alert(BoxVertices);
 	start(BoxVertices, vertices);
 }
 

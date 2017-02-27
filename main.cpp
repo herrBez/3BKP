@@ -16,6 +16,9 @@
 #include "Instance3BKP.h"
 #include <assert.h>     /* assert */
 
+char FILENAME[128];
+char OUTPUTFILENAME[128];
+
 
 using namespace std;
 
@@ -593,6 +596,7 @@ Instance3BKP get_option(int argc,  char * argv[]){
 			 
 		}
     }
+    sprintf(FILENAME, "%s", argv[1]);
     Instance3BKP instance(argv[1], extended);
 	instance.print();
     return instance;
@@ -638,9 +642,12 @@ void output(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 		}
 	}
 	
-	ofstream outfile("output.txt");
+	
+	sprintf(OUTPUTFILENAME, "output_%s", FILENAME);
+	ofstream outfile(OUTPUTFILENAME);
 	if(!outfile.good()) {
-		throw std::runtime_error("Cannot open the file");
+		cerr << OUTPUTFILENAME << endl;
+		throw std::runtime_error("Cannot open the file ");
 	}
 	
 	outfile << "#Vengono inclusi solo gli oggetti messi nello zaino" << endl;

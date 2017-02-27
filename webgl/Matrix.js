@@ -55,6 +55,17 @@ function MultiplyMatrix(A, B){
 }
 	
 
+
+function getRotationX(angle)
+{
+	anglex = Math.PI/180 * angle;   /* Conversion angle from degree to radians */
+    return $M([[1.0, 0.0, 0.0, 0.0],
+			   [0.0, Math.cos(anglex), -Math.sin(anglex), 0.0],
+			   [0.0, Math.sin(anglex), Math.cos(anglex), 0.0],
+			   [0, 0,  0.0, 1.0],
+			   ]);
+}
+
 function getRotationY(angle)
 {
 	
@@ -62,5 +73,14 @@ function getRotationY(angle)
     return $M([[Math.cos(anglex),  0.0, Math.sin(anglex), 0.0],
 			   [0.0, 1, 0.0, 0.0],
 			   [-Math.sin(anglex), 0,  Math.cos(anglex), 0.0],
+			   [0.0, 0.0, 0.0, 1.0]]);
+}
+
+function getRotationZ(angle)
+{
+	anglex = Math.PI/180 * angle;   /* Conversion angle from degree to radians */
+    return $M([[Math.cos(anglex),  -Math.sin(anglex), 0.0, 0.0],
+			   [Math.sin(anglex), Math.cos(anglex), 0.0, 0.0],
+			   [0, 0,  1.0, 0.0],
 			   [0.0, 0.0, 0.0, 1.0]]);
 }
