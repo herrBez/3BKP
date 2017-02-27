@@ -1,0 +1,15 @@
+#Vengono inclusi solo gli oggetti messi nello zaino
+#Dimensione Zaino 986 486 422
+#La prima riga indica le dimensioni dello zaino
+#Formato: i pos_i_x pos_i_y pos_i_z rot_dim_i_x rot_dim_i_y rot_dim_i_z
+986 486 422
+0	0 127 0 	98 231 111 
+1	98 0 0 	19 248 348 
+2	0 358 0 	128 128 130 
+3	128 0 0 	130 128 128 
+4	663 0 0 	205 62 54 
+5	258 385 0 	98 101 256 
+6	491 0 0 	45 27 172 
+7	656 62 0 	212 334 351 
+8	258 62 0 	610 318 364 
+9	868 0 0 	118 230 215 

@@ -31,10 +31,9 @@ var Z = 2;
 var vertices;
 var boxVertices;
 
-var CAMERA_STANDARD_Z = -20;
 
 var move_camera = false;
-var camerapos = [0, 0, CAMERA_STANDARD_Z];
+var camerapos = [0, 0, 0];
 
 var rotationEnabled = [false, false, false];
 var rotationCoefficient = [1, 1, 1];
@@ -42,8 +41,24 @@ var rotationCoefficient = [1, 1, 1];
 
 var colorInformation;
 
+var representAsTriangle = true;
+
+
+var zoom_step = [0, 0, 0];
+
+
 function initMatrix(){
-	camerapos[Z] = CAMERA_STANDARD_Z;
+	
+	camerapos[X] = (boxVertices[3*7 + X] - boxVertices[3*6 + X])/2;
+	camerapos[Y] = (-boxVertices[3*7 + Y] + boxVertices[3*4 + Y])/2;
+	camerapos[Z] = -5*boxVertices[3*4 + Z];
+
+	
+	zoom_step[X] = boxVertices[3*6 + X] / 20;
+	zoom_step[Y] = boxVertices[3*6 + Y] / 20;
+	zoom_step[Z] = boxVertices[3*6 + Z] / 20;
+	
+	
 	rotationEnabled = [false,false,false];
 	ViewMatrix = Matrix.I(4);
 	ViewMatrix.elements[0][3] = camerapos[X];
@@ -259,7 +274,7 @@ function drawScene() {
   // ratio of 640:480, and we only want to see objects between 0.1 units
   // and 100 units away from the camera.
 
-  perspectiveMatrix = makePerspective(45, 640.0/480.0, 0.1, 100.0);
+  perspectiveMatrix = makePerspective(45, 640.0/480.0, 0.1, boxVertices[3*6 + Z]*20);
 
   // Set the drawing position to the "identity" point, which is
   // the center of the scene.
@@ -281,9 +296,15 @@ function drawScene() {
 	
 		gl.bindBuffer(gl.ARRAY_BUFFER, VerticesBuffer[i]);
 		gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
-	
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer[0]);
-		gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+		
+		if(representAsTriangle){
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer[0]);
+			gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+		}
+		else{	
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer[1]);
+			gl.drawElements(gl.LINES, 24, gl.UNSIGNED_SHORT, 0);
+		}
 	}
 	
 	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesColor);
@@ -421,18 +442,26 @@ function setMatrixUniforms() {
 
 function KeyBoard(code){
 	switch(code){
+		case "I".charCodeAt(0): rotationCoefficient[X] = -1*rotationCoefficient[X];
+								rotationCoefficient[Y] = -1*rotationCoefficient[Y];
+								rotationCoefficient[Z] = -1*rotationCoefficient[Z]; break;
 		case "X".charCodeAt(0): rotationEnabled[0] = !rotationEnabled[0]; break; 
 		case "Y".charCodeAt(0): rotationEnabled[1] = !rotationEnabled[1]; break;
 		case "Z".charCodeAt(0): rotationEnabled[2] = !rotationEnabled[2]; break;
 		case 187: //+ in CHROME
-		case 171: camerapos[Z]++; break; //+ in Firefox
-		case 189:
-		case 173: camerapos[Z]--; break; //-
+		case 171: camerapos[Z]+=zoom_step[Z]; break; //+ in Firefox
+		case 189: 
+		case 173: camerapos[Z]-=zoom_step[Z]; break; //-
 		
-		case 38: camerapos[Y]++; break; //KEYUP
-		case 40: camerapos[Y]--; break; //KEYDOWN
-		case 39: camerapos[X]--; break; //KEYLEFT
-		case 37: camerapos[X]++; break; //KEYRIGHT
+		case 38: camerapos[Y]+= zoom_step[Y]; break; //KEYUP
+		case 40: camerapos[Y]-= zoom_step[Y]; break; //KEYDOWN
+		case 39: camerapos[X]-= zoom_step[X]; break; //KEYLEFT
+		case 37: camerapos[X]+= zoom_step[X]; break; //KEYRIGHT
+		case "T".charCodeAt(0): representAsTriangle = !representAsTriangle; break;
+		case "B".charCodeAt(0):
+			var rotation = getRotationY(180);
+			ViewMatrix = MultiplyMatrix(ViewMatrix, rotation);
+			break;
 		case "R".charCodeAt(0): initMatrix(); break; //RESET
 		default: console.log("Error: code " + code + " not recognized ");
 	}
@@ -449,5 +478,7 @@ var description = ""+
 	"right -> Move camera right</br>"+
 	"left -> Move camera left</br>"+
 	"R -> Reset</br>";
+	"T -> draw parallelepipedes as lines and not solid or vice versa <br>";
+	"I -> Invert the sense of rotation<br>";
 	
 

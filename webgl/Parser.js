@@ -29,7 +29,7 @@ function processText(text){
 		}
 	}
 	console.log(lines.length);
-	console.log("There are " + counter + " objects in the knapsack");
+	console.log("There are " + (counter-1) + " objects in the knapsack");
 	
 	var position = new Array();
 	var dimension = new Array();
