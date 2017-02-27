@@ -31,3 +31,5 @@ main
 
 #REMOVE zip files
 *.zip
+#REMOVE HIDDEN DIRECTORY
+.fr*
