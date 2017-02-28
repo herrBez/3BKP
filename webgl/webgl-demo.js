@@ -10,7 +10,7 @@ var cubeVerticesColor;
 var VerticesBuffer;
 var ColorBuffer;
 
-
+var CenterOfMassBuffer;
 
 var ModelMatrix;
 var ViewMatrix;
@@ -22,6 +22,7 @@ var vertexColorAttribute;
 
 var perspectiveMatrix;
 
+var centerOfMass;
 
 var X = 0;
 var Y = 1;
@@ -49,6 +50,8 @@ var representAsTriangle;
 
 
 var zoom_step = [0, 0, 0];
+
+var enabledCenterOfMass = false;
 
 
 function initMatrix(){
@@ -83,6 +86,8 @@ function initAttributes(){
 	for(var i = 0; i < vertices.length; i++){
 		representAsTriangle[i] = true;
 	}
+	
+	
 }
 
 //
@@ -91,11 +96,12 @@ function initAttributes(){
 // Called when the canvas is created to get the ball rolling.
 // Figuratively, that is. There's nothing moving in this demo.
 //
-function start(_boxVertices, _itemIndices, _vertices) {
+function start(_boxVertices, _itemIndices, _vertices, _centerOfMass) {
   console.log("Start");
   boxVertices = _boxVertices;
   vertices = _vertices; 	
-  
+  centerOfMass = _centerOfMass;
+ 
   initAttributes();
   addSelector();
   canvas = document.getElementById("glcanvas");
@@ -234,6 +240,10 @@ function initBuffers() {
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorInformation[i]), gl.STATIC_DRAW);
 	}
 	
+	centerOfMassBuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, centerOfMassBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(centerOfMass), gl.STATIC_DRAW);
+	
 	
 	
 	cubeVerticesBuffer = gl.createBuffer();
@@ -319,7 +329,16 @@ function drawScene() {
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer[1]);
 			gl.drawElements(gl.LINES, 24, gl.UNSIGNED_SHORT, 0);
 		}
+		
+		if(enabledCenterOfMass){
+			gl.bindBuffer(gl.ARRAY_BUFFER, centerOfMassBuffer);
+			gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+			gl.drawArrays(gl.POINTS, i, 1);
+		}
 	}
+	
+	
+	
 	
 	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesColor);
 	gl.vertexAttribPointer(vertexColorAttribute, 3, gl.FLOAT, false, 0, 0);
@@ -329,6 +348,11 @@ function drawScene() {
 
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer[1]);
 	gl.drawElements(gl.LINES, 24, gl.UNSIGNED_SHORT, 0);  
+	
+	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesBuffer);
+	gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+	
+
 }
 
 //
@@ -478,6 +502,8 @@ function KeyBoard(code){
 		case "R".charCodeAt(0): initMatrix(); 
 								initAttributes(); 
 								break; //RESET
+		case "C".charCodeAt(0): enabledCenterOfMass = !enabledCenterOfMass; 
+								break;
 		default: console.log("Error: code " + code + " not recognized ");
 	}
 }

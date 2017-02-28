@@ -425,7 +425,7 @@ void setupLPBalancingConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVa
 		int index = 0;
 		for(int i = 0; i < N; i++){
 			idVar[index] = map.Chi[i][delta];
-			coeff[index] = -instance.mass[i];
+			coeff[index] = instance.mass[i];
 			index++;
 		} 
 		for(int i = 0; i < N; i++){
@@ -456,7 +456,7 @@ void setupLPBalancingConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVa
 		int index = 0;
 		for(int i = 0; i < N; i++){
 			idVar[index] = map.Chi[i][delta];
-			coeff[index] = -instance.mass[i];
+			coeff[index] = instance.mass[i];
 			index++;
 		} 
 		for(int i = 0; i < N; i++){

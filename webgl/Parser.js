@@ -50,6 +50,7 @@ function processText(text){
 
 function calculateVertices(BoxDimension, itemIndices, position, dimension){
 	var vertices = new Array();
+	var centerOfMass = new Array();
 	for(var i = 0; i < position.length; i++){
 		var x = position[i][0];
 		var y = position[i][1];
@@ -72,6 +73,9 @@ function calculateVertices(BoxDimension, itemIndices, position, dimension){
 			x+dx,	y+dy, 	z+dz,
 			x, 		y+dy,	z+dz,
 		]);
+		centerOfMass.push(
+			x+(dx/2.0), y+(dy/2.0), z+(dz/2.0)	
+		);
 	}
 	var x = 0;
 	var y = 0;
@@ -93,7 +97,8 @@ function calculateVertices(BoxDimension, itemIndices, position, dimension){
 			x, 		y+dy,	z+dz,
 		
 	];
+	
 	//alert(BoxVertices);
-	start(BoxVertices, itemIndices, vertices);
+	start(BoxVertices, itemIndices, vertices, centerOfMass);
 }
 

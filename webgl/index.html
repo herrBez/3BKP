@@ -16,6 +16,7 @@
 		varying lowp vec4 vColor;
 		void main(void) {
 			gl_FragColor = vColor;
+			
 		}
     </script>
 
@@ -35,7 +36,7 @@
       void main(void) {
         gl_Position = uPMatrix * ViewMatrix * ModelMatrix * vec4(aVertexPosition, 1.0);
 		vColor = aColor;
-		
+		gl_PointSize = 10.0;
       }
     </script>
     
