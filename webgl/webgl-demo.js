@@ -328,12 +328,7 @@ function drawScene() {
 	gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer[1]);
-	gl.drawElements(gl.LINES, 24, gl.UNSIGNED_SHORT, 0);
-	
-	
-  
- 
-  
+	gl.drawElements(gl.LINES, 24, gl.UNSIGNED_SHORT, 0);  
 }
 
 //
@@ -480,7 +475,9 @@ function KeyBoard(code){
 			var rotation = getRotationY(180);
 			ViewMatrix = MultiplyMatrix(ViewMatrix, rotation);
 			break;
-		case "R".charCodeAt(0): initMatrix(); break; //RESET
+		case "R".charCodeAt(0): initMatrix(); 
+								initAttributes(); 
+								break; //RESET
 		default: console.log("Error: code " + code + " not recognized ");
 	}
 }
@@ -508,7 +505,8 @@ function addSelector(){
 		s += "<option value=\"" + i + '\">' + i + '</option>';
 	}
 	s += "</select>";
-	selectDIV.innerHTML = selectDIV.innerHTML + s;
+	
+	selectDIV.innerHTML = s;
 	var selectField = document.getElementById("selectId");
 	
 	selectField.addEventListener("change", function() {

@@ -106,8 +106,7 @@ class Instance3BKP {
 					for(auto &j : i){
 						j.resize(3);
 					}
-				}
-				calculateGamma();		
+				}	
 			}
 			
 			infile.close();

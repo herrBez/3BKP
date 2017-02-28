@@ -302,7 +302,9 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 				coeff[index] = 1.0;
 				index++;
 				for(int r = 0; r < R; r++){
-					idVar[index] = map.Rho[i][r];
+					/* Possible typo in the paper */
+					//idVar[index] = map.Rho[i][r];
+					idVar[index] = map.Rho[j][r];
 					coeff[index] = instance.s[j][instance.R[r][delta]];
 					index++;
 				}
@@ -429,7 +431,7 @@ void setupLPBalancingConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVa
 		for(int i = 0; i < N; i++){
 			for(int r = 0; r < 6; r++){
 				idVar[index] = map.Rho[i][r];
-				coeff[index] = instance.mass[i]*instance.gamma[i][r][delta];
+				coeff[index] = instance.mass[i]*(instance.s[i][instance.R[r][delta]]/2.0);
 				index++;
 			}
 		}
@@ -460,7 +462,7 @@ void setupLPBalancingConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVa
 		for(int i = 0; i < N; i++){
 			for(int r = 0; r < 6; r++){
 				idVar[index] = map.Rho[i][r];
-				coeff[index] = instance.mass[i]*instance.gamma[i][r][delta];
+				coeff[index] = instance.mass[i]*(instance.s[i][instance.R[r][delta]]/2.0);
 				index++;
 			}
 		}
