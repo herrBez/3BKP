@@ -33,3 +33,7 @@ main
 *.zip
 #REMOVE HIDDEN DIRECTORY
 .fr*
+
+
+Model.lp
+Model.sol
