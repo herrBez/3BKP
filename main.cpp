@@ -68,8 +68,6 @@ struct mapVar {
 		for(auto &i : Chi){
 			i.resize(3);
 		}
-		
-		
 	}
 };
 
@@ -689,17 +687,11 @@ void output(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
  */
 int main (int argc, char *argv[])
 {
-	
-	
-	
-	bool exc_arised = false;
-	
+	bool exc_arised = false;	
 	try { 
-		
 
 		Instance3BKP instance = get_option(argc, argv);	
-		
-		
+				
 		DECL_ENV( env );
 		DECL_PROB( env, lp );
 		mapVar map = setupLP(env, lp, instance);

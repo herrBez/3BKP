@@ -1,3 +1,7 @@
+/**
+ * author: Mirko Bez
+ * 
+ */
 var canvas;
 var gl;
 var squareVerticesBuffer;

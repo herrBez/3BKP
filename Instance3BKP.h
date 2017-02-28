@@ -1,47 +1,50 @@
+/**
+ * @author Mirko Bez
+ * @file main.cpp
+ * @brief help class containing the 3BKP instance. It is accountable
+ * for the parsing of the input file
+ */
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <numeric>
 #include <stdexcept>
 
-
 class Instance3BKP {
 	private : 
-	Instance3BKP() : s(0, std::vector<double>(0)),mass(0) , profit(0), gamma(0, std::vector<std::vector<double>>(0, std::vector<double>(0))) { }
-	
-	/**
-	 * TODO
-	 * Computes gamma the center of mass with respect to bottom-left-back point of the item.
-	 * It is called by the constructor
-	 */
-	void calculateGamma(){
-		
-	}
-	
+	Instance3BKP() : s(0, std::vector<double>(0)),mass(0) , profit(0) { }
 	
 	public:
-		/* Size of the 3D Box */
+		/** Size of the 3D Box */
 		double S[3];
-		double W, D, H;
+		/** Alias for S[0] */
+		double W;
+		/** Alias for S[1] */
+		double D;
+		/** Alias for S[2] */
+		double H;
 		
-		//Used only if the center of mass constraints are enabled
+		/** Used only if the stability constraint are considered */
 		double L[3];
+		/** Used only if the stability constraint are considered */
 		double U[3];
 		
-		//True if centroid are considered, False othw.
+		/** True if centroid are considered, False otherwise */
 		bool extended;
 		
-		
+		/** vector containing the three dimension of the items */
 		std::vector< std::vector< double > > s;
 		
+		/** vector containing the masses of the items */
 		std::vector< double > mass;
+		
+		/** vector containing the profits of the items */
 		std::vector< double > profit;
 		
-		std::vector< std::vector< std::vector< double > > > gamma;
 		
 		
 		
-		/* Set of rotation of the object. i.e. permutation of 1,2,3 */
+		/** Set of rotation of the object. i.e. permutation of 1,2,3 */
 		double R [6][3] = {
 			{0,1,2},
 			{0,2,1},
@@ -70,7 +73,8 @@ class Instance3BKP {
 		/**
 		 * Constructor
 		 * @param filename name of the file to parse
-		 * 
+		 * @param _extended true if the model is extended with 
+		 * stability constraint, false otherwise
 		 */
 		Instance3BKP(const char * filename, bool _extended){
 			extended = _extended;
@@ -92,21 +96,10 @@ class Instance3BKP {
 			for(int i = 0; i < N; i++){
 				infile >> s[i][0] >> s[i][1] >> s[i][2] >> mass[i] >> profit[i];
 			}
-			
-			
-			
-			
+
 			if(extended){
 				infile >> L[0] >> L[1] >> L[2];
-				infile >> U[0] >> U[1] >> U[2];
-				
-				gamma.resize(N);
-				for(auto &i : gamma) {
-					i.resize(6);
-					for(auto &j : i){
-						j.resize(3);
-					}
-				}	
+				infile >> U[0] >> U[1] >> U[2];			
 			}
 			
 			infile.close();
@@ -121,7 +114,6 @@ class Instance3BKP {
 				std::cout << s[i][0] << " " << s[i][1] << " " << s[i][2] << " " << mass[i] << " " << profit[i] << std::endl;
 			}
 		}
-	
 
 
 };
