@@ -44,6 +44,7 @@
   </head>
 	
   <body>
+	  <h1>3D 3BKP Plotter</h1>
     <input type="file" id="files" name="files[]" multiple />
     <canvas id="glcanvas" width="640" height="480">
       Your browser doesn't appear to support the HTML5 <code>&lt;canvas&gt;</code> element.
@@ -51,6 +52,7 @@
     <div id="KeyBoardDescription">
     
     </div>
+    <div id="Select"></div>
     <script>
 	    document.getElementById('files').addEventListener('change', handleFileSelect, false);
 	    var descriptionDIV = document.getElementById('KeyBoardDescription');
@@ -59,6 +61,8 @@
 			var code = e.keyCode ? e.keyCode : e.which;
 			KeyBoard(code);
 		};
+		
+		
 		
 	</script>
   </body>

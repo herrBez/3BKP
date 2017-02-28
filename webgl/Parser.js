@@ -33,6 +33,7 @@ function processText(text){
 	
 	var position = new Array();
 	var dimension = new Array();
+	var itemIndices = new Array();
 	
 	var token = lines[0].split(/\s+/);
 	var BoxDimension = [parseFloat(token[0]), parseFloat(token[1]), parseFloat(token[2])];
@@ -40,14 +41,14 @@ function processText(text){
 	for(var i =1; i < lines.length; i++){
 		console.log(lines[i]);
 		var token = lines[i].split(/\s+/);
-		var index = parseInt(token[0]);
+		itemIndices.push(parseInt(token[0]));
 		position.push([parseFloat(token[1]), parseFloat(token[2]), parseFloat(token[3])]);
 		dimension.push([parseFloat(token[4]), parseFloat(token[5]), parseFloat(token[6])]);
 	}
-	calculateVertices(BoxDimension, position, dimension);
+	calculateVertices(BoxDimension, itemIndices, position, dimension);
 }
 
-function calculateVertices(BoxDimension, position, dimension){
+function calculateVertices(BoxDimension, itemIndices, position, dimension){
 	var vertices = new Array();
 	for(var i = 0; i < position.length; i++){
 		var x = position[i][0];
@@ -93,6 +94,6 @@ function calculateVertices(BoxDimension, position, dimension){
 		
 	];
 	//alert(BoxVertices);
-	start(BoxVertices, vertices);
+	start(BoxVertices, itemIndices, vertices);
 }
 

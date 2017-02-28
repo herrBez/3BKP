@@ -27,6 +27,10 @@ var X = 0;
 var Y = 1;
 var Z = 2;
 
+var LINES = 0;
+var TRIANGLE = 1;
+
+
 
 var vertices;
 var boxVertices;
@@ -41,7 +45,7 @@ var rotationCoefficient = [1, 1, 1];
 
 var colorInformation;
 
-var representAsTriangle = true;
+var representAsTriangle;
 
 
 var zoom_step = [0, 0, 0];
@@ -74,17 +78,26 @@ function initMatrix(){
 	ModelMatrix.elements[2][3] = 0.0;
 }
 
+function initAttributes(){
+	representAsTriangle = new Array();
+	for(var i = 0; i < vertices.length; i++){
+		representAsTriangle[i] = true;
+	}
+}
+
 //
 // start
 //
 // Called when the canvas is created to get the ball rolling.
 // Figuratively, that is. There's nothing moving in this demo.
 //
-function start(_boxVertices, _vertices) {
+function start(_boxVertices, _itemIndices, _vertices) {
   console.log("Start");
   boxVertices = _boxVertices;
   vertices = _vertices; 	
-	
+  
+  initAttributes();
+  addSelector();
   canvas = document.getElementById("glcanvas");
   
   canvas.addEventListener('click', function(evt){
@@ -152,6 +165,7 @@ function initBuffers() {
 
   
   colorInformation = new Array();
+  /* Assign random colors to the different polygons */
   for(var i = 0; i < vertices.length; i++){
 	 var r = Math.random();
 	 var g = Math.random();
@@ -245,16 +259,16 @@ function initBuffers() {
 
 function rotation(){
 	
-	if(rotationEnabled[0]){
-		var RotationMatrixX = getRotationX(0.2*rotationCoefficient[0]);
+	if(rotationEnabled[X]){
+		var RotationMatrixX = getRotationX(0.2*rotationCoefficient[X]);
 		ViewMatrix = MultiplyMatrix(ViewMatrix, RotationMatrixX);
 	}
-	if(rotationEnabled[1]){
-		var RotationMatrixY = getRotationY(0.2*rotationCoefficient[1]);
+	if(rotationEnabled[Y]){
+		var RotationMatrixY = getRotationY(0.2*rotationCoefficient[Y]);
 		ViewMatrix = MultiplyMatrix(ViewMatrix, RotationMatrixY);
 	}
-	if(rotationEnabled[2]){
-		var RotationMatrixZ = getRotationZ(0.2*rotationCoefficient[2]);
+	if(rotationEnabled[Z]){
+		var RotationMatrixZ = getRotationZ(0.2*rotationCoefficient[Z]);
 		ViewMatrix = MultiplyMatrix(ViewMatrix, RotationMatrixZ);
 	}
 }
@@ -297,7 +311,7 @@ function drawScene() {
 		gl.bindBuffer(gl.ARRAY_BUFFER, VerticesBuffer[i]);
 		gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 		
-		if(representAsTriangle){
+		if(representAsTriangle[i]){
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer[0]);
 			gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 		}
@@ -457,7 +471,11 @@ function KeyBoard(code){
 		case 40: camerapos[Y]-= zoom_step[Y]; break; //KEYDOWN
 		case 39: camerapos[X]-= zoom_step[X]; break; //KEYLEFT
 		case 37: camerapos[X]+= zoom_step[X]; break; //KEYRIGHT
-		case "T".charCodeAt(0): representAsTriangle = !representAsTriangle; break;
+		case "T".charCodeAt(0): 
+			for(var i = 0; i < vertices.length; i++){
+				representAsTriangle[i] = !representAsTriangle[i]; 
+			}
+			break;
 		case "B".charCodeAt(0):
 			var rotation = getRotationY(180);
 			ViewMatrix = MultiplyMatrix(ViewMatrix, rotation);
@@ -477,8 +495,26 @@ var description = ""+
 	"down -> Move camera down</br>"+
 	"right -> Move camera right</br>"+
 	"left -> Move camera left</br>"+
-	"R -> Reset</br>";
-	"T -> draw parallelepipedes as lines and not solid or vice versa <br>";
-	"I -> Invert the sense of rotation<br>";
+	"R -> Reset</br>" + 
+	"T -> draw parallelepipedes as lines and not solid or vice versa <br>" + 
+	"I -> Invert the sense of rotation<br>" +
+	"B -> 180 degree rotation around Y axis";
 	
+function addSelector(){
+	var selectDIV = document.getElementById("Select");
+		
+	var s = "<select id=\"selectId\">";
+	for(var i = 0; i < vertices.length; i++){
+		s += "<option value=\"" + i + '\">' + i + '</option>';
+	}
+	s += "</select>";
+	selectDIV.innerHTML = selectDIV.innerHTML + s;
+	var selectField = document.getElementById("selectId");
+	
+	selectField.addEventListener("change", function() {
+		var i = parseInt(selectField.value);
+		representAsTriangle[i] = !representAsTriangle[i];
+   
+});
 
+}
