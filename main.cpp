@@ -711,7 +711,7 @@ int main (int argc, char *argv[])
 		CPXfreeprob(env, &lp);
 		CPXcloseCPLEX(&env);
 	} catch (exception& e){
-		cout << ">>Exception: " << e.what() << endl;
+		cout << ">>Exception in processing " << argv[1] << ": " << e.what() << endl;
 		exc_arised = true;
 	}
 	return exc_arised?EXIT_FAILURE:EXIT_SUCCESS;

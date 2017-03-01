@@ -117,10 +117,17 @@ class Instance3BKP {
 				std::getline(infile, line);
 				ss.clear();
 				ss.str(line);
+				if(line.size() == 0){
+					throw std::runtime_error("The given file does not contain information about lower bounds.\n Please give an extended instance as input or don't use option -e");
+				}
+				std::cout << line.size() << std::endl;
 				ss >> L[0] >> L[1] >> L[2];
 				std::getline(infile, line);
 				ss.clear();
 				ss.str(line);
+				if(line.size() == 0){
+					throw std::runtime_error("The given file does not contain information about upper bounds.\nPlease give an extended instance as input or don't use option -e");
+				}
 				ss >> U[0] >> U[1] >> U[2];			
 			}
 			
