@@ -11,6 +11,6 @@ done
 
 for f in Instance/*.dat
 do 
-	echo "Processing" $f
+	echo "Processing extended version" $f
 	./main $f -q -e
 done

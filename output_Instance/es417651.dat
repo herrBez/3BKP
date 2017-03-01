@@ -2,7 +2,6 @@
 #Dimensione Zaino 612 492 384
 #La prima riga indica le dimensioni dello zaino
 #Formato: i pos_i_x pos_i_y pos_i_z rot_dim_i_x rot_dim_i_y rot_dim_i_z
-#Le ultime due righe contengono i valori dei lower bounds ed upper bounds
 612 492 384
 0	0 0 0 	65 65 116 
 1	0 0 116 	70 164 95 

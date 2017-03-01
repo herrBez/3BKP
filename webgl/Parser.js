@@ -50,7 +50,7 @@ function processText(text){
 	var BoxDimension = [parseFloat(token[0]), parseFloat(token[1]), parseFloat(token[2])];
 	
 	for(var i =1; i < lines.length; i++){
-		console.log(lines[i]);
+		console.log("line" + lines[i]);
 		var token = lines[i].split(/\s+/);
 		itemIndices.push(parseInt(token[0]));
 		position.push([parseFloat(token[1]), parseFloat(token[2]), parseFloat(token[3])]);
@@ -84,11 +84,12 @@ function calculateVertices(BoxDimension, itemIndices, position, dimension, L, U)
 			x+dx,	y+dy, 	z+dz,
 			x, 		y+dy,	z+dz,
 		]);
+		
 		centerOfMass.push(
 			[x+(dx/2.0), y+(dy/2.0), z+(dz/2.0)]
 		);
 	}
-	alert(vertices.length + " " +centerOfMass.length);
+	
 	var x = 0;
 	var y = 0;
 	var z = 0;
@@ -121,12 +122,11 @@ function calculateVertices(BoxDimension, itemIndices, position, dimension, L, U)
 			L[0], L[1], U[2],
 			U[0], L[1], U[2],
 			U[0], U[1], U[2],
-			L[0], U[1], U[2],
-			
+			L[0], U[1], U[2],	
 		];
 	}
 	
-	//alert(BoxVertices);
+	
 	start(BoxVertices, itemIndices, vertices, centerOfMass, innerBox);
 }
 

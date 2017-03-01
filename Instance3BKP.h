@@ -56,6 +56,18 @@ class Instance3BKP {
 			{2,1,0},
 		};
 		
+		
+		void check(){
+			for(int i = 0; i < 3; i++){
+				if(U[i] == L[i]){
+					std::cerr << "Warning upper and lower bound corresponds in dimension " + i;
+				}
+				if(U[i] < L[i]){
+					throw std::runtime_error("Lower bounds are bigger than upper bounds. The Region is empty");
+				}
+			}
+		}
+		
 	public:
 		/**
 		 * @return the volume of the box
@@ -129,6 +141,7 @@ class Instance3BKP {
 					throw std::runtime_error("The given file does not contain information about upper bounds.\nPlease give an extended instance as input or don't use option -e");
 				}
 				ss >> U[0] >> U[1] >> U[2];			
+				check();
 			}
 			
 			infile.close();
