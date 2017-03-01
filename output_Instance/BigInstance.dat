@@ -2,14 +2,17 @@
 #Dimensione Zaino 5 5 5
 #La prima riga indica le dimensioni dello zaino
 #Formato: i pos_i_x pos_i_y pos_i_z rot_dim_i_x rot_dim_i_y rot_dim_i_z
+#Le ultime due righe contengono i valori dei lower bounds ed upper bounds
 5 5 5
-0	0 0 0 	2 2 2 
-1	0 0 2 	2 2 2 
-2	2 3 3 	2 2 2 
-3	3 3 1 	2 2 2 
-4	4 2 0 	1 1 1 
-5	2 3 2 	1 1 1 
-6	2 0 2 	3 3 3 
-7	4 1 0 	1 1 1 
-8	3 2 0 	1 1 1 
-9	2 0 1 	1 1 1 
+0	2 2 0 	2 2 2 
+1	3 0 3 	2 2 2 
+2	0 0 3 	2 2 2 
+3	0 0 0 	2 2 2 
+4	4 4 1 	1 1 1 
+5	2 4 1 	1 1 1 
+6	0 2 2 	3 3 3 
+7	4 1 2 	1 1 1 
+8	4 0 0 	1 1 1 
+9	3 1 0 	1 1 1 
+L 2 2 2
+U 3 3 3

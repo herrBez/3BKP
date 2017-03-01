@@ -35,7 +35,7 @@ var Z = 2;
 var LINES = 0;
 var TRIANGLE = 1;
 
-
+var extended;
 
 var vertices;
 var boxVertices;
@@ -105,7 +105,11 @@ function start(_boxVertices, _itemIndices, _vertices, _centerOfMass, _innerBoxVe
   vertices = _vertices; 	
   centerOfMass = _centerOfMass;
   innerBoxVertices = _innerBoxVertices;
- 
+  if(innerBoxVertices.length == 0){
+	extended = false;
+  } else {
+	extended = true;
+  }
   initAttributes();
   addSelector();
   canvas = document.getElementById("glcanvas");
@@ -246,10 +250,12 @@ function initBuffers() {
 	gl.bindBuffer(gl.ARRAY_BUFFER, centerOfMassBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(centerOfMass), gl.STATIC_DRAW);
 	
-	innerBoxVerticesBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, innerBoxVerticesBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(innerBoxVertices), gl.STATIC_DRAW);
-	
+	if(extended){
+		
+		innerBoxVerticesBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, innerBoxVerticesBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(innerBoxVertices), gl.STATIC_DRAW);
+	}
 	cubeVerticesBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(boxVertices), gl.STATIC_DRAW);
@@ -321,27 +327,31 @@ function drawScene() {
 	for(var i = 0; i < vertices.length; i++){
 		gl.bindBuffer(gl.ARRAY_BUFFER, ColorBuffer[i]);
 		gl.vertexAttribPointer(vertexColorAttribute, 3, gl.FLOAT, false, 0, 0);
-	
-		gl.bindBuffer(gl.ARRAY_BUFFER, VerticesBuffer[i]);
-		gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+		if(!enabledCenterOfMass){
+			gl.bindBuffer(gl.ARRAY_BUFFER, VerticesBuffer[i]);
+			gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 		
-		if(representAsTriangle[i]){
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer[0]);
-			gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+			if(representAsTriangle[i]){
+				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer[0]);
+				gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+			}
+			else{	
+				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer[1]);
+				gl.drawElements(gl.LINES, 24, gl.UNSIGNED_SHORT, 0);
+			}
 		}
-		else{	
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer[1]);
-			gl.drawElements(gl.LINES, 24, gl.UNSIGNED_SHORT, 0);
-		}
-		
 		if(enabledCenterOfMass){
 			gl.bindBuffer(gl.ARRAY_BUFFER, centerOfMassBuffer);
 			gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 			gl.drawArrays(gl.POINTS, i, 1);
 		}
+		
 	}
 	
-	if(enabledCenterOfMass){
+	
+	//Draw inner box 
+	if(enabledCenterOfMass && extended){
+		
 		gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesColor);
 		gl.vertexAttribPointer(vertexColorAttribute, 3, gl.FLOAT, false, 0, 0);
 
@@ -534,7 +544,8 @@ var description = ""+
 	"R -> Reset</br>" + 
 	"T -> draw parallelepipedes as lines and not solid or vice versa <br>" + 
 	"I -> Invert the sense of rotation<br>" +
-	"B -> 180 degree rotation around Y axis";
+	"B -> 180 degree rotation around Y axis" + 
+	"C -> Show Center of Mass";
 	
 function addSelector(){
 	var selectDIV = document.getElementById("Select");

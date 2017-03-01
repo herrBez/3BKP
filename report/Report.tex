@@ -3,8 +3,9 @@
 \usepackage[utf8]{inputenc}
 \usepackage[italian]{babel}
 \begin{document}
+
 \section{Note}
-Il modello è stato implementato (per ora) tralasciando i vincoli del centro di massa.
+
 Nella prossima sezione segue una descrizione di come possano essere aggiunti.
 \paragraph{Formato di file}
 Il formato di input è il seguente:
@@ -59,8 +60,6 @@ Il formato di input è il seguente:
 \section{Per aggiungere i balancing constraint (14/15)}
 Per aggiungere i vincoli del centro di massa bisogna:
 \begin{itemize}
-	\item implementare il metodo \verb|calculateGamma| nella classe \verb|instance3BKP|.
-	Questo metodo dovrebbe calcolare i valori di $\gamma_{ir}^\delta$.
 	\item Aggiungere ai file delle istanze due righe contenenti $L^0, L^1, L^2$ e $U^0, U^1, U^2$
 	\item Usare l'opzione \verb|--extended| o per brevità \verb|-e|.
 \end{itemize}

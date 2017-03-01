@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/TeX Live for SUSE Linux) (format=pdflatex 2014.11.7)  27 FEB 2017 19:16
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/TeX Live for SUSE Linux) (format=pdflatex 2014.11.7)  1 MAR 2017 15:52
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -352,7 +352,7 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 Here is how much of TeX's memory you used:
  1921 strings out of 493315
  26574 string characters out of 6145893
- 117110 words of memory out of 5000000
+ 118110 words of memory out of 5000000
  5396 multiletter control sequences out of 15000+600000
  7748 words of font info for 28 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
@@ -366,7 +366,7 @@ s/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texmf/fonts/type1/public/amsfon
 ts/cm/cmssbx10.pfb></usr/share/texmf/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
 </usr/share/texmf/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texmf/fo
 nts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on Report.pdf (2 pages, 106632 bytes).
+Output written on Report.pdf (2 pages, 104448 bytes).
 PDF statistics:
  51 PDF objects out of 1000 (max. 8388607)
  36 compressed objects within 1 object stream
