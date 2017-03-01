@@ -174,7 +174,7 @@ function initWebGL() {
 // one object -- a simple two-dimensional square.
 //
 function initBuffers() {
-
+  alert("REINIT ALL");
   
   colorInformation = new Array();
   /* Assign random colors to the different polygons */
@@ -246,9 +246,13 @@ function initBuffers() {
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorInformation[i]), gl.STATIC_DRAW);
 	}
 	
-	centerOfMassBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, centerOfMassBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(centerOfMass), gl.STATIC_DRAW);
+	centerOfMassBuffer = new Array();
+	for(var i = 0; i < centerOfMass.length; i++){
+		centerOfMassBuffer.push(gl.createBuffer());
+		gl.bindBuffer(gl.ARRAY_BUFFER, centerOfMassBuffer[i]);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(centerOfMass[i]), gl.STATIC_DRAW);
+	} 
+	
 	
 	if(extended){
 		innerBoxVerticesBuffer = gl.createBuffer();
@@ -351,12 +355,14 @@ function drawScene() {
 				drawParallelepiped(VerticesBuffer[i], ColorBuffer[i], cubeVerticesIndexBuffer[1], gl.LINES, 24); 
 			}
 		}
-		if(enabledCenterOfMass){
-			drawArray(centerOfMassBuffer, ColorBuffer[i], gl.POINTS, i, 1);
-		}
+		
 		
 	}
-	
+	if(enabledCenterOfMass){
+		for(var i = 0; i < centerOfMass.length; i++){
+			drawArray(centerOfMassBuffer[i], ColorBuffer[i], gl.POINTS, 0, 1);
+ 		}
+	}
 	
 	//Draw inner box 
 	if(enabledCenterOfMass && extended){

@@ -643,7 +643,7 @@ void output(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	}
 	
 	
-	sprintf(OUTPUTFILENAME, "output_%s", FILENAME);
+	sprintf(OUTPUTFILENAME, "output%s_%s", extended?"_extended":"", FILENAME);
 	ofstream outfile(OUTPUTFILENAME);
 	if(!outfile.good()) {
 		cerr << OUTPUTFILENAME << endl;
@@ -714,6 +714,5 @@ int main (int argc, char *argv[])
 		cout << ">>Exception: " << e.what() << endl;
 		exc_arised = true;
 	}
-	
 	return exc_arised?EXIT_FAILURE:EXIT_SUCCESS;
 }

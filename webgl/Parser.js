@@ -85,9 +85,10 @@ function calculateVertices(BoxDimension, itemIndices, position, dimension, L, U)
 			x, 		y+dy,	z+dz,
 		]);
 		centerOfMass.push(
-			x+(dx/2.0), y+(dy/2.0), z+(dz/2.0)	
+			[x+(dx/2.0), y+(dy/2.0), z+(dz/2.0)]
 		);
 	}
+	alert(vertices.length + " " +centerOfMass.length);
 	var x = 0;
 	var y = 0;
 	var z = 0;
@@ -124,7 +125,6 @@ function calculateVertices(BoxDimension, itemIndices, position, dimension, L, U)
 			
 		];
 	}
-	alert(innerBox);
 	
 	//alert(BoxVertices);
 	start(BoxVertices, itemIndices, vertices, centerOfMass, innerBox);

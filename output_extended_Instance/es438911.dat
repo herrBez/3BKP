@@ -1,0 +1,24 @@
+#Vengono inclusi solo gli oggetti messi nello zaino
+#Dimensione Zaino 986 486 422
+#La prima riga indica le dimensioni dello zaino
+#Formato: i pos_i_x pos_i_y pos_i_z rot_dim_i_x rot_dim_i_y rot_dim_i_z
+#Le ultime due righe contengono i valori dei lower bounds ed upper bounds
+986 486 422
+0	0 396 0 	88 90 168 
+1	837 87 50 	67 399 301 
+2	0 44 362 	59 321 59 
+3	0 12 216 	34 75 144 
+4	0 87 0 	141 73 34 
+5	88 245 216 	139 126 146 
+6	340 0 0 	497 245 422 
+7	0 105 50 	270 128 311 
+8	441 371 52 	393 101 370 
+9	0 245 34 	441 151 153 
+10	441 245 0 	304 200 50 
+11	0 438 187 	170 48 208 
+12	59 44 362 	210 170 48 
+13	0 0 48 	205 44 168 
+14	0 233 192 	48 205 170 
+15	170 0 0 	170 208 48 
+L 100 100 100
+U 250 250 250
