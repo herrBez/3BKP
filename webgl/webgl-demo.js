@@ -39,9 +39,8 @@ var TRIANGLE = 1;
 
 var vertices;
 var boxVertices;
-
-
-var move_camera = false;
+var innerBoxVertices;
+var innerBoxVerticesBuffer;
 var camerapos = [0, 0, 0];
 
 var rotationEnabled = [false, false, false];
@@ -100,19 +99,18 @@ function initAttributes(){
 // Called when the canvas is created to get the ball rolling.
 // Figuratively, that is. There's nothing moving in this demo.
 //
-function start(_boxVertices, _itemIndices, _vertices, _centerOfMass) {
+function start(_boxVertices, _itemIndices, _vertices, _centerOfMass, _innerBoxVertices) {
   console.log("Start");
   boxVertices = _boxVertices;
   vertices = _vertices; 	
   centerOfMass = _centerOfMass;
+  innerBoxVertices = _innerBoxVertices;
  
   initAttributes();
   addSelector();
   canvas = document.getElementById("glcanvas");
   
-  canvas.addEventListener('click', function(evt){
-		move_camera = !move_camera;
-			},false);
+  canvas.addEventListener('click', function(evt){},false);
 
   initWebGL(canvas);      // Initialize the GL context
 
@@ -248,7 +246,9 @@ function initBuffers() {
 	gl.bindBuffer(gl.ARRAY_BUFFER, centerOfMassBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(centerOfMass), gl.STATIC_DRAW);
 	
-	
+	innerBoxVerticesBuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, innerBoxVerticesBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(innerBoxVertices), gl.STATIC_DRAW);
 	
 	cubeVerticesBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesBuffer);
@@ -341,7 +341,16 @@ function drawScene() {
 		}
 	}
 	
-	
+	if(enabledCenterOfMass){
+		gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesColor);
+		gl.vertexAttribPointer(vertexColorAttribute, 3, gl.FLOAT, false, 0, 0);
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, innerBoxVerticesBuffer);
+		gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer[1]);
+		gl.drawElements(gl.LINES, 24, gl.UNSIGNED_SHORT, 0);  
+	}
 	
 	
 	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesColor);

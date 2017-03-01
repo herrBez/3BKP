@@ -20,14 +20,25 @@ function processText(text){
 	var rawLines = text.split("\n");
 	var lines = new Array();
 	var counter = 0;
+	var L = [];
+	var U = [];
 	for(var i = 0; i < rawLines.length; i++){
 		if(rawLines[i].trim().length > 0){
-			if(rawLines[i].trim().charAt(0) != '#'){
+			var firstChar = rawLines[i].trim().charAt(0);
+			if(firstChar != '#' && firstChar != 'L' && firstChar != 'U'){
 				lines.push(rawLines[i].trim());
 				counter++;
+			} 
+			var token = rawLines[i].split(/\s+/);
+			if(firstChar == 'L'){
+				L = [parseFloat(token[1]), parseFloat(token[2]), parseFloat(token[3])];
+			}
+			if(firstChar == 'U'){
+				U = [parseFloat(token[1]), parseFloat(token[2]), parseFloat(token[3])];
 			}
 		}
 	}
+	
 	console.log(lines.length);
 	console.log("There are " + (counter-1) + " objects in the knapsack");
 	
@@ -45,10 +56,10 @@ function processText(text){
 		position.push([parseFloat(token[1]), parseFloat(token[2]), parseFloat(token[3])]);
 		dimension.push([parseFloat(token[4]), parseFloat(token[5]), parseFloat(token[6])]);
 	}
-	calculateVertices(BoxDimension, itemIndices, position, dimension);
+	calculateVertices(BoxDimension, itemIndices, position, dimension, L, U);
 }
 
-function calculateVertices(BoxDimension, itemIndices, position, dimension){
+function calculateVertices(BoxDimension, itemIndices, position, dimension, L, U){
 	var vertices = new Array();
 	var centerOfMass = new Array();
 	for(var i = 0; i < position.length; i++){
@@ -97,8 +108,25 @@ function calculateVertices(BoxDimension, itemIndices, position, dimension){
 			x, 		y+dy,	z+dz,
 		
 	];
+	var innerBox = new Array();
+	if(L.length == 3 && U.length == 3){
+		innerBox = [
+			//Back Face
+			L[0], L[1], L[2],
+			U[0], L[1], L[2],
+			U[0], U[1], L[2],
+			L[0], U[1], L[2],
+			//Front Face
+			L[0], L[1], U[2],
+			U[0], L[1], U[2],
+			U[0], U[1], U[2],
+			L[0], U[1], U[2],
+			
+		];
+	}
+	alert(innerBox);
 	
 	//alert(BoxVertices);
-	start(BoxVertices, itemIndices, vertices, centerOfMass);
+	start(BoxVertices, itemIndices, vertices, centerOfMass, innerBox);
 }
 

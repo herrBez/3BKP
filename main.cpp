@@ -654,6 +654,7 @@ void output(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	outfile << "#Dimensione Zaino " << instance.S[0] << " " << instance.S[1] <<" "<< instance.S[2] << endl; 
 	outfile << "#La prima riga indica le dimensioni dello zaino" << endl;
 	outfile << "#Formato: i pos_i_x pos_i_y pos_i_z rot_dim_i_x rot_dim_i_y rot_dim_i_z" << endl;
+	outfile << "#Le ultime due righe contengono i valori dei lower bounds ed upper bounds" << endl;
 	
 	outfile << instance.S[0] << " " << instance.S[1] << " " << instance.S[2] << endl;
 	for(int i = 0; i < N; i++){
@@ -673,6 +674,10 @@ void output(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 		
 		outfile << endl;
 		
+	}
+	if(extended){
+		outfile << "L " << instance.L[0] << " " << instance.L[1] << " " << instance.L[2] << endl;
+		outfile << "U " << instance.U[0] << " " << instance.U[1] << " " << instance.U[2] << endl;
 	}
 	outfile.close();
 }	
