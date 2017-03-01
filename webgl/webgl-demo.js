@@ -251,7 +251,6 @@ function initBuffers() {
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(centerOfMass), gl.STATIC_DRAW);
 	
 	if(extended){
-		
 		innerBoxVerticesBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, innerBoxVerticesBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(innerBoxVertices), gl.STATIC_DRAW);
@@ -264,9 +263,7 @@ function initBuffers() {
 	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesColor);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorBuffer), gl.STATIC_DRAW);
 
-	//cubeVerticesIndexBuffer = gl.createBuffer();
-	//gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer);
-	//gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
+	
 	cubeVerticesIndexBuffer = new Array();
 	cubeVerticesIndexBuffer.push(gl.createBuffer());
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer[0]);
@@ -291,6 +288,26 @@ function rotation(){
 		var RotationMatrixZ = getRotationZ(0.2*rotationCoefficient[Z]);
 		ViewMatrix = MultiplyMatrix(ViewMatrix, RotationMatrixZ);
 	}
+}
+
+
+function drawParallelepiped(vbo, cbo, ibo, mode, numberOfElements){
+	gl.bindBuffer(gl.ARRAY_BUFFER, cbo);
+	gl.vertexAttribPointer(vertexColorAttribute, 3, gl.FLOAT, false, 0, 0);
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+	gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
+	gl.drawElements(mode, numberOfElements, gl.UNSIGNED_SHORT, 0);  
+}
+
+function drawArray(vbo, cbo, mode, start_index, numberOfElements){
+	gl.bindBuffer(gl.ARRAY_BUFFER, cbo);
+	gl.vertexAttribPointer(vertexColorAttribute, 3, gl.FLOAT, false, 0, 0);
+	gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+	gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+	gl.drawArrays(mode, start_index, numberOfElements);
 }
 
 //
@@ -325,25 +342,17 @@ function drawScene() {
 	setMatrixUniforms();
 	
 	for(var i = 0; i < vertices.length; i++){
-		gl.bindBuffer(gl.ARRAY_BUFFER, ColorBuffer[i]);
-		gl.vertexAttribPointer(vertexColorAttribute, 3, gl.FLOAT, false, 0, 0);
-		if(!enabledCenterOfMass){
-			gl.bindBuffer(gl.ARRAY_BUFFER, VerticesBuffer[i]);
-			gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 		
+		if(!enabledCenterOfMass){
 			if(representAsTriangle[i]){
-				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer[0]);
-				gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+				drawParallelepiped(VerticesBuffer[i], ColorBuffer[i], cubeVerticesIndexBuffer[0], gl.TRIANGLES, 36); 
 			}
 			else{	
-				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer[1]);
-				gl.drawElements(gl.LINES, 24, gl.UNSIGNED_SHORT, 0);
+				drawParallelepiped(VerticesBuffer[i], ColorBuffer[i], cubeVerticesIndexBuffer[1], gl.LINES, 24); 
 			}
 		}
 		if(enabledCenterOfMass){
-			gl.bindBuffer(gl.ARRAY_BUFFER, centerOfMassBuffer);
-			gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
-			gl.drawArrays(gl.POINTS, i, 1);
+			drawArray(centerOfMassBuffer, ColorBuffer[i], gl.POINTS, i, 1);
 		}
 		
 	}
@@ -351,31 +360,10 @@ function drawScene() {
 	
 	//Draw inner box 
 	if(enabledCenterOfMass && extended){
-		
-		gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesColor);
-		gl.vertexAttribPointer(vertexColorAttribute, 3, gl.FLOAT, false, 0, 0);
-
-		gl.bindBuffer(gl.ARRAY_BUFFER, innerBoxVerticesBuffer);
-		gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
-
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer[1]);
-		gl.drawElements(gl.LINES, 24, gl.UNSIGNED_SHORT, 0);  
+		drawParallelepiped(innerBoxVerticesBuffer, cubeVerticesColor, cubeVerticesIndexBuffer[1], gl.LINES, 24);
 	}
 	
-	
-	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesColor);
-	gl.vertexAttribPointer(vertexColorAttribute, 3, gl.FLOAT, false, 0, 0);
-
-	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesBuffer);
-	gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
-
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer[1]);
-	gl.drawElements(gl.LINES, 24, gl.UNSIGNED_SHORT, 0);  
-	
-	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesBuffer);
-	gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
-	
-
+	drawParallelepiped(cubeVerticesBuffer, cubeVerticesColor, cubeVerticesIndexBuffer[1], gl.LINES, 24);
 }
 
 //

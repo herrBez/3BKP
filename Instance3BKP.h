@@ -9,6 +9,8 @@
 #include <vector>
 #include <numeric>
 #include <stdexcept>
+#include <sstream>      // std::stringstream
+#include <string>
 
 class Instance3BKP {
 	private : 
@@ -79,27 +81,47 @@ class Instance3BKP {
 		Instance3BKP(const char * filename, bool _extended){
 			extended = _extended;
 			std::ifstream infile(filename);
+			std::string line;
+			std::istringstream ss;
+			
 			if(!infile.good()) {
 				throw std::runtime_error("The given file does not exist");
 			}
-			infile >> S[0] >> S[1] >> S[2];
+			std::getline(infile, line);
+			
+			ss.str(line);
+			ss >> S[0] >> S[1] >> S[2];
 			W = S[0];
 			D = S[1];
 			H = S[2];
-			infile >> N;
+			
+			std::getline(infile, line);
+			ss.clear();
+			ss.str(line);
+			
+			ss >> N;
 			s.resize(N);
 			for(auto &i : s) i.resize(3);
-			
 			mass.resize(N);
 			profit.resize(N);
 			
 			for(int i = 0; i < N; i++){
-				infile >> s[i][0] >> s[i][1] >> s[i][2] >> mass[i] >> profit[i];
+				std::getline(infile, line);
+				ss.clear();
+				ss.str(line);
+				ss >> s[i][0] >> s[i][1] >> s[i][2] >> mass[i] >> profit[i];
+				
 			}
 
 			if(extended){
-				infile >> L[0] >> L[1] >> L[2];
-				infile >> U[0] >> U[1] >> U[2];			
+				std::getline(infile, line);
+				ss.clear();
+				ss.str(line);
+				ss >> L[0] >> L[1] >> L[2];
+				std::getline(infile, line);
+				ss.clear();
+				ss.str(line);
+				ss >> U[0] >> U[1] >> U[2];			
 			}
 			
 			infile.close();
@@ -112,6 +134,10 @@ class Instance3BKP {
 			std::cout << S[0] << " " << S[1] << " " << S[2] << std::endl;
 			for(int i = 0; i < N; i++){
 				std::cout << s[i][0] << " " << s[i][1] << " " << s[i][2] << " " << mass[i] << " " << profit[i] << std::endl;
+			}
+			if(extended){
+				std::cout << "L " << L[0] << " " << L[1] << " " << L[2] << std::endl;
+				std::cout << "U " << U[0] << " " << U[1] << " " << U[2] << std::endl;
 			}
 		}
 

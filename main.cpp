@@ -561,8 +561,8 @@ void print_help(char * argv[]){
 	cout << "Usage : " << argv[0] << " <instance.dat> " << " [OPT]... " << endl;
 	cout << endl;
 	cout << "-h, --help\t\t\tprint this message and exit" << endl;
-	cout << "-q, --quiet\t\t\tdo not write the solved problem in a file named /tmp/Model.sol" << endl;
-	cout << "-e, --extended\t\t\t use also the balancing constraint. (Yet is dummy because gammas are not computed)" << endl;
+	cout << "-q, --quiet\t\t\tdo not write the solved problem in a file named /tmp/Model.sol, Model.lp" << endl;
+	cout << "-e, --extended\t\t\t use also the balancing constraint." << endl;
 	cout << endl;
 }
 
