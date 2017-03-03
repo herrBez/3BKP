@@ -15,6 +15,15 @@
 #include <unistd.h>
 #include "Instance3BKP.h"
 #include <assert.h>     /* assert */
+#include <signal.h>
+#include <unistd.h>
+
+void my_handler(sig_t s){
+      printf("SIGINT\n");
+      exit(1);
+}
+
+
 
 char FILENAME[128];
 char OUTPUTFILENAME[128];
@@ -527,6 +536,14 @@ mapVar setupLP(CEnv env, Prob lp, Instance3BKP instance)
  */
 double solve( CEnv env, Prob lp, Instance3BKP instance) {
 	int N = instance.N;
+	
+	struct sigaction sigIntHandler;
+	sigIntHandler.sa_handler =(__sighandler_t) my_handler;
+	sigemptyset(&sigIntHandler.sa_mask);
+	sigIntHandler.sa_flags = 0;
+    sigaction(SIGINT, &sigIntHandler, NULL);
+	
+	
 	clock_t t1,t2;
     t1 = clock();
     struct timeval  tv1, tv2;
@@ -536,6 +553,8 @@ double solve( CEnv env, Prob lp, Instance3BKP instance) {
     gettimeofday(&tv2, NULL);
 	double objval = 0.0;
 	CHECKED_CPX_CALL( CPXgetobjval, env, lp, &objval );
+	
+
 	
 	double user_time = (double)(tv2.tv_sec+tv2.tv_usec*1e-6 - (tv1.tv_sec+tv1.tv_usec*1e-6));
 	double cpu_time = (double)(t2-t1) / CLOCKS_PER_SEC;
@@ -684,7 +703,7 @@ void output(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	outfile.close();
 	
 	double orig_obj = 0;
-	for(int i = 0; i < t.size(); i++){
+	for(uint i = 0; i < t.size(); i++){
 		if(t[i] > 0.9)
 			orig_obj += instance.profit[i];
 	}
