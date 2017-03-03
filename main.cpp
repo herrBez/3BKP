@@ -94,7 +94,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 	 for(int i = 0; i < N; i++){
 		for(int delta = 0; delta < 3; delta++){
 			char xtype = 'C';
-			double obj = 0.0;
+			double obj = -1.0;
 			double lb = 0.0;
 			double ub = CPX_INFBOUND;
 			snprintf(name, NAME_SIZE, "chi %d %d", i, delta);
@@ -111,7 +111,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 	 */ 
 	for(int j = 0; j < N; j++){
 			char xtype = 'B';
-			double obj = instance.profit[j];
+			double obj = instance.M * (instance.profit[j]/instance.pMin);
 			double lb = 0.0;
 			double ub = 1.0;
 			sprintf(name, "t_%d", j);
@@ -512,6 +512,7 @@ mapVar setupLP(CEnv env, Prob lp, Instance3BKP instance)
 		CHECKED_CPX_CALL( CPXwriteprob, env, lp, "Model.lp", NULL ); 
 	}
 	
+	
 	return map;
 }
 
@@ -681,6 +682,13 @@ void output(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 		outfile << "U " << instance.U[0] << " " << instance.U[1] << " " << instance.U[2] << endl;
 	}
 	outfile.close();
+	
+	double orig_obj = 0;
+	for(int i = 0; i < t.size(); i++){
+		if(t[i] > 0.9)
+			orig_obj += instance.profit[i];
+	}
+	cout << " The original objective function value is " << orig_obj << endl;
 }	
 
 

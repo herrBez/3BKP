@@ -16,7 +16,30 @@ class Instance3BKP {
 	private : 
 	Instance3BKP() : s(0, std::vector<double>(0)),mass(0) , profit(0) { }
 	
+	void findMinimumProfit(){
+		if(profit.size() < 1)
+			throw new std::runtime_error("You have to provide at least one element.");
+		pMin = profit[0];
+		for(uint i = 1; i  < profit.size(); i++){
+			if(profit[i] < pMin)
+				pMin = profit[i];
+		}
+	}
+	
+	void calculateM(){
+		double val = N * (S[0] + S[1] + S[2]);
+		for(int j = 0; j < N; j++){
+			for(int delta = 0; delta < 3; delta++){
+				val -= s[j][delta];
+			}
+		}
+		M = val;
+	}
+	
+	
+	
 	public:
+		double M;
 		/** Size of the 3D Box */
 		double S[3];
 		/** Alias for S[0] */
@@ -30,6 +53,9 @@ class Instance3BKP {
 		double L[3];
 		/** Used only if the stability constraint are considered */
 		double U[3];
+		
+		/** Minimum profit */
+		double pMin;
 		
 		/** True if centroid are considered, False otherwise */
 		bool extended;
@@ -82,7 +108,7 @@ class Instance3BKP {
 			return s[i][0]*s[i][1]*s[i][2];
 		}
 		
-		/* Number of items */
+		/** Number of given items, i.e. cardinality of J */
 		int N;
 		/**
 		 * Constructor
@@ -143,7 +169,9 @@ class Instance3BKP {
 				ss >> U[0] >> U[1] >> U[2];			
 				check();
 			}
-			
+			findMinimumProfit();
+			M = N * (S[0] + S[1] + S[2]);
+
 			infile.close();
 		}
 		
