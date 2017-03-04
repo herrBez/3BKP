@@ -628,7 +628,7 @@ Instance3BKP get_option(int argc,  char * argv[]){
 		}
     }
     sprintf(FILENAME, "%s", argv[1]);
-    Instance3BKP instance(argv[1], extended);
+    Instance3BKP instance(argv[1], extended, 0);
 	instance.print();
     return instance;
 }
