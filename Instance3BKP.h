@@ -14,25 +14,15 @@
 
 class Instance3BKP {
 	private : 
-	Instance3BKP() : s(0, std::vector<double>(0)),mass(0) , profit(0) { }
+	Instance3BKP() : s(0, std::vector<double>(0)),mass(0) , profit(0), S(0, std::vector<double>(0)) { }
 	
 	public:
-		/** Size of the 3D Box */
-		double S[3];
-		/** Alias for S[0] */
-		double W;
-		/** Alias for S[1] */
-		double D;
-		/** Alias for S[2] */
-		double H;
+		/** Number of items, i.e. cardinality of J */
+		int N;
 		
-		/** Used only if the stability constraint are considered */
-		double L[3];
-		/** Used only if the stability constraint are considered */
-		double U[3];
+		/** Number of knapsacks, i.e. cardinality of K */
+		int K;
 		
-		/** True if centroid are considered, False otherwise */
-		bool extended;
 		
 		/** vector containing the three dimension of the items */
 		std::vector< std::vector< double > > s;
@@ -44,7 +34,10 @@ class Instance3BKP {
 		std::vector< double > profit;
 		
 		
+		/** vector containing the three dimension of the k knapsack */
+		std::vector< std::vector< double > > S;
 		
+		bool extended;
 		
 		/** Set of rotation of the object. i.e. permutation of 1,2,3 */
 		double R [6][3] = {
@@ -56,24 +49,13 @@ class Instance3BKP {
 			{2,1,0},
 		};
 		
-		
-		void check(){
-			for(int i = 0; i < 3; i++){
-				if(U[i] == L[i]){
-					std::cerr << "Warning upper and lower bound corresponds in dimension " + i;
-				}
-				if(U[i] < L[i]){
-					throw std::runtime_error("Lower bounds are bigger than upper bounds. The Region is empty");
-				}
-			}
-		}
-		
+	
 	public:
 		/**
 		 * @return the volume of the box
 		 */
-		double getBoxVolume(){
-			return W*D*H;
+		double getBoxVolume(int k){
+			return S[k][0]*S[k][1]*S[k][2];
 		}
 		/**
 		 * @return the volume of the i-th item
@@ -82,8 +64,7 @@ class Instance3BKP {
 			return s[i][0]*s[i][1]*s[i][2];
 		}
 		
-		/* Number of items */
-		int N;
+		
 		/**
 		 * Constructor
 		 * @param filename name of the file to parse
@@ -100,13 +81,20 @@ class Instance3BKP {
 				throw std::runtime_error("The given file does not exist");
 			}
 			std::getline(infile, line);
-			
 			ss.str(line);
-			ss >> S[0] >> S[1] >> S[2];
-			W = S[0];
-			D = S[1];
-			H = S[2];
+			ss >> K;
+			std::cout << K << std::endl;
 			
+			S.resize(K);
+			for(auto &i : S) i.resize(3);
+			
+			for(int k = 0; k < K; k++){
+				std::getline(infile, line);
+				ss.clear();
+				ss.str(line);
+				ss >> S[k][0] >> S[k][1] >> S[k][2];
+			}
+
 			std::getline(infile, line);
 			ss.clear();
 			ss.str(line);
@@ -125,24 +113,7 @@ class Instance3BKP {
 				
 			}
 
-			if(extended){
-				std::getline(infile, line);
-				ss.clear();
-				ss.str(line);
-				if(line.size() == 0){
-					throw std::runtime_error("The given file does not contain information about lower bounds.\n Please give an extended instance as input or don't use option -e");
-				}
-				std::cout << line.size() << std::endl;
-				ss >> L[0] >> L[1] >> L[2];
-				std::getline(infile, line);
-				ss.clear();
-				ss.str(line);
-				if(line.size() == 0){
-					throw std::runtime_error("The given file does not contain information about upper bounds.\nPlease give an extended instance as input or don't use option -e");
-				}
-				ss >> U[0] >> U[1] >> U[2];			
-				check();
-			}
+
 			
 			infile.close();
 		}
@@ -151,14 +122,15 @@ class Instance3BKP {
 		 * Print the instance
 		 */
 		void print(){
-			std::cout << S[0] << " " << S[1] << " " << S[2] << std::endl;
+			std::cout << "There are " << K << " Knapsacks " << std::endl;
+			for(int k = 0; k < K; k++){
+				std::cout << S[k][0] << " " << S[k][1] << " " << S[k][2] << std::endl;
+			}
+			std::cout << "Items " << std::endl;
 			for(int i = 0; i < N; i++){
 				std::cout << s[i][0] << " " << s[i][1] << " " << s[i][2] << " " << mass[i] << " " << profit[i] << std::endl;
 			}
-			if(extended){
-				std::cout << "L " << L[0] << " " << L[1] << " " << L[2] << std::endl;
-				std::cout << "U " << U[0] << " " << U[1] << " " << U[2] << std::endl;
-			}
+			
 		}
 
 

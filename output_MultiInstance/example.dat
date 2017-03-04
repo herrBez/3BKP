@@ -1,0 +1,10 @@
+#Vengono inclusi solo gli oggetti messi nello zaino
+#Dimensione del 0-mo Zaino 3 3 3
+#Dimensione del 1-mo Zaino 3 3 3
+#Knapsack 0-mo
+k 3 3 3
+2	0 0 0 	3 3 3 
+#Knapsack 1-mo
+k 3 3 3
+0	0 0 0 	1 1 1 
+1	1 0 0 	2 2 2 
