@@ -24,6 +24,7 @@ class Instance3BKP {
 			if(profit[i] < pMin)
 				pMin = profit[i];
 		}
+		std::cout << "min profit " << pMin << std::endl;
 	}
 	
 	void calculateM(){
@@ -34,6 +35,7 @@ class Instance3BKP {
 			}
 		}
 		M = val;
+		std::cout << "M = " << M << std::endl;
 	}
 	
 	
@@ -171,7 +173,8 @@ class Instance3BKP {
 			}
 			findMinimumProfit();
 			M = N * (S[0] + S[1] + S[2]);
-
+			
+			std::cout << "M" << M << std::endl;
 			infile.close();
 		}
 		

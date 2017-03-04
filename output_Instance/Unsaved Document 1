@@ -1,0 +1,16 @@
+#Vengono inclusi solo gli oggetti messi nello zaino
+#Dimensione Zaino 5 5 5
+#La prima riga indica le dimensioni dello zaino
+#Formato: i pos_i_x pos_i_y pos_i_z rot_dim_i_x rot_dim_i_y rot_dim_i_z
+5 5 5
+0       0 1 0   2 2 2 
+1       2 2 0   2 2 2 
+2       3 0 0   2 2 2 
+3       0 3 0   2 2 2 
+4       1 0 1   1 1 1 
+5       0 0 0   1 1 1 
+6       0 0 2   3 3 3 
+7       1 0 0   1 1 1 
+8       2 0 0   1 1 1 
+9       0 0 1   1 1 1 
+

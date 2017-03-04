@@ -23,7 +23,10 @@ void my_handler(sig_t s){
       exit(1);
 }
 
+double timeout;
 
+
+//int CPXXgetcallbackinfo( CPXCENVptr env, void * cbdata, int wherefrom, int whichinfo, void * result_p ) 
 
 char FILENAME[128];
 char OUTPUTFILENAME[128];
@@ -44,6 +47,7 @@ static struct option long_options[] = {
 	{"help", no_argument, 0, 'h'},
 	{"quiet", no_argument, 0, 'q'},
 	{"extended", no_argument, 0, 'e'},
+	{"timeout", required_argument, 0, 't'},
 	{0, 0, 0, 0},
 };
 
@@ -103,7 +107,9 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 	 for(int i = 0; i < N; i++){
 		for(int delta = 0; delta < 3; delta++){
 			char xtype = 'C';
-			double obj = -1.0;
+			double obj = 0;
+			if(delta == 1)
+				obj = -1.0;
 			double lb = 0.0;
 			double ub = CPX_INFBOUND;
 			snprintf(name, NAME_SIZE, "chi %d %d", i, delta);
@@ -525,6 +531,10 @@ mapVar setupLP(CEnv env, Prob lp, Instance3BKP instance)
 	return map;
 }
 
+
+void printTotalTime(){
+}
+
 /**
  * solve the model write the result in a file and returns the return value of the function
  * @param env the CPLEX environment
@@ -606,14 +616,15 @@ Instance3BKP get_option(int argc,  char * argv[]){
 		print_help(argv);
 		exit(EXIT_SUCCESS);
 	}
+	timeout = 1e75;
 	optind = 2; //Starting from index 2, because the first place is destinated to the istance file.
 	int option_index;
-	while((c = getopt_long (argc, argv, "hqe", long_options, &option_index)) != EOF) {
+	while((c = getopt_long (argc, argv, "hqet:", long_options, &option_index)) != EOF) {
 		switch(c){
 			case 'h': print_help(argv); exit(EXIT_SUCCESS); break;
 			case 'q': output_required=false; break;
 			case 'e': extended = true; break;
-			 
+			case 't': timeout = strtol(optarg, NULL, 0); break;
 		}
     }
     sprintf(FILENAME, "%s", argv[1]);
@@ -621,6 +632,8 @@ Instance3BKP get_option(int argc,  char * argv[]){
 	instance.print();
     return instance;
 }
+
+
 
 /**
  * Print a human readable output in the file named output.txt
@@ -728,7 +741,9 @@ int main (int argc, char *argv[])
 		DECL_ENV( env );
 		DECL_PROB( env, lp );
 		mapVar map = setupLP(env, lp, instance);
+		/* Stop after the given time */ 
 		
+		CHECKED_CPX_CALL(CPXsetdblparam, env,  CPX_PARAM_TILIM, timeout);
 		// find the solution
 		solve(env, lp, instance);
 		
