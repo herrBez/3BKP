@@ -388,15 +388,18 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	}
 	
 	
-	/* Constraint (16) */
+	/* Constraint (16) - Modified by us because it leaded to unfeasible models, whenever an object
+	 * was bigger than the knapsack */
 	for(int i = 0; i < N; i++){
-		vector < int > idVar(R);
-		vector < double > coeff(R);
+		vector < int > idVar(R+1);
+		vector < double > coeff(R+1);
 		for(int r = 0; r < R; r++){
 			idVar[r] = map.Rho[i][r];
 			coeff[r] = 1.0;
 		}
-		double rhs = 1.0;
+		idVar[R] = map.T[i];
+		coeff[R] = -1.0;
+		double rhs = 0.0;
 		char sense = 'E';
 		int matbeg = 0;
 		
