@@ -1,0 +1,49 @@
+\documentclass{scrartcl}
+
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{amsmath}
+\begin{document}
+\section{Oggetti più grandi dello zaino}
+Si prenda in considerazione un problema dello zaino in 3 dimensioni in cui:
+\begin{itemize}
+	\item $(S^0,S^1,S^2)$
+	\item $J = \{1\}$
+	\item $(s_{1, 0}^0,s_{1,0}^1, s_{1,0}^2)$
+\end{itemize}
+Una volta inseriti i vincoli abbiamo nel vincolo 8:
+$$
+\begin{array}{ll}
+\chi_0^0 + 2 \rho_{00} + 2 \rho_{01} + \rho_{02} + \rho_{03} + \rho_{04} + \rho_{05} \leq 1 & \\
+\chi_0^1 +  \rho_{00} +  \rho_{01} + 2 \rho_{02} + \rho_{03} + 2 \rho_{04} + \rho_{05} \leq 1 & \\
+\chi_0^2 +  \rho_{00} +  \rho_{01} + \rho_{02} + 2 \rho_{03} + \rho_{04} + 2 \rho_{05} \leq 1 & \\
+\end{array}
+$$
+Ora siccome deve valere il vincolo numero $(16)$ abbiamo:
+$$
+\sum_{r\in R} \rho_{ir} = 1 \ \ \ \forall i \in J
+$$
+ma visto che le variabili sono binarie:
+$$
+\sum_{r\in R} \rho_{ir} = 1 \iff \exists r \in R : \rho_{ir} = 1
+$$
+anche per gli oggetti che non vengono inseriti nello zaino.
+Quindi visto che le variabili $\chi$ sono positive nell'esempio si ha che, se:
+$$
+\begin{array}{l}
+\rho_{00} = 1 \implies \chi_1^0 + 2 \rho_{00} > 1 \\
+\rho_{01} = 1 \implies \chi_1^0 + 2 \rho_{01} > 1 \\
+\rho_{02} = 1 \implies \chi_1^1 + 2 \rho_{02} > 1 \\
+\rho_{03} = 1 \implies \chi_1^2 + 2 \rho_{03} > 1 \\
+\rho_{04} = 1 \implies \chi_1^1 + 2 \rho_{04} > 1 \\
+\rho_{05} = 1 \implies \chi_1^2 + 2 \rho_{05} > 1 \\
+\end{array}
+$$
+
+
+%\begin{itemize}
+%	\item aggiungere una "settima" rotazione in cui tutti i valori $s_*$ sono nulli.
+%	Per esempio per evitare troppi \verb|if-else| si potrebbe aggiungere una quarta dimensione fittizia ai vari $s$ e aggiungere come settima rotazione la tripletta ${4,4,4}$.
+%	\item \dots
+%\end{itemize}
+\end{document}

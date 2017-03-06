@@ -74,16 +74,16 @@ Per aggiungere i vincoli del centro di massa bisogna:
 \subsection{Oggetti più grandi dello zaino}
 Si prenda in considerazione un problema dello zaino in 3 dimensioni in cui:
 \begin{itemize}
-	\item $(S^0,S^1,S^2) = (1,1,1)$
+	\item $(S^0,S^1,S^2)$
 	\item $J = \{1\}$
-	\item $(s_{1, 0}^0,s_{1,0}^1, s_{1,0}^2) = (2,1,1)$
+	\item $(s_{1, 0}^0,s_{1,0}^1, s_{1,0}^2)$
 \end{itemize}
 Una volta inseriti i vincoli abbiamo nel vincolo 8:
 $$
 \begin{array}{ll}
 \chi_0^0 + 2 \rho_{00} + 2 \rho_{01} + \rho_{02} + \rho_{03} + \rho_{04} + \rho_{05} \leq 1 & \\
-\chi_1^0 +  \rho_{00} +  \rho_{01} + 2 \rho_{02} + \rho_{03} + 2 \rho_{04} + \rho_{05} \leq 1 & \\
-\chi_0^0 +  \rho_{00} +  \rho_{01} + \rho_{02} + 2 \rho_{03} + \rho_{04} + 2 \rho_{05} \leq 1 & \\
+\chi_0^1 +  \rho_{00} +  \rho_{01} + 2 \rho_{02} + \rho_{03} + 2 \rho_{04} + \rho_{05} \leq 1 & \\
+\chi_0^2 +  \rho_{00} +  \rho_{01} + \rho_{02} + 2 \rho_{03} + \rho_{04} + 2 \rho_{05} \leq 1 & \\
 \end{array}
 $$
 Ora siccome deve valere il vincolo numero $(16)$ abbiamo:
@@ -95,7 +95,7 @@ $$
 \sum_{r\in R} \rho_{ir} = 1 \iff \exists r \in R : \rho_{ir} = 1
 $$
 anche per gli oggetti che non vengono inseriti nello zaino.
-Quindi visto che le variabili $\chi$ sono positivi nell'esempio si ha che, se:
+Quindi visto che le variabili $\chi$ sono positive nell'esempio si ha che, se:
 $$
 \begin{array}{l}
 \rho_{00} = 1 \implies \chi_1^0 + 2 \rho_{00} > 1 \\
