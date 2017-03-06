@@ -23,6 +23,11 @@ void my_handler(sig_t s){
       exit(1);
 }
 
+bool optimize[3] = {
+	true, true, true
+};
+
+
 double timeout;
 
 
@@ -48,6 +53,9 @@ static struct option long_options[] = {
 	{"quiet", no_argument, 0, 'q'},
 	{"extended", no_argument, 0, 'e'},
 	{"timeout", required_argument, 0, 't'},
+	{"disable-x", no_argument, 0, 'x'},
+	{"disable-y", no_argument, 0, 'y'},
+	{"disable-z", no_argument, 0, 'z'},
 	{0, 0, 0, 0},
 };
 
@@ -107,9 +115,10 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 	 for(int i = 0; i < N; i++){
 		for(int delta = 0; delta < 3; delta++){
 			char xtype = 'C';
-			double obj = 0;
-			if(delta == 1)
+			double obj = 0.0;
+			if(optimize[delta]) //If we want to optimize this dimension
 				obj = -1.0;
+			
 			double lb = 0.0;
 			double ub = CPX_INFBOUND;
 			snprintf(name, NAME_SIZE, "chi %d %d", i, delta);
@@ -619,14 +628,20 @@ Instance3BKP get_option(int argc,  char * argv[]){
 	timeout = 1e75;
 	optind = 2; //Starting from index 2, because the first place is destinated to the istance file.
 	int option_index;
-	while((c = getopt_long (argc, argv, "hqet:", long_options, &option_index)) != EOF) {
+	while((c = getopt_long (argc, argv, "hqet:xyz", long_options, &option_index)) != EOF) {
 		switch(c){
 			case 'h': print_help(argv); exit(EXIT_SUCCESS); break;
 			case 'q': output_required=false; break;
 			case 'e': extended = true; break;
 			case 't': timeout = strtol(optarg, NULL, 0); break;
+			case 'x': optimize[0] = false; break;
+			case 'y': optimize[1] = false; break;
+			case 'z': optimize[2] = false; break;
+			
+			
 		}
     }
+
     sprintf(FILENAME, "%s", argv[1]);
     Instance3BKP instance(argv[1], extended, 0);
 	instance.print();
