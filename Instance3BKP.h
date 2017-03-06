@@ -122,87 +122,6 @@ class Instance3BKP {
 		/** Number of given items, i.e. cardinality of J */
 		int N;
 		
-		Instance3BKP(const char * filename, bool _extended){
-			extended = _extended;
-			FILE * fp = fopen(filename, "r");
-			if(fp == NULL){
-				perror(" Could not open given file ");
-				exit(EXIT_FAILURE);
-			}
-			char line[128];
-			//char tok[32];
-			char * l = NULL;
-			int line_counter = 0;
-		
-			while(fscanf(fp, "%[^\n]\n", &line[0]) != EOF) {
-				line_counter++;
-				l = trim(line);
-				if(l[0] != '#')
-					break;
-			}
-			printf("Read %s\n", l);
-			sscanf(l, "%lf%lf%lf", &S[0], &S[1], &S[2]);
-			printf("%lf %lf %lf\n", S[0], S[1], S[2]);
-			W = S[0];
-			D = S[1];
-			H = S[2];
-			while(fscanf(fp, "%[^\n]\n", &line[0]) != EOF) {
-				line_counter++;
-				l = trim(line);
-				if(l[0] != '#')
-					break;
-			}
-			sscanf(l, "%d", &N);
-			printf("%d\n", N);
-			s.resize(N);
-			for(auto &i : s) i.resize(3);
-			mass.resize(N);
-			profit.resize(N);
-			for(int i = 0; i < N; i++){
-				while(fscanf(fp, "%[^\n]\n", &line[0]) != EOF) {
-					line_counter++;
-					l = trim(line);
-					if(l[0] != '#')
-						break;
-				}
-				sscanf(l, "%lf%lf%lf%lf%lf", &s[i][0], &s[i][1], &s[i][2], &mass[i], &profit[i]);
-				printf("%lf %lf %lf %lf %lf\n", s[i][0], s[i][1], s[i][2], mass[i], profit[i]);
-				
-			}	
-			
-			if(extended){
-				while(fscanf(fp, "%[^\n]\n", &line[0]) != EOF) {
-					line_counter++;
-					l = trim(line);
-					if(l[0] != '#')
-						break;
-				}
-				if(strlen(line) == 0){
-					throw std::runtime_error("The given file does not contain information about lower bounds.\n Please give an extended instance as input or don't use option -e");
-				}
-				sscanf(l, "%lf%lf%lf", &L[0], &L[1], &L[2]);
-				printf("L %lf %lf %lf\n", L[0], L[1], L[2]);
-				while(fscanf(fp, "%[^\n]\n", &line[0]) != EOF) {
-					line_counter++;
-					l = trim(line);
-					if(l[0] != '#')
-						break;
-				}
-				if(strlen(line) == 0){
-					throw std::runtime_error("The given file does not contain information about lower bounds.\n Please give an extended instance as input or don't use option -e");
-				}
-				sscanf(l, "%lf%lf%lf", &U[0], &U[1], &U[2]);
-				printf("U %lf %lf %lf\n", U[0], U[1], U[2]);
-				check();
-			}
-			
-			
-	
-			if(fclose(fp) == EOF){
-				perror(" Could not close file ");
-			}
-			
-		}
 		
 		/**
 		 * Constructor
@@ -210,7 +129,7 @@ class Instance3BKP {
 		 * @param _extended true if the model is extended with 
 		 * stability constraint, false otherwise
 		 */
-		Instance3BKP(const char * filename, bool _extended, int foo){
+		Instance3BKP(const char * filename, bool _extended){
 			extended = _extended;
 			
 			std::ifstream infile(filename);
@@ -265,9 +184,7 @@ class Instance3BKP {
 				check();
 			}
 			findMinimumProfit();
-			M = N * (S[0] + S[1] + S[2]);
-			
-			std::cout << "M" << M << std::endl;
+			calculateM();
 			infile.close();
 		}
 		

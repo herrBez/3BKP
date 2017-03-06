@@ -602,9 +602,13 @@ double solve( CEnv env, Prob lp, Instance3BKP instance) {
 void print_help(char * argv[]){
 	cout << "Usage : " << argv[0] << " <instance.dat> " << " [OPT]... " << endl;
 	cout << endl;
-	cout << "-h, --help\t\t\tprint this message and exit" << endl;
-	cout << "-q, --quiet\t\t\tdo not write the solved problem in a file named /tmp/Model.sol, Model.lp" << endl;
+	cout << "-h, --help\t\t\t print this message and exit" << endl;
+	cout << "-q, --quiet\t\t\t do not write the solved problem in a file named /tmp/Model.sol, Model.lp" << endl;
 	cout << "-e, --extended\t\t\t use also the balancing constraint." << endl;
+	cout << "-x, --disable-x\t\t\t do not optimize w.r.t. x" << endl;
+	cout << "-y, --disable-y\t\t\t do not optimize w.r.t. y" << endl;
+	cout << "-z, --disable-z\t\t\t do not optimize w.r.t. z" << endl;
+	cout << "-t, --timeout\t\t\t set a timeout in seconds, after which CPLEX will stop (It returns the incumbent solution)" << endl;
 	cout << endl;
 }
 
@@ -617,7 +621,7 @@ void print_help(char * argv[]){
  * @param argc 
  * @param argv
  */
-Instance3BKP get_option(int argc,  char * argv[]){
+void get_option(int argc,  char * argv[]){
 	int c;
 	if(argc < 2) {
 		print_help(argv);
@@ -640,15 +644,10 @@ Instance3BKP get_option(int argc,  char * argv[]){
 			case 'x': optimize[0] = false; break;
 			case 'y': optimize[1] = false; break;
 			case 'z': optimize[2] = false; break;
-			
-			
 		}
     }
 
     sprintf(FILENAME, "%s", argv[1]);
-    Instance3BKP instance(argv[1], extended, 0);
-	instance.print();
-    return instance;
 }
 
 
@@ -754,7 +753,8 @@ int main (int argc, char *argv[])
 	bool exc_arised = false;	
 	try { 
 
-		Instance3BKP instance = get_option(argc, argv);	
+		get_option(argc, argv);	
+		Instance3BKP instance(argv[1], extended);
 				
 		DECL_ENV( env );
 		DECL_PROB( env, lp );
