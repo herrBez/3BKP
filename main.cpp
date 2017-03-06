@@ -465,7 +465,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	/* Constraint (Multi) */
 	for(int k = 0; k < K; k++){
 		for(int j = 0; j < N; j++){
-			std::cout << "VABBOH" << endl;
+			
 			vector < int > idVar(2);
 			vector < double > coeff(2);
 			idVar[0] = map.T[k][j];
