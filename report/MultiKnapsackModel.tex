@@ -1,0 +1,70 @@
+\documentclass{scrartcl}
+
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\begin{document}
+\section{Variabili}
+\begin{itemize}
+	\item $z_k$ assume valore $1$ se lo zaino $k-$simo viene utilizzato, $0$ altrimenti.
+\end{itemize}
+	
+	
+s.t.
+\begin{equation}
+\sum_{j \in J} w_j d_j h_j t_{kj} \leq W_kD_kH_k \quad\quad \forall k \in K
+\end{equation}
+\begin{equation}
+\sum_{\delta\in\Delta}(b_{kij}^\delta + b_{kij}^\delta) \geq t_{ki} + t_{kj} - 1, \quad i < j,\ k \in K,\ i \in J,\ j \in J
+\end{equation}
+\begin{equation}
+\chi_{ki}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{ir} \leq S_k^\delta \quad \quad k \in K,\ i \in J,\ \delta \in \Delta
+\end{equation}
+\begin{equation}
+\chi_{ki}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{ir} \leq \chi_{kj}^\delta + M(1 - b_{kij}^\delta), \quad \quad i < j,\ k \in K, i \in J, j \in J, \delta \in \Delta
+\end{equation}
+\begin{equation}
+\chi_{kj}^\delta + \sum_{r \in R} s_{jr}^\delta \rho_{jr} \leq \chi_{ki}^\delta + M(1 - b_{kji}^\delta), \quad \quad i < j,\ k \in K, i \in J, j \in J, \delta \in \Delta
+\end{equation}
+\begin{equation}
+\chi_{ki}^\delta \leq M t_{ki}\quad\quad k \in K, i \in J, \delta \in \Delta
+\end{equation}
+\begin{equation}
+b_{kij}^\delta \leq t_{ki}\quad \quad k \in K, i \in J, j \in J, \delta \in \Delta
+\end{equation}
+\begin{equation}
+b_{kji}^\delta \leq t_{kj} \quad \quad k \in K, i \in J, j \in J, \delta \in \Delta
+\end{equation}
+\begin{equation}
+\sum_{r \in R} \rho_{ir} = \sum_{k \in K} t_{ki}\quad \quad i \in J
+\end{equation}
+\begin{equation}
+\label{constraint:multi:tkzk}
+t_{kj} \leq z_k\quad \quad k \in K, j \in J
+\end{equation}
+\begin{equation}
+\label{constraint:multi:onlyInOneKnapsack}
+\sum_{k \in K} t_{kj} \leq 1 \quad \quad j \in J
+\end{equation}
+\begin{equation}
+\chi_{ki}^\delta \geq 0 \quad \quad k \in K, i \in J, \delta \in \Delta
+\end{equation}
+\begin{equation}
+t_{ki} \in \{0,1\} \quad \quad k \in K, i \in J
+\end{equation}
+\begin{equation}
+b_{kji}^\delta \in \{0,1\} \quad \quad k \in K, i \in J, j \in J, \delta \in \delta
+\end{equation}
+\begin{equation}
+\rho_{ir} \in \{0,1\} \quad\quad i \in J, r \in R
+\end{equation}
+\begin{equation}
+z_k \in \{0,1\} \quad \quad k \in K
+\end{equation}
+
+\section{Note}
+\begin{itemize}
+\item Tutti i vincoli a parte \ref{constraint:multi:tkzk} e \ref{constraint:multi:onlyInOneKnapsack} sono stati ottenuti adattando i vincoli del modello di partenza.
+\item Il vincolo \ref{constraint:multi:tkzk} fa sì che un oggetto possa essere inserito nel $k-$simo zaino soltanto se lo zaino viene effettivamente utilizzato nella soluzione.
+\item Il vincolo \ref{constraint:multi:onlyInOneKnapsack} fa sì che un oggetto possa essere inserito al massimo in uno zaino. 
+\end{itemize}
+\end{document}
