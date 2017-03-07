@@ -101,11 +101,11 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 	
 	/*
 	 * Adding z variables
-	 * 
+	 * z_k = 1 if the k-th knapsack is used, 0 otherwise
 	 */
 	 for(int k = 0; k < K; k++){
 		char xtype = 'B';
-		double obj = -1.0;
+		double obj = 0.0; //should I add a fixed cost per knapsack?
 		double lb = 0.0;
 		double ub = 1.0;
 		sprintf(name, "z %d", k);
@@ -116,8 +116,8 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 	
 	/*
 	 * 
-	 * adding \chi_ik^\delta variables
-	 * the coordinate of the bottom-left-back point of itme i along dimension \delta
+	 * adding \chi_ki^\delta variables
+	 * the coordinate of the bottom-left-back point of item i along dimension \delta in knapsack k
 	 * + constraint(17)
 	 * 
 	 */
@@ -138,14 +138,15 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 
 	/* 
 	 * adding t variables
-	 * t_j := binary value {1 if j-th item is loaded in the KP 0 otherwise} 
+	 * t_kj := binary value {1 if j-th item is loaded in the KP 0 otherwise} 
 	 * + constraint(18)
 	 */ 
 	 for(int k = 0; k < K; k++){
 		for(int j = 0; j < N; j++){
 		
 			char xtype = 'B';
-			double obj = instance.profit[j];
+			cout << instance.profit[j] << endl;
+			double obj = 100*instance.profit[j]; //TODO MODIFIED OBJ FUNCTION
 			double lb = 0.0;
 			double ub = 1.0;
 			sprintf(name, "t_%d %d", k, j);
@@ -162,7 +163,6 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 	for(int k = 0; k < K; k++){
 		for(int i = 0; i < N; i++){
 			for(int j = 0; j < N; j++){
-			
 				for(int delta = 0; delta < 3; delta++){
 					char xtype = 'B';
 					double obj = 0;
@@ -214,7 +214,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	//int DELTA = 3; //Cardinality of the set \Delta
 	int M = 1e6; //Used in constraint 9-10 
 	
-	//Constraint (6): sum_{j \in J} w_j*d_j*h_j*t_j <= WDH
+	//Constraint (6): sum_{j \in J} w_j*d_j*h_j*t_kj <= W_k D_k H_k
 	
 	for(int k = 0; k < K; k++){
 		vector<double> coef(N);
@@ -230,7 +230,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	}
 	
 	
-	//Constraint (7) : (\sum_{\delta \in \Delta} b_ij^\delta + b_ij^\delta) -t_i -t_j >= -1
+	//Constraint (7) : (\sum_{\delta \in \Delta} b_kij^\delta + b_kij^\delta) -t_ki -t_kj >= -1
 	for(int k = 0; k < K; k++){
 		for(int i = 0; i < N; i++){
 			for(int j = 0; j < N; j++){
@@ -270,7 +270,6 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 		
 	/* (8) */
 	for(int k = 0; k < K; k++){
-		
 		for(int i = 0; i < N; i++){
 			for(int delta = 0; delta < 3; delta++){
 				vector< int > idVar(7);
@@ -445,13 +444,18 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	
 	/* Constraint (16) */
 	for(int i = 0; i < N; i++){
-		vector < int > idVar(R);
-		vector < double > coeff(R);
+		vector < int > idVar(R + K);
+		vector < double > coeff(R + K);
+		
 		for(int r = 0; r < R; r++){
 			idVar[r] = map.Rho[i][r];
 			coeff[r] = 1.0;
 		}
-		double rhs = 1.0;
+		for(int k = 0; k < K; k++){
+			idVar[R+k] = map.T[k][i];
+			coeff[R+k] = -1.0;
+		}
+		double rhs = 0.0;
 		char sense = 'E';
 		int matbeg = 0;
 		
@@ -483,23 +487,23 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 		}
 	}
 	
-	
-		for(int j = 0; j < N; j++){
-			vector < int > idVar(K);
-			vector < double > coeff(K);
-			for(int k = 0; k < K; k++){
-				idVar[k] = map.T[k][j];
-				coeff[k] = 1.0;
-			}
-			double rhs = 1.0;
-			char sense = 'L';
-			int matbeg = 0;
-			
-			snprintf(name, NAME_SIZE, "Multi (2) %d ", j);
-			char * cname = (char*) (&name[0]);
-			CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
-			
+	/* */
+	for(int j = 0; j < N; j++){
+		vector < int > idVar(K);
+		vector < double > coeff(K);
+		for(int k = 0; k < K; k++){
+			idVar[k] = map.T[k][j];
+			coeff[k] = 1.0;
 		}
+		double rhs = 1.0;
+		char sense = 'L';
+		int matbeg = 0;
+		
+		snprintf(name, NAME_SIZE, "Multi (2) %d ", j);
+		char * cname = (char*) (&name[0]);
+		CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
+	}
+	
 	
 }
 
@@ -714,10 +718,14 @@ void output(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	
 
 	vector< vector< double > > t = vector< vector<double> >(K, vector< double >(N));
-	
+	vector< double > z = vector<double>(K);
 	vector< vector< vector < double > > > chi(K, vector< vector< double> >(N, vector< double >(3)));
-	
 	vector< vector < double > > rho(N, vector< double >(6));
+	
+	int begin = map.Z[0];
+	int end = map.Z[K-1];
+	CHECKED_CPX_CALL (CPXgetx, env, lp, &z[0], begin, end);
+	
 	for(int k = 0; k < K; k++){
 		int begin = map.T[k][0];
 		int end = map.T[k][N - 1];
@@ -760,10 +768,13 @@ void output(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	
 	outfile << "#Vengono inclusi solo gli oggetti messi nello zaino" << endl;
 	for(int k = 0; k < K; k++){
-		outfile << "#Dimensione del " << k << "-mo Zaino " << instance.S[k][0] << " " << instance.S[k][1] <<" "<< instance.S[k][2] << endl;
+		if(z[k] > 0.9)
+			outfile << "#Dimensione del " << k << "-mo Zaino " << instance.S[k][0] << " " << instance.S[k][1] <<" "<< instance.S[k][2] << endl;
 	} 
 	
 	for(int k = 0; k < K; k++){
+		if(z[k] < 0.1)
+			continue;
 		outfile << "#Knapsack " << k << "-mo" << endl;
 		outfile << instance.S[k][0] << " " << instance.S[k][1] << " " << instance.S[k][2] << endl;
 	
