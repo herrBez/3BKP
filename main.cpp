@@ -213,6 +213,17 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	//int DELTA = 3; //Cardinality of the set \Delta
 	int M = 1e6; //Used in constraint 9-10 
 	
+	{ //ADD A FAKE CONSTRAINT TO ADD AT LEAST ONE KNAPSACK
+		vector< double > coef(K, 1);
+		char sense = 'G';
+		int matbeg = 0;
+		double rhs = 1;
+		snprintf(name, NAME_SIZE, "(6)");
+		char* cname = (char*)(&name[0]);
+		CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, K, &rhs, &sense, &matbeg, &map.Z[0], &coef[0], 0, &cname);
+	}
+	
+	
 	//Constraint (6): sum_{j \in J} w_j*d_j*h_j*t_kj <= W_k D_k H_k
 	
 	for(int k = 0; k < K; k++){
@@ -225,7 +236,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 		double rhs = instance.getBoxVolume(k);
 		snprintf(name, NAME_SIZE, "(6)");
 		char* cname = (char*)(&name[0]);
-		CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, N, &rhs, &sense, &matbeg, &map.T[k][0], &coef[0], 0, &cname);
+		CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, map.T[k].size(), &rhs, &sense, &matbeg, &map.T[k][0], &coef[0], 0, &cname);
 	}
 	
 	
