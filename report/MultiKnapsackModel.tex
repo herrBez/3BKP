@@ -8,13 +8,15 @@
 	\item $z_k$ assume valore $1$ se lo zaino $k-$simo viene utilizzato, $0$ altrimenti.
 \end{itemize}
 	
-	
+\begin{equation}
+\sum_{k \in K} \sum_{j \in J} p_j \cdot t_{kj}
+\end{equation}
 s.t.
 \begin{equation}
 \sum_{j \in J} w_j d_j h_j t_{kj} \leq W_kD_kH_k \quad\quad \forall k \in K
 \end{equation}
 \begin{equation}
-\sum_{\delta\in\Delta}(b_{kij}^\delta + b_{kij}^\delta) \geq t_{ki} + t_{kj} - 1, \quad i < j,\ k \in K,\ i \in J,\ j \in J
+\sum_{\delta\in\Delta}(b_{kij}^\delta + b_{kji}^\delta) \geq t_{ki} + t_{kj} - 1, \quad i < j,\ k \in K,\ i \in J,\ j \in J
 \end{equation}
 \begin{equation}
 \chi_{ki}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{ir} \leq S_k^\delta \quad \quad k \in K,\ i \in J,\ \delta \in \Delta
@@ -52,7 +54,7 @@ t_{kj} \leq z_k\quad \quad k \in K, j \in J
 t_{ki} \in \{0,1\} \quad \quad k \in K, i \in J
 \end{equation}
 \begin{equation}
-b_{kji}^\delta \in \{0,1\} \quad \quad k \in K, i \in J, j \in J, \delta \in \delta
+b_{kij}^\delta \in \{0,1\} \quad \quad k \in K, i \in J, j \in J, \delta \in \delta
 \end{equation}
 \begin{equation}
 \rho_{ir} \in \{0,1\} \quad\quad i \in J, r \in R

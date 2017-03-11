@@ -145,8 +145,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 		for(int j = 0; j < N; j++){
 		
 			char xtype = 'B';
-			cout << instance.profit[j] << endl;
-			double obj = 100*instance.profit[j]; //TODO MODIFIED OBJ FUNCTION
+			double obj = instance.profit[j]; //TODO MODIFIED OBJ FUNCTION
 			double lb = 0.0;
 			double ub = 1.0;
 			sprintf(name, "t_%d %d", k, j);
