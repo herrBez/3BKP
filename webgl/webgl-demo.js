@@ -53,14 +53,34 @@ var representAsTriangle;
 
 var zoom_step = [0, 0, 0];
 
+var padding = 0.2;
+
 var enabledCenterOfMass = false;
 
+function findMaxZ() {
+	var max = boxVertices[0][3*4 + Z];
+	for(var k = 1; k < boxVertices.length; k++){
+		if(max < boxVertices[k][3*4 + Z])
+			max = boxVertices[k][3*4 + Z];
+	} 
+	return max;
+}
+
+function findCenter() {
+	var l = 0;
+	for(var k = 0; k < boxVertices.length; k++){
+		l += (boxVertices[k][3*7 + X] - boxVertices[k][3*6 + X])
+		l += padding;
+	}
+	
+	return l/2;
+}
 
 function initMatrix(){
 	
-	camerapos[X] = (boxVertices[0][3*7 + X] - boxVertices[0][3*6 + X])/2;
+	camerapos[X] = findCenter();
 	camerapos[Y] = (-boxVertices[0][3*7 + Y] + boxVertices[0][3*4 + Y])/2;
-	camerapos[Z] = -5*boxVertices[0][3*4 + Z];
+	camerapos[Z] = -6*findMaxZ();
 
 	
 	zoom_step[X] = boxVertices[0][3*6 + X] / 20;
@@ -80,6 +100,7 @@ function initMatrix(){
 		var x = 0;
 		for(l = 0; l < k; l++){
 			x += (-(boxVertices[l][3*7 + X] - boxVertices[l][3*6 + X]));
+			x += padding;
 		}
 		ModelMatrix[k].elements[0][3] = x; //Move in x axis
 		ModelMatrix[k].elements[1][3] = 0.0; //Move in y axis
@@ -89,8 +110,6 @@ function initMatrix(){
 }
 
 function initAttributes(){
-	alert(vertices[0].length);
-	alert(boxVertices.length);
 	representAsTriangle = new Array();
 	var i = 0;
 	var k = 0;
@@ -268,7 +287,7 @@ function initBuffers() {
 	centerOfMassBuffer = new Array();
 	for(var k = 0; k < boxVertices.length; k++){
 		centerOfMassBufferTmp = new Array();
-		for(var i = 0; i < centerOfMass.length; i++){
+		for(var i = 0; i < centerOfMass[k].length; i++){
 			centerOfMassBufferTmp.push(gl.createBuffer());
 			gl.bindBuffer(gl.ARRAY_BUFFER, centerOfMassBufferTmp[i]);
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(centerOfMass[k][i]), gl.STATIC_DRAW);
@@ -355,7 +374,7 @@ function drawScene() {
   // ratio of 640:480, and we only want to see objects between 0.1 units
   // and 100 units away from the camera.
 
-  perspectiveMatrix = makePerspective(45, 640.0/480.0, 0.1, boxVertices[0][3*6 + Z]*20);
+  perspectiveMatrix = makePerspective(45, 640.0/480.0, 0.1, findMaxZ()*20);
 
   // Set the drawing position to the "identity" point, which is
   // the center of the scene.
@@ -381,6 +400,12 @@ function drawScene() {
 				else{	
 					drawParallelepiped(VerticesBuffer[k][i], ColorBuffer[k][i], cubeVerticesIndexBuffer[1], gl.LINES, 24); 
 				}
+			}
+		}
+		if(enabledCenterOfMass){
+			for(var i = 0; i < centerOfMass[k].length; i++){
+				drawArray(centerOfMassBuffer[k][i], ColorBuffer[k][i], gl.POINTS, 0, 1);
+				
 			}
 		}
 	
@@ -525,8 +550,10 @@ function KeyBoard(code){
 		case 39: camerapos[X]-= zoom_step[X]; break; //KEYLEFT
 		case 37: camerapos[X]+= zoom_step[X]; break; //KEYRIGHT
 		case "T".charCodeAt(0): 
-			for(var i = 0; i < vertices.length; i++){
-				representAsTriangle[i] = !representAsTriangle[i]; 
+			for(var k = 0; k < boxVertices.length; k++){
+				for(var i = 0; i < vertices[k].length; i++){
+					representAsTriangle[k][i] = !representAsTriangle[k][i]; 
+				}
 			}
 			break;
 		case "B".charCodeAt(0):

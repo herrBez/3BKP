@@ -69,7 +69,6 @@ function processText(text){
 		
 		
 	}
-	alert(position);
 	calculateVertices(BoxDimension, itemIndices, position, dimension, L, U);
 }
 
