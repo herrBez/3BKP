@@ -40,78 +40,103 @@ function processText(text){
 	}
 	
 	console.log(lines.length);
-	console.log("There are " + (counter-1) + " objects in the knapsack");
+	console.log("There are " + (counter-1) + " lines to parse");
 	
-	var position = new Array();
-	var dimension = new Array();
-	var itemIndices = new Array();
+	var position = [];
+	var dimension = [];
+	var itemIndices = [];
 	
 	var token = lines[0].split(/\s+/);
-	var BoxDimension = [parseFloat(token[0]), parseFloat(token[1]), parseFloat(token[2])];
-	
-	for(var i =1; i < lines.length; i++){
+	var BoxDimension = new Array();
+	var knapsack = -1;
+	for(var i =0; i < lines.length; i++){
+		
 		console.log("line" + lines[i]);
 		var token = lines[i].split(/\s+/);
-		itemIndices.push(parseInt(token[0]));
-		position.push([parseFloat(token[1]), parseFloat(token[2]), parseFloat(token[3])]);
-		dimension.push([parseFloat(token[4]), parseFloat(token[5]), parseFloat(token[6])]);
+		if(token.length == 3) {
+			BoxDimension.push([parseFloat(token[0]), parseFloat(token[1]), parseFloat(token[2])]);
+			knapsack = BoxDimension.length - 1;
+			itemIndices.push(new Array());
+			position.push(new Array());
+			dimension.push(new Array());
+		} else if(token.length == 7) {
+			itemIndices[itemIndices.length-1].push(parseInt(token[0]));
+			position[position.length-1].push([parseFloat(token[1]), parseFloat(token[2]), parseFloat(token[3])]);
+			dimension[dimension.length-1].push([parseFloat(token[4]), parseFloat(token[5]), parseFloat(token[6])]);
+		} else {
+			alert("Parse Error: Number of token not recognized");
+		}
+		
+		
 	}
+	alert(position);
 	calculateVertices(BoxDimension, itemIndices, position, dimension, L, U);
 }
 
 function calculateVertices(BoxDimension, itemIndices, position, dimension, L, U){
 	var vertices = new Array();
 	var centerOfMass = new Array();
-	for(var i = 0; i < position.length; i++){
-		var x = position[i][0];
-		var y = position[i][1];
-		var z = position[i][2];
+	var BoxVertices = new Array();
+	for(var k = 0; k < position.length; k++){
+		var verticesTmp = new Array();
+		var centerOfMassTmp = new Array();
 		
-		var dx = dimension[i][0];
-		var dy = dimension[i][1];
-		var dz = dimension[i][2];
+		for(var i = 0; i < position[k].length; i++){
+			var x = position[k][i][0];
+			var y = position[k][i][1];
+			var z = position[k][i][2];
+		
+			var dx = dimension[k][i][0];
+			var dy = dimension[k][i][1];
+			var dz = dimension[k][i][2];
 		
 		
-		vertices.push([
-			//Back Face
-			x, 		y, 		z,
-			x+dx, 	y, 		z,
-			x+dx,	y+dy, 	z,
-			x, 		y+dy,	z,
-			//Front Face
-			x, 		y, 		z+dz,
-			x+dx, 	y, 		z+dz,
-			x+dx,	y+dy, 	z+dz,
-			x, 		y+dy,	z+dz,
-		]);
+			verticesTmp.push([
+				//Back Face
+				x, 		y, 		z,
+				x+dx, 	y, 		z,
+				x+dx,	y+dy, 	z,
+				x, 		y+dy,	z,
+				//Front Face
+				x, 		y, 		z+dz,
+				x+dx, 	y, 		z+dz,
+				x+dx,	y+dy, 	z+dz,
+				x, 		y+dy,	z+dz,
+			]);
 		
-		centerOfMass.push(
-			[x+(dx/2.0), y+(dy/2.0), z+(dz/2.0)]
-		);
+			centerOfMassTmp.push(
+				[x+(dx/2.0), y+(dy/2.0), z+(dz/2.0)]
+			);
+		}
+		vertices.push(verticesTmp);
+		centerOfMass.push(centerOfMassTmp);
 	}
 	
-	var x = 0;
-	var y = 0;
-	var z = 0;
-	var dx = BoxDimension[0];
-	var dy = BoxDimension[1];
-	var dz = BoxDimension[2];
-	
-	BoxVertices = [ 
-			//Back Face
-			x, 		y, 		z,
-			x+dx, 	y, 		z,
-			x+dx,	y+dy, 	z,
-			x, 		y+dy,	z,
-			//Front Face
-			x, 		y, 		z+dz,
-			x+dx, 	y, 		z+dz,
-			x+dx,	y+dy, 	z+dz,
-			x, 		y+dy,	z+dz,
+	for(var k = 0; k < BoxDimension.length; k++){
+		var x = 0;
+		var y = 0;
+		var z = 0;
 		
-	];
+		var dx = BoxDimension[k][0];
+		var dy = BoxDimension[k][1];
+		var dz = BoxDimension[k][2];
+	
+		BoxVertices.push([ 
+				//Back Face
+				x, 		y, 		z,
+				x+dx, 	y, 		z,
+				x+dx,	y+dy, 	z,
+				x, 		y+dy,	z,
+				//Front Face
+				x, 		y, 		z+dz,
+				x+dx, 	y, 		z+dz,
+				x+dx,	y+dy, 	z+dz,
+				x, 		y+dy,	z+dz,
+			
+		]);
+	 }
 	var innerBox = new Array();
-	if(L.length == 3 && U.length == 3){
+	/*if(L.length == 3 && U.length == 3){
 		innerBox = [
 			//Back Face
 			L[0], L[1], L[2],
@@ -124,9 +149,9 @@ function calculateVertices(BoxDimension, itemIndices, position, dimension, L, U)
 			U[0], U[1], U[2],
 			L[0], U[1], U[2],	
 		];
-	}
+	}*/
 	
-	
+
 	start(BoxVertices, itemIndices, vertices, centerOfMass, innerBox);
 }
 

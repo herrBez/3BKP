@@ -213,19 +213,10 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	//int DELTA = 3; //Cardinality of the set \Delta
 	int M = 1e6; //Used in constraint 9-10 
 	
-	{ //ADD A FAKE CONSTRAINT TO ADD AT LEAST ONE KNAPSACK
-		vector< double > coef(K, 1);
-		char sense = 'G';
-		int matbeg = 0;
-		double rhs = 1;
-		snprintf(name, NAME_SIZE, "(6)");
-		char* cname = (char*)(&name[0]);
-		CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, K, &rhs, &sense, &matbeg, &map.Z[0], &coef[0], 0, &cname);
-	}
 	
 	
 	//Constraint (6): sum_{j \in J} w_j*d_j*h_j*t_kj <= W_k D_k H_k
-	
+	/*
 	for(int k = 0; k < K; k++){
 		vector<double> coef(N);
 		for(int j = 0; j < N; j++){
@@ -237,7 +228,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 		snprintf(name, NAME_SIZE, "(6)");
 		char* cname = (char*)(&name[0]);
 		CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, map.T[k].size(), &rhs, &sense, &matbeg, &map.T[k][0], &coef[0], 0, &cname);
-	}
+	}*/
 	
 	
 	//Constraint (7) : (\sum_{\delta \in \Delta} b_kij^\delta + b_kij^\delta) -t_ki -t_kj >= -1
@@ -430,7 +421,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	
 	
 	//Constraint (13): b_{ji}^\delta <= t_j ==> b_{ji}^\delta - t_j = 0
-	for(int k = 0; k < K; k++){
+	/*for(int k = 0; k < K; k++){
 		for(int i = 0; i < N; i++){
 			for(int j = 0;  j < N; j++){
 				for(int delta = 0; delta < 3; delta++){
@@ -449,7 +440,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 				}
 			}
 		}
-	}
+	}*/
 	
 	
 	/* Constraint (16) */
@@ -778,7 +769,7 @@ void output(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	
 	outfile << "#Vengono inclusi solo gli oggetti messi nello zaino" << endl;
 	for(int k = 0; k < K; k++){
-		if(z[k] > 0.9)
+		if(z[k] > 0.5)
 			outfile << "#Dimensione del " << k << "-mo Zaino " << instance.S[k][0] << " " << instance.S[k][1] <<" "<< instance.S[k][2] << endl;
 	} 
 	

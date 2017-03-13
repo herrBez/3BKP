@@ -47,7 +47,6 @@ var rotationEnabled = [false, false, false];
 var rotationCoefficient = [1, 1, 1];
 
 
-var colorInformation;
 
 var representAsTriangle;
 
@@ -59,14 +58,14 @@ var enabledCenterOfMass = false;
 
 function initMatrix(){
 	
-	camerapos[X] = (boxVertices[3*7 + X] - boxVertices[3*6 + X])/2;
-	camerapos[Y] = (-boxVertices[3*7 + Y] + boxVertices[3*4 + Y])/2;
-	camerapos[Z] = -5*boxVertices[3*4 + Z];
+	camerapos[X] = (boxVertices[0][3*7 + X] - boxVertices[0][3*6 + X])/2;
+	camerapos[Y] = (-boxVertices[0][3*7 + Y] + boxVertices[0][3*4 + Y])/2;
+	camerapos[Z] = -5*boxVertices[0][3*4 + Z];
 
 	
-	zoom_step[X] = boxVertices[3*6 + X] / 20;
-	zoom_step[Y] = boxVertices[3*6 + Y] / 20;
-	zoom_step[Z] = boxVertices[3*6 + Z] / 20;
+	zoom_step[X] = boxVertices[0][3*6 + X] / 20;
+	zoom_step[Y] = boxVertices[0][3*6 + Y] / 20;
+	zoom_step[Z] = boxVertices[0][3*6 + Z] / 20;
 	
 	
 	rotationEnabled = [false,false,false];
@@ -75,19 +74,32 @@ function initMatrix(){
 	ViewMatrix.elements[1][3] = camerapos[Y];
 	ViewMatrix.elements[2][3] = camerapos[Z];
 		
-	ModelMatrix = Matrix.I(4);
-	ModelMatrix.elements[0][0] = 1.0;
-	ModelMatrix.elements[1][1] = 1.0;
-	ModelMatrix.elements[2][2] = 1.0;
-	ModelMatrix.elements[0][3] = 0.0;
-	ModelMatrix.elements[1][3] = 0.0;
-	ModelMatrix.elements[2][3] = 0.0;
+	ModelMatrix = new Array();
+	for(k = 0; k < boxVertices.length; k++){
+		ModelMatrix.push(Matrix.I(4));
+		var x = 0;
+		for(l = 0; l < k; l++){
+			x += (-(boxVertices[l][3*7 + X] - boxVertices[l][3*6 + X]));
+		}
+		ModelMatrix[k].elements[0][3] = x; //Move in x axis
+		ModelMatrix[k].elements[1][3] = 0.0; //Move in y axis
+		ModelMatrix[k].elements[2][3] = 0.0; //Move in z axis
+		console.log("THIS " + ModelMatrix[k].elements[0][3]);
+	}
 }
 
 function initAttributes(){
+	alert(vertices[0].length);
+	alert(boxVertices.length);
 	representAsTriangle = new Array();
-	for(var i = 0; i < vertices.length; i++){
-		representAsTriangle[i] = true;
+	var i = 0;
+	var k = 0;
+	for(k = 0; k < boxVertices.length; k++){
+		var tmp = new Array();
+		for(i = 0; i < vertices[k].length; i++){
+			tmp.push(true);
+		}
+		representAsTriangle.push(tmp);
 	}
 	
 	
@@ -105,13 +117,9 @@ function start(_boxVertices, _itemIndices, _vertices, _centerOfMass, _innerBoxVe
   vertices = _vertices; 	
   centerOfMass = _centerOfMass;
   innerBoxVertices = _innerBoxVertices;
-  if(innerBoxVertices.length == 0){
-	extended = false;
-  } else {
-	extended = true;
-  }
+  
   initAttributes();
-  addSelector();
+	//addSelector();
   canvas = document.getElementById("glcanvas");
   
   canvas.addEventListener('click', function(evt){},false);
@@ -174,28 +182,31 @@ function initWebGL() {
 // one object -- a simple two-dimensional square.
 //
 function initBuffers() {
-  alert("REINIT ALL");
   
-  colorInformation = new Array();
+  var colorInformation = new Array();
   /* Assign random colors to the different polygons */
-  for(var i = 0; i < vertices.length; i++){
-	 var r = Math.random();
-	 var g = Math.random();
-	 var b = Math.random();
-	 colorInformation.push(
-		[
-		r, g, b,
-		r, g, b,
-		r, g, b,
-		r, g, b,
-		r, g, b,
-		r, g, b,
-		r, g, b,
-		r, g, b,
-		]
-	 );
-  }
-  var colorBuffer = [
+  for(var k = 0; k < boxVertices.length; k++){
+	  var colorInformationTmp = new Array();
+		for(var i = 0; i < vertices[k].length; i++){
+			var r = Math.random();
+			var g = Math.random();
+			var b = Math.random();
+			colorInformationTmp.push(
+				[
+					r, g, b,
+					r, g, b,
+					r, g, b,
+					r, g, b,
+					r, g, b,
+					r, g, b,
+					r, g, b,
+					r, g, b,
+				]
+			);
+		}
+		colorInformation.push(colorInformationTmp);
+	}
+  var colorCubeVertices = [
 	1.0, 0.0, 0.0,
 	1.0, 0.0, 0.0,
 	1.0, 0.0, 0.0,
@@ -204,7 +215,6 @@ function initBuffers() {
 	1.0, 0.0, 0.0,
 	1.0, 0.0, 0.0,
 	1.0, 0.0, 0.0,
-	
 	];
 	
 	
@@ -230,42 +240,58 @@ function initBuffers() {
     3, 2, 6,
     6, 7, 3,
   ];
+  
   VerticesBuffer = new Array();
   ColorBuffer = new Array();
   // Now pass the list of vertices into WebGL to build the shape. We
   // do this by creating a Float32Array from the JavaScript array,
   // then use it to fill the current vertex buffer.
-	for(var i = 0; i < vertices.length; i++){
-		console.log("Binding " + vertices[i] );
-		VerticesBuffer.push(gl.createBuffer());
-		gl.bindBuffer(gl.ARRAY_BUFFER, VerticesBuffer[i]);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices[i]), gl.STATIC_DRAW);
+  
+	for(var k = 0; k < boxVertices.length; k++){
+		VerticesBufferTmp = new Array();
+		ColorBufferTmp = new Array();
 		
-		ColorBuffer.push(gl.createBuffer());
-		gl.bindBuffer(gl.ARRAY_BUFFER, ColorBuffer[i]);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorInformation[i]), gl.STATIC_DRAW);
+		for(var i = 0; i < vertices[k].length; i++){
+		
+			VerticesBufferTmp.push(gl.createBuffer());
+			gl.bindBuffer(gl.ARRAY_BUFFER, VerticesBufferTmp[i]);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices[k][i]), gl.STATIC_DRAW);
+
+			ColorBufferTmp.push(gl.createBuffer());
+			gl.bindBuffer(gl.ARRAY_BUFFER, ColorBufferTmp[i]);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorInformation[k][i]), gl.STATIC_DRAW);
+		}
+		VerticesBuffer.push(VerticesBufferTmp);
+		ColorBuffer.push(ColorBufferTmp);
 	}
 	
 	centerOfMassBuffer = new Array();
-	for(var i = 0; i < centerOfMass.length; i++){
-		centerOfMassBuffer.push(gl.createBuffer());
-		gl.bindBuffer(gl.ARRAY_BUFFER, centerOfMassBuffer[i]);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(centerOfMass[i]), gl.STATIC_DRAW);
-	} 
+	for(var k = 0; k < boxVertices.length; k++){
+		centerOfMassBufferTmp = new Array();
+		for(var i = 0; i < centerOfMass.length; i++){
+			centerOfMassBufferTmp.push(gl.createBuffer());
+			gl.bindBuffer(gl.ARRAY_BUFFER, centerOfMassBufferTmp[i]);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(centerOfMass[k][i]), gl.STATIC_DRAW);
+		} 
+		centerOfMassBuffer.push(centerOfMassBufferTmp);
+	}
 	
 	
-	if(extended){
+	/*if(extended){
 		innerBoxVerticesBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, innerBoxVerticesBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(innerBoxVertices), gl.STATIC_DRAW);
+	}*/
+	cubeVerticesBuffer = new Array();
+	for(var k = 0; k < boxVertices.length; k++){
+		cubeVerticesBuffer.push(gl.createBuffer());
+		gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesBuffer[k]);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(boxVertices[k]), gl.STATIC_DRAW);
 	}
-	cubeVerticesBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(boxVertices), gl.STATIC_DRAW);
-
+	
 	cubeVerticesColor = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesColor);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorBuffer), gl.STATIC_DRAW);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorCubeVertices), gl.STATIC_DRAW);
 
 	
 	cubeVerticesIndexBuffer = new Array();
@@ -329,7 +355,7 @@ function drawScene() {
   // ratio of 640:480, and we only want to see objects between 0.1 units
   // and 100 units away from the camera.
 
-  perspectiveMatrix = makePerspective(45, 640.0/480.0, 0.1, boxVertices[3*6 + Z]*20);
+  perspectiveMatrix = makePerspective(45, 640.0/480.0, 0.1, boxVertices[0][3*6 + Z]*20);
 
   // Set the drawing position to the "identity" point, which is
   // the center of the scene.
@@ -343,33 +369,24 @@ function drawScene() {
 	ViewMatrix.elements[1][3] = camerapos[Y];
 	ViewMatrix.elements[2][3] = camerapos[Z];
 	rotation();
-	setMatrixUniforms();
 	
-	for(var i = 0; i < vertices.length; i++){
 		
-		if(!enabledCenterOfMass){
-			if(representAsTriangle[i]){
-				drawParallelepiped(VerticesBuffer[i], ColorBuffer[i], cubeVerticesIndexBuffer[0], gl.TRIANGLES, 36); 
-			}
-			else{	
-				drawParallelepiped(VerticesBuffer[i], ColorBuffer[i], cubeVerticesIndexBuffer[1], gl.LINES, 24); 
+	for(var k = 0; k < boxVertices.length; k++){
+		setMatrixUniforms(ModelMatrix[k]);
+		for(var i = 0; i < vertices[k].length; i++){
+			if(!enabledCenterOfMass){
+				if(representAsTriangle[k][i]){
+					drawParallelepiped(VerticesBuffer[k][i], ColorBuffer[k][i], cubeVerticesIndexBuffer[0], gl.TRIANGLES, 36); 
+				}
+				else{	
+					drawParallelepiped(VerticesBuffer[k][i], ColorBuffer[k][i], cubeVerticesIndexBuffer[1], gl.LINES, 24); 
+				}
 			}
 		}
-		
-		
-	}
-	if(enabledCenterOfMass){
-		for(var i = 0; i < centerOfMass.length; i++){
-			drawArray(centerOfMassBuffer[i], ColorBuffer[i], gl.POINTS, 0, 1);
- 		}
-	}
 	
-	//Draw inner box 
-	if(enabledCenterOfMass && extended){
-		drawParallelepiped(innerBoxVerticesBuffer, cubeVerticesColor, cubeVerticesIndexBuffer[1], gl.LINES, 24);
-	}
 	
-	drawParallelepiped(cubeVerticesBuffer, cubeVerticesColor, cubeVerticesIndexBuffer[1], gl.LINES, 24);
+		drawParallelepiped(cubeVerticesBuffer[k], cubeVerticesColor, cubeVerticesIndexBuffer[1], gl.LINES, 24);
+	}
 }
 
 //
@@ -478,12 +495,12 @@ function mvTranslate(v) {
   multMatrix(Matrix.Translation($V([v[0], v[1], v[2]])).ensure4x4());
 }
 
-function setMatrixUniforms() {
+function setMatrixUniforms(SelectedModelMatrix) {
   var pUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
   gl.uniformMatrix4fv(pUniform, false, new Float32Array(perspectiveMatrix.flatten()));
 
   var modelUniform = gl.getUniformLocation(shaderProgram, "ModelMatrix");
-  gl.uniformMatrix4fv(modelUniform, false, new Float32Array(ModelMatrix.flatten()));
+  gl.uniformMatrix4fv(modelUniform, false, new Float32Array(SelectedModelMatrix.flatten()));
   
   var viewUniform =  gl.getUniformLocation(shaderProgram, "ViewMatrix");
   gl.uniformMatrix4fv(viewUniform, false, new Float32Array(ViewMatrix.flatten()));
@@ -541,6 +558,7 @@ var description = ""+
 	"B -> 180 degree rotation around Y axis" + 
 	"C -> Show Center of Mass";
 	
+	/*
 function addSelector(){
 	var selectDIV = document.getElementById("Select");
 		
@@ -558,5 +576,6 @@ function addSelector(){
 		representAsTriangle[i] = !representAsTriangle[i];
    
 });
+}*/
 
-}
+
