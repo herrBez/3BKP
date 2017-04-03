@@ -39,7 +39,7 @@ class Instance3BKP {
 		std::vector< std::vector< double > > S;
 		
 		
-		std::vector< int > fixedCost;
+		std::vector< double > fixedCost;
 		
 		bool extended;
 		
