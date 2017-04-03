@@ -41,6 +41,10 @@ function processText(text){
 	
 	console.log(lines.length);
 	console.log("There are " + (counter-1) + " lines to parse");
+	if(counter <= 0) {
+		alert("No lines to show. Exiting");
+		throw new Error("There is nothing to show. Maybe the instance is empty because it is not convenient to use kanpsacks");
+	}
 	
 	var position = [];
 	var dimension = [];

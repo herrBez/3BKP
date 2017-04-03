@@ -27,6 +27,7 @@ class Instance3BKP {
 		/** vector containing the three dimension of the items */
 		std::vector< std::vector< double > > s;
 		
+		
 		/** vector containing the masses of the items */
 		std::vector< double > mass;
 		
@@ -36,6 +37,9 @@ class Instance3BKP {
 		
 		/** vector containing the three dimension of the k knapsack */
 		std::vector< std::vector< double > > S;
+		
+		
+		std::vector< int > fixedCost;
 		
 		bool extended;
 		
@@ -86,13 +90,14 @@ class Instance3BKP {
 			std::cout << K << std::endl;
 			
 			S.resize(K);
+			fixedCost.resize(K);
 			for(auto &i : S) i.resize(3);
 			
 			for(int k = 0; k < K; k++){
 				std::getline(infile, line);
 				ss.clear();
 				ss.str(line);
-				ss >> S[k][0] >> S[k][1] >> S[k][2];
+				ss >> S[k][0] >> S[k][1] >> S[k][2] >> fixedCost[k];
 			}
 
 			std::getline(infile, line);

@@ -6,14 +6,17 @@
 \section{Variabili}
 \begin{itemize}
 	\item $z_k$ assume valore $1$ se lo zaino $k-$simo viene utilizzato, $0$ altrimenti.
+	\item $F_k$ è un costo fisso per utilizzare lo zaino $k-$simo.
+	\item $L$ è un fattore per cui viene moltiplicato il primo componente della funzione obiettivo per contare
+	di più rispetto al minimizzare l'uso degli zaini.
 \end{itemize}
 	
 \begin{equation}
-\sum_{k \in K} \sum_{j \in J} p_j \cdot t_{kj}
+\left( \sum_{k \in K} \sum_{j \in J} L \cdot \frac{p_{j}}{p_{min}} \cdot t_{kj} \right) - \left( \sum_{k \in K} F_k \cdot z_k \right)
 \end{equation}
-s.t.
+s.t. 
 \begin{equation}
-\sum_{j \in J} w_j d_j h_j t_{kj} \leq W_kD_kH_k \quad\quad \forall k \in K
+\sum_{j \in J} w_j d_j h_j t_{kj} \leq W_kD_kH_k \quad\quad \forall k \in K 
 \end{equation}
 \begin{equation}
 \sum_{\delta\in\Delta}(b_{kij}^\delta + b_{kji}^\delta) \geq t_{ki} + t_{kj} - 1, \quad i < j,\ k \in K,\ i \in J,\ j \in J
