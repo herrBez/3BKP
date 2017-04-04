@@ -1,23 +1,91 @@
 \documentclass{scrartcl}
-
+\usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage[utf8]{inputenc}
 \usepackage[italian]{babel}
+
+\newcommand{\MutliLineEquation}[3]{ 
+	\ensuremath{
+		#1 = \left\{
+		\begin{array}{ll}
+		1& \text{#2} \\
+		0& \text{#3} \\
+		\end{array}
+		\right.
+	}
+}
+
+\title{Estensione con più Zaini}
 \begin{document}
-\section{Variabili}
-\begin{itemize}
-	\item $z_k$ assume valore $1$ se lo zaino $k-$simo viene utilizzato, $0$ altrimenti.
-	\item $F_k$ è un costo fisso per utilizzare lo zaino $k-$simo.
-	\item $L$ è un fattore per cui viene moltiplicato il primo componente della funzione obiettivo per contare
-	di più rispetto al minimizzare l'uso degli zaini.
-\end{itemize}
+\maketitle
+Lo scopo di questo documento è fornire un modello esteso con più zaini di quello descritto
+nel paper ``The three-dimensional knapsack problem with balancing constraints''.
+
+\textbf{Disclaimer: Non sono stati considerati i Balancing constraints del paper originale}.
+
 	
+\section{Variabili}
+In questa sezione vengono descritte le variabili contenute nel modello esteso.
+\subsection{Variabili mantenute identiche}
+\begin{itemize}
+	\item \MutliLineEquation{\rho_{ir}}{Se l'oggetto $i$ è rotato con la rotazione $r$}{Altrimenti}
+\end{itemize}
+\subsection{Variabili semplicemente estese}
+Vengono elencate le variabili che sono presenti nel modello originario e sono state estese per tenere
+in considerazione il fatto che vengano usate nello zaino $k$.
+\begin{itemize}
+	\item \MutliLineEquation{t_{ki}}{Se l'oggetto $i$ è inserito nello zaino $k$}{Altrimenti}
+	\item $\chi_{ki}^\delta$ coordinata del punto più in basso a sinistra e più in fondo (bottom-left-back point) dell'oggetto
+	$i$ lungo la dimensione $\delta$ nello zaino $k$.
+	\item \MutliLineEquation{b_{kij}}{Se l'oggetto $i$ viene prima dell'oggetto $j$ nel $k$-simo zaino nella dimensione $\delta$}{Altrimenti}
+\end{itemize}
+\subsection{Variabili nuove}
+\begin{itemize}
+	\item \MutliLineEquation{z_k}{Se lo zaino $k-$simo viene utilizzato}{Altrimenti}
+\end{itemize}
+\section{Funzione Obiettivo - Con spiegazioni}
+Vengono descritti i parametri che compaiono nella funzione obiettivo
+\begin{itemize}
+	\item $f_k$ è il costo associato all'utilizzo del $k-$simo zaino e viene letto dal file di input.
+	\item $L$ è un fattore per cui viene moltiplicato il primo componente della funzione obiettivo per contare
+	di più rispetto alla minimizzazione dei valori delle coordinate.
+	Siccome deve essere più grande di qualsiasi valore $\chi_{ki}$ si può prendere per questo valore
+	$$
+	L = max(S_{k}^\delta : k \in K : \delta \in \Delta) + 1
+	$$
+	se si rendono tutti i valori $f_k$ e $p_i$ maggiori o uguali a $1$.
+
+	\item Di default $\Delta' = \Delta$, ma per rendere il modello più veloce si può cercare di ottimizzare rispetto una sola delle dimensioni, per esempio $y$ ($\Delta' = \{2\}$),	o nessuna ($\Delta = \varnothing$). In quest'ultimo caso
+	la seconda componente della funzione obiettivo viene ignorata.
+\end{itemize}
+
+
 \begin{equation}
-\left( \sum_{k \in K} \sum_{j \in J} L \cdot \frac{p_{j}}{p_{min}} \cdot t_{kj} \right) - \left( \sum_{k \in K} F_k \cdot z_k \right)
+L \cdot \left(\left( \sum_{k \in K} \sum_{j \in J} \bar{p_{j}} \cdot t_{kj} \right) - \left( \sum_{k \in K} \bar{f_k} \cdot z_k \right) \right)
+- \left( \sum_{k \in K}\sum_{i \in J}\sum_{\delta \in \Delta'} \chi_{ki}^\delta \right)
 \end{equation}
-s.t. 
+
+dove:
+\begin{itemize}
+	\item $$\bar{p_{j}} = \frac{p_{j}}{g}$$
+	\item $$\bar{f_{k}} = \frac{f_{k}}{g}$$
+	\item dove 
+	$$
+	g = min(p_j\ :\ j \in J, f_k\ :\ k \in K)
+	$$
+\end{itemize}
+In modo tale che tutti i valori $\bar{f_k}$ e $\bar{p_j}$ siano maggiori o uguali ad $1$ e quindi se moltiplicati
+con $L$ pesino più dell'ottimizzazione delle coordinate.
+
+Naturalmente questo metodo assume che i profitti degli oggetti e i costi associati agli zaini siano positivi e \emph{non nulli}.
+Questa condizione può essere forzata a run-time con un \textit{assert}.
+
+
+\section{Vincoli}
 \begin{equation}
 \sum_{j \in J} w_j d_j h_j t_{kj} \leq W_kD_kH_k \quad\quad \forall k \in K 
 \end{equation}
+
 \begin{equation}
 \sum_{\delta\in\Delta}(b_{kij}^\delta + b_{kji}^\delta) \geq t_{ki} + t_{kj} - 1, \quad i < j,\ k \in K,\ i \in J,\ j \in J
 \end{equation}
@@ -63,13 +131,100 @@ b_{kij}^\delta \in \{0,1\} \quad \quad k \in K, i \in J, j \in J, \delta \in \de
 \rho_{ir} \in \{0,1\} \quad\quad i \in J, r \in R
 \end{equation}
 \begin{equation}
+\label{zk:in:0:1}
 z_k \in \{0,1\} \quad \quad k \in K
 \end{equation}
 
-\section{Note}
+\subsection{Note}
 \begin{itemize}
-\item Tutti i vincoli a parte \ref{constraint:multi:tkzk} e \ref{constraint:multi:onlyInOneKnapsack} sono stati ottenuti adattando i vincoli del modello di partenza.
+\item Tutti i vincoli a parte \ref{constraint:multi:tkzk}, \ref{constraint:multi:onlyInOneKnapsack} e \ref{zk:in:0:1} sono stati ottenuti adattando i vincoli del modello di partenza.
 \item Il vincolo \ref{constraint:multi:tkzk} fa sì che un oggetto possa essere inserito nel $k-$simo zaino soltanto se lo zaino viene effettivamente utilizzato nella soluzione.
-\item Il vincolo \ref{constraint:multi:onlyInOneKnapsack} fa sì che un oggetto possa essere inserito al massimo in uno zaino. 
+\item Il vincolo \ref{constraint:multi:onlyInOneKnapsack} fa sì che un oggetto possa essere inserito al più in uno zaino. 
+\item Il vincolo 9 è ridondante rispetto ad 8. (Ogni vincolo creato con 9 ha il corrispettivo in 8).
+\item Per il vincolo 7 si può utilizzare invece di un generico $M$, l'$L$ definito per la funzione obiettivo.
+\end{itemize}
+
+\section{Dimensioni del problema}
+Assumendo verosimilmente che 
+\begin{itemize}
+	\item $|K| < |J|$
+\end{itemize}  
+si ottiene che il numero di variabili è minore di $3|J|^3 + 4|J|^2 + 7|J|$, quindi
+nell'ordine di $O(|J|^3)$.
+
+Il numero di vincoli può essere sovrapprossimato con le stesse assunzioni fatte per le variabili in circa:
+$$
+\frac{19}{2}|J|^3 + \frac{15}{2}|J|^2 + 10|J|
+$$
+che è sempre nell'ordine $O(|J|^3)$.
+\begin{table}[h!]
+\begin{tabular}{|l|l|}
+	\hline
+	Variabili & \# Variabili \\
+	\hline
+	& \\
+	$z_k$ & $|K|$ \\
+	$\rho_{ir}$ & $|J| \cdot 6$\\
+	$t_{ki}$ & $|J| \cdot |K|$ \\
+	$X_{ki}^\delta$ & $|J| \cdot |K| \cdot | \Delta |$\\
+	$b_{kij}^\delta$ & $|J| \cdot |J| \cdot |K| \cdot |\Delta|$\\ 
+	& \\
+	\hline
+	& $3|J||J||K| + 4|J||K|+6|J|+K$ \\
+	\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\begin{tabular}{|l|l|}
+	\hline
+	Vincoli & \# Vincoli (UPPER BOUND)\\
+	\hline
+	(2) & $|K|$ \\
+	(3) & $|K| |J| (|J|-1)/2$ \\
+	(4) & $3\cdot |K| |J| $ \\
+	(5) & $3\cdot |K| |J| (|J|-1)/2$\\
+	(6) & $3\cdot |K| |J| (|J|-1)/2$ \\
+	(7) & $3\cdot |K| |J|$ \\
+	(8) & $3\cdot |K| |J| |J|$\\
+	(9) - È ridondante & 0 \\
+	(10)& $|J|$ \\
+	(11)& $|K| |J|$ \\
+	(12)& $|J|$ \\
+	\hline
+	Totale senza bound   & $3\cdot|K||J||J| + 7\cdot|K||J|(|J|-1)/2 + 7|K||J|+ 2|J| + |K|$ \\
+	\hline
+	Bound & \\
+	\hline 
+	(13)& $3 \cdot |K| |J|$ \\
+	(14)& $|K| |J|$ \\
+	(15)& $3 \cdot |K| |J| |J|$ \\
+	(16)& $6 |J|$ \\
+	(17)& $|K|$ \\
+	\hline
+	Totale & $6\cdot|K||J||J| + 7\cdot|K||J|(|J|-1)/2 + 11|K||J|+ 8|J| + 2|K|$ \\
+	\hline
+\end{tabular}
+\end{table}
+
+
+\section{File di Input}
+\begin{itemize}
+	\item $K$, il numero di zaini
+	\item Seguono $K$ righe contenente nella riga $k$ i dati per lo zaino $k$ intervallati da uno spazio:
+	\begin{itemize}
+		\item $S_k^1$
+		\item $S_k^2$
+		\item $S_k^3$
+		\item $f_k$
+	\end{itemize} 
+	\item $N$, il numero di oggetti ($|J|$)
+	\begin{itemize}
+		\item $s_i^1$
+		\item $s_i^2$
+		\item $s_i^3$
+		\item $m_i$
+		\item $p_i$
+	\end{itemize}
 \end{itemize}
 \end{document}

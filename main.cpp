@@ -29,12 +29,24 @@ const int NAME_SIZE = 512;
 char name[NAME_SIZE];
 bool output_required = true;
 
+bool optimize[3] = {
+	true, true, true
+};
+
+bool optimizeKnapsackCost = true;
+
+double timeout;
+
 bool extended = false;
 /** Struct containing the long options */
 static struct option long_options[] = {	
-	{"help", no_argument, 0, 'h'},
-	{"quiet", no_argument, 0, 'q'},
-	{"extended", no_argument, 0, 'e'},
+	{"help", no_argument, 0, 'h'},		/* Print a help message and exit */
+	{"quiet", no_argument, 0, 'q'},		/* Do not produce extra files */
+	{"extended", no_argument, 0, 'e'},  
+	{"disable-x", no_argument, 0, 'x'}, /* Disable optimization wrt x */
+	{"disable-y", no_argument, 0, 'y'}, /* Disable optimization wrt y */
+	{"disable-z", no_argument, 0, 'z'}, /* Disable optimization wrt z */
+	{"ignore-knapsack-cost", no_argument, 0, 'i'}, /* Disable optimization of knapsacks */
 	{0, 0, 0, 0},
 };
 
@@ -105,7 +117,8 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 	 */
 	 for(int k = 0; k < K; k++){
 		char xtype = 'B';
-		double obj = -1 * instance.fixedCost[k];
+		printf("%.2lf %.2lf\n", instance.L, instance.fixedCost[k]);
+		double obj = optimizeKnapsackCost?-instance.L * instance.fixedCost[k]:0.0;
 		double lb = 0.0;
 		double ub = 1.0;
 		sprintf(name, "z %d", k);
@@ -125,7 +138,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 		for(int i = 0; i < N; i++){
 			for(int delta = 0; delta < 3; delta++){
 				char xtype = 'C';
-				double obj = 0.0;
+				double obj = optimize[delta]?-1.0:0.0;
 				double lb = 0.0;
 				double ub = CPX_INFBOUND;
 				snprintf(name, NAME_SIZE, "chi %d %d %d", i, k, delta);
@@ -145,7 +158,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 		for(int j = 0; j < N; j++){
 		
 			char xtype = 'B';
-			double obj = instance.profit[j]; //TODO MODIFIED OBJ FUNCTION
+			double obj = instance.L * instance.profit[j]; //TODO MODIFIED OBJ FUNCTION
 			double lb = 0.0;
 			double ub = 1.0;
 			sprintf(name, "t_%d %d", k, j);
@@ -213,6 +226,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	//int DELTA = 3; //Cardinality of the set \Delta
 	int M = 1e6; //Used in constraint 9-10 
 	
+	unsigned int number_of_constraint = 0;
 	
 	
 	//Constraint (6): sum_{j \in J} w_j*d_j*h_j*t_kj <= W_k D_k H_k
@@ -227,6 +241,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 		snprintf(name, NAME_SIZE, "(6)");
 		char* cname = (char*)(&name[0]);
 		CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, map.T[k].size(), &rhs, &sense, &matbeg, &map.T[k][0], &coef[0], 0, &cname);
+		number_of_constraint++;
 	}
 	
 	
@@ -264,6 +279,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 				CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
 				/* Checking that the vector is correctly initialized */
 				assert(index == idVar.size());
+				number_of_constraint++;
 			}
 		}
 	}
@@ -291,6 +307,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 				CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
 				/* Checking that the vector is correctly initialized */
 				assert(index == idVar.size());
+				number_of_constraint++;
 			}
 		}
 	}
@@ -328,6 +345,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 				
 					/* Checking that the vector is correctly initialized */
 					assert(index == idVar.size());
+					number_of_constraint++;
 				}
 			}
 		}
@@ -370,6 +388,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 				
 					/* Checking that the vector is correctly initialized */
 					assert(index == idVar.size());
+					number_of_constraint++;
 				}
 			}
 		}
@@ -385,13 +404,14 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 				idVar[0] = map.Chi[k][i][delta];
 				coeff[0] = 1.0;
 				idVar[1] = map.T[k][i];
-				coeff[1] = -M;
+				coeff[1] = -instance.L;
 				char sense = 'L';
 				int matbeg = 0;
 				double rhs = 0;
 				snprintf(name, NAME_SIZE, "(11) %d %d",i,delta);
 				char* cname = (char*)(&name[0]);
 				CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
+				number_of_constraint++;
 			}
 		}
 	}
@@ -413,6 +433,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 					snprintf(name, NAME_SIZE, "(12) %d %d %d", i, j, delta);
 					char * cname = (char*) (&name[0]);
 					CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coef[0], 0, &cname);
+					number_of_constraint++;
 				}
 			}
 		}
@@ -436,6 +457,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 					snprintf(name, NAME_SIZE, "(13) %d %d %d", i,j,delta);
 					char * cname = (char*) (&name[0]);
 					CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
+					number_of_constraint++;
 				}
 			}
 		}
@@ -462,7 +484,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 		snprintf(name, NAME_SIZE, "(16) %d", i);
 		char * cname = (char*) (&name[0]);
 		CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
-
+		number_of_constraint++;
 	}
 	
 	
@@ -484,6 +506,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 			snprintf(name, NAME_SIZE, "Multi %d %d",k, j);
 			char * cname = (char*) (&name[0]);
 			CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
+			number_of_constraint++;
 		}
 	}
 	
@@ -502,9 +525,9 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 		snprintf(name, NAME_SIZE, "Multi (2) %d ", j);
 		char * cname = (char*) (&name[0]);
 		CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
+		number_of_constraint++;
 	}
-	
-	
+	printf("Number of constraints (not considering the variable bounds): %d\n", number_of_constraint);
 }
 
 
@@ -524,7 +547,7 @@ mapVar setupLP(CEnv env, Prob lp, Instance3BKP instance)
 	int K = instance.K;
 	int R = 6;
 	mapVar map(K, N, R);
-	
+
 	/* We deal with a maximization problem */
 	CHECKED_CPX_CALL( CPXchgobjsen, env, lp, CPX_MAX); 
 	/* Set up the variables */
@@ -532,10 +555,6 @@ mapVar setupLP(CEnv env, Prob lp, Instance3BKP instance)
 	/* Set up the constraints */
 	setupLPConstraints(env, lp, instance, map);
 	
-	/* If the problem is extended 
-	if(instance.extended)
-		setupLPBalancingConstraints(env, lp, instance, map);
-	*/
 	
 	if(output_required){
 		CHECKED_CPX_CALL( CPXwriteprob, env, lp, "Model.lp", NULL ); 
@@ -581,7 +600,6 @@ double solve( CEnv env, Prob lp, Instance3BKP instance) {
 	return objval;
 }
 
-
 /** 
  * print the help message
  * @param argv in order to get the name of the compiled program
@@ -589,9 +607,14 @@ double solve( CEnv env, Prob lp, Instance3BKP instance) {
 void print_help(char * argv[]){
 	cout << "Usage : " << argv[0] << " <instance.dat> " << " [OPT]... " << endl;
 	cout << endl;
-	cout << "-h, --help\t\t\tprint this message and exit" << endl;
-	cout << "-q, --quiet\t\t\tdo not write the solved problem in a file named /tmp/Model.sol, Model.lp" << endl;
+	cout << "-h, --help\t\t\t print this message and exit" << endl;
+	cout << "-q, --quiet\t\t\t do not write the solved problem in a file named /tmp/Model.sol, Model.lp" << endl;
 	cout << "-e, --extended\t\t\t use also the balancing constraint." << endl;
+	cout << "-x, --disable-x\t\t\t do not optimize w.r.t. x" << endl;
+	cout << "-y, --disable-y\t\t\t do not optimize w.r.t. y" << endl;
+	cout << "-z, --disable-z\t\t\t do not optimize w.r.t. z" << endl;
+	cout << "-t, --timeout\t\t\t set a timeout in seconds, after which CPLEX will stop (It returns the incumbent solution)" << endl;
+	cout << "-i, --ignore-kanpsack-cost\t\t the program will not try to optimize the number of knapsacks" << endl;
 	cout << endl;
 }
 
@@ -617,12 +640,19 @@ Instance3BKP get_option(int argc,  char * argv[]){
 	}
 	optind = 2; //Starting from index 2, because the first place is destinated to the istance file.
 	int option_index;
-	while((c = getopt_long (argc, argv, "hqe", long_options, &option_index)) != EOF) {
+	timeout = 1e75; /* Default value in CPLEX ~ 3 centuries */
+	while((c = getopt_long (argc, argv, "hqet:xyzi", long_options, &option_index)) != EOF) {
 		switch(c){
 			case 'h': print_help(argv); exit(EXIT_SUCCESS); break;
 			case 'q': output_required=false; break;
 			case 'e': extended = true; break;
-			 
+			case 't': timeout = strtod(optarg, NULL); 
+				printf("Timeout set to %lf\n", timeout);
+				break;
+			case 'x': optimize[0] = false; break;
+			case 'y': optimize[1] = false; break;
+			case 'z': optimize[2] = false; break;
+			case 'i': optimizeKnapsackCost = false; break;
 		}
     }
     sprintf(FILENAME, "%s", argv[1]);
@@ -746,7 +776,11 @@ int main (int argc, char *argv[])
 				
 		DECL_ENV( env );
 		DECL_PROB( env, lp );
+		
 		mapVar map = setupLP(env, lp, instance);
+		
+		/* Set up timeout */
+		CHECKED_CPX_CALL(CPXsetdblparam, env,  CPX_PARAM_TILIM, timeout);
 		
 		// find the solution
 		solve(env, lp, instance);
@@ -754,7 +788,7 @@ int main (int argc, char *argv[])
 		// print output
 		output(env, lp, instance, map);
 		
-		// free-allocated resolve
+		// free-allocated resources
 		CPXfreeprob(env, &lp);
 		CPXcloseCPLEX(&env);
 	} catch (exception& e){

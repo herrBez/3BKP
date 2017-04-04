@@ -11,10 +11,56 @@
 #include <stdexcept>
 #include <sstream>      // std::stringstream
 #include <string>
+#include <assert.h>
 
 class Instance3BKP {
 	private : 
 	Instance3BKP() : s(0, std::vector<double>(0)),mass(0) , profit(0), S(0, std::vector<double>(0)) { }
+		
+	double computeG() {
+		double min = +1e75;
+		for(int i = 0; i < N; ++i){
+			if(min > profit[i])
+				min = profit[i];
+		}
+		for(int k = 0; k < K; ++k){
+			if(min > fixedCost[k])
+				min = fixedCost[k];
+		}
+		return min;
+	}
+	
+	void normalizeProfitAndFixedCost(){
+		double min = computeG();
+		for(int i = 0; i < N; ++i) {
+			profit[i] /= min;
+		}
+		for(int k = 0; k < K; ++k){
+			fixedCost[k] /= min;
+		}
+		
+	}
+	
+	void computeL() {
+		L = -1e75;
+		for(int k = 0; k < K; k++){
+			for(int delta = 0; delta < 3; delta++){
+				if(L < S[k][delta])
+					L = S[k][delta];
+			}
+		}
+		L += 1;
+		printf("L = %lf\n", L);
+	}
+	
+	void verifyExistenceCondition() {
+		for(int i = 0; i < N; i++){
+			assert(profit[i] > 0);
+		}
+		for(int k = 0; k < K; k++){
+			assert(fixedCost[k] > 0);
+		}
+	}
 	
 	public:
 		/** Number of items, i.e. cardinality of J */
@@ -22,6 +68,8 @@ class Instance3BKP {
 		
 		/** Number of knapsacks, i.e. cardinality of K */
 		int K;
+		
+		double L;
 		
 		
 		/** vector containing the three dimension of the items */
@@ -117,10 +165,10 @@ class Instance3BKP {
 				ss >> s[i][0] >> s[i][1] >> s[i][2] >> mass[i] >> profit[i];
 				
 			}
-
-
-			
 			infile.close();
+			verifyExistenceCondition();
+			normalizeProfitAndFixedCost();
+			computeL();
 		}
 		
 		/**
@@ -129,9 +177,9 @@ class Instance3BKP {
 		void print(){
 			std::cout << "There are " << K << " Knapsacks " << std::endl;
 			for(int k = 0; k < K; k++){
-				std::cout << S[k][0] << " " << S[k][1] << " " << S[k][2] << std::endl;
+				std::cout << S[k][0] << " " << S[k][1] << " " << S[k][2] << " " << fixedCost[k] << std::endl;
 			}
-			std::cout << "Items " << std::endl;
+			std::cout << "There are " << N << " Items " << std::endl;
 			for(int i = 0; i < N; i++){
 				std::cout << s[i][0] << " " << s[i][1] << " " << s[i][2] << " " << mass[i] << " " << profit[i] << std::endl;
 			}
