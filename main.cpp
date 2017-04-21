@@ -849,6 +849,26 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
 			CPXchgbds(env, lp, 1, &map.T[k][i], &bound, &value);
 		}
 	}
+	//fix b variables with known values
+	for(int k = 0; k < K; k++){
+		for(int i = 0; i < N; i++){
+			for(int j = 0; j < N; j++){
+				for(int delta = 0; delta < 3; delta++){
+					char bound = 'B';
+					double value = fetched_variables.b[k][i][j][delta];
+					CPXchgbds(env, lp, 1, &map.B[k][i][j][delta], &bound, &value);
+				}
+			}
+		}
+	}
+	//fix rho variabes with known values
+	for(int i = 0; i < N; i++){
+		for(int r = 0; r < 6; r++){
+			char bound = 'B';
+			double value = fetched_variables.rho[i][r];
+			CPXchgbds(env, lp, 1, &map.Rho[i][r], &bound, &value);
+		}
+	}
 	
 	
 	
