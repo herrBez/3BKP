@@ -101,22 +101,23 @@ struct mapVar {
  */
 struct VarVal {
 	private : 
-	VarVal() : T(0, vector< double >(0)), B(0, vector<vector<vector<double>>>(0, vector<vector<double>>(0, vector< double >(0)))),
-			   Rho(0, vector< double >(0)), Chi(0, vector< vector<double> >(0, vector<double>(0))) { }
+	VarVal() : t(0, vector< double >(0)), b(0, vector<vector<vector<double>>>(0, vector<vector<double>>(0, vector< double >(0)))),
+			   rho(0, vector< double >(0)), chi(0, vector< vector<double> >(0, vector<double>(0))), rotation(0, vector<int>(0)) { }
 	public : 
-	vector< vector< double > > T;
-	vector< vector < vector < vector < double > > > > B;
-	vector< vector < double > > Rho;
-	vector< vector < vector < double > > > Chi;
-	vector< double > Z;
+	vector< vector< double > > t;
+	vector< vector < vector < vector < double > > > > b;
+	vector< vector < double > > rho;
+	vector< vector < vector < double > > > chi;
+	vector< double > z;
+	vector< vector< int > > rotation;
 	
 	VarVal(int K, int N, int R){
-		T.resize(K);
-		for(auto &i : T)
+		t.resize(K);
+		for(auto &i : t)
 			i.resize(N);
 		
-		B.resize(K);
-		for(auto &i : B) {
+		b.resize(K);
+		for(auto &i : b) {
 			i.resize(N);
 			for(auto &k : i) {
 				k.resize(N);
@@ -126,19 +127,24 @@ struct VarVal {
 			}
 		}
 		
-		Rho.resize(N);
-		for(auto &i : Rho){
+		rho.resize(N);
+		for(auto &i : rho){
 			i.resize(R);
 		}
 		
-		Chi.resize(K);
-		for(auto &k : Chi){
+		chi.resize(K);
+		for(auto &k : chi){
 			k.resize(N);
 			for(auto &i : k){
 				i.resize(3);
 			}
 		}
-		Z.resize(K);
+		z.resize(K);
+		
+		rotation.resize(N);
+		for(auto &r : rotation){
+			r.resize(3);
+		}
 	}
 };
 
@@ -709,6 +715,54 @@ Instance3BKP get_option(int argc,  char * argv[]){
     return instance;
 }
 
+
+
+struct VarVal fetchVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
+	
+	int N = instance.N;
+	int K = instance.K;
+	
+	struct VarVal variable_values(K, N, 6);
+	
+	
+	int begin = map.Z[0];
+	int end = map.Z[K-1];
+	CHECKED_CPX_CALL (CPXgetx, env, lp, &variable_values.z[0], begin, end);
+	
+	for(int k = 0; k < K; k++){
+		int begin = map.T[k][0];
+		int end = map.T[k][N - 1];
+		CHECKED_CPX_CALL( CPXgetx, env, lp, &variable_values.t[k][0], begin, end);
+	}
+	
+	for(int k = 0; k < K; k++){
+		for(int i = 0; i < N; i++){
+			int begin = map.Chi[k][i][0];
+			int end = map.Chi[k][i][2];
+			CHECKED_CPX_CALL( CPXgetx, env, lp, &(variable_values.chi[k][i][0]), begin, end);
+		}
+	}
+	
+	for(int i = 0; i < N; i++){
+		int begin = map.Rho[i][0];
+		int end = map.Rho[i][5];
+		CHECKED_CPX_CALL( CPXgetx, env, lp, &(variable_values.rho[i][0]), begin, end);
+	}
+	vector< vector< int > > rotation(N, vector< int >(3));
+	for(int i = 0; i < N; i++){
+		
+		for(int r = 0; r < 6; r++){
+			if(variable_values.rho[i][r] >= 0.9) { //Taking into account round errors due to the double representation
+				for(int delta = 0; delta < 3; delta++){
+					variable_values.rotation[i][delta] = instance.R[r][delta];
+				}
+				break;
+			}
+		}
+	}
+	return variable_values;
+}
+
 /**
  * Print a human readable output in the file named output.txt
  * @param env
@@ -721,48 +775,7 @@ void output(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	int N = instance.N;
 	int K = instance.K;
 	
-
-	vector< vector< double > > t = vector< vector<double> >(K, vector< double >(N));
-	vector< double > z = vector<double>(K);
-	vector< vector< vector < double > > > chi(K, vector< vector< double> >(N, vector< double >(3)));
-	vector< vector < double > > rho(N, vector< double >(6));
-	
-	int begin = map.Z[0];
-	int end = map.Z[K-1];
-	CHECKED_CPX_CALL (CPXgetx, env, lp, &z[0], begin, end);
-	
-	for(int k = 0; k < K; k++){
-		int begin = map.T[k][0];
-		int end = map.T[k][N - 1];
-		CHECKED_CPX_CALL( CPXgetx, env, lp, &t[k][0], begin, end);
-	}
-	
-	for(int k = 0; k < K; k++){
-		for(int i = 0; i < N; i++){
-			int begin = map.Chi[k][i][0];
-			int end = map.Chi[k][i][2];
-			CHECKED_CPX_CALL( CPXgetx, env, lp, &(chi[k][i][0]), begin, end);
-		}
-	}
-	
-	for(int i = 0; i < N; i++){
-		int begin = map.Rho[i][0];
-		int end = map.Rho[i][5];
-		CHECKED_CPX_CALL( CPXgetx, env, lp, &(rho[i][0]), begin, end);
-	}
-	vector< vector< int > > rotation(N, vector< int >(3));
-	for(int i = 0; i < N; i++){
-		
-		for(int r = 0; r < 6; r++){
-			if(rho[i][r] >= 0.9) { //Taking into account round errors due to the double representation
-				for(int delta = 0; delta < 3; delta++){
-					rotation[i][delta] = instance.R[r][delta];
-				}
-				break;
-			}
-		}
-	}
-	
+	struct VarVal v = fetchVariables(env, lp, instance, map);
 	
 	sprintf(OUTPUTFILENAME, "output%s_%s", extended?"_extended":"", FILENAME);
 	ofstream outfile(OUTPUTFILENAME);
@@ -773,29 +786,29 @@ void output(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	
 	outfile << "#Vengono inclusi solo gli oggetti messi nello zaino" << endl;
 	for(int k = 0; k < K; k++){
-		if(z[k] > 0.5)
+		if(v.z[k] > 0.5)
 			outfile << "#Dimensione del " << k << "-mo Zaino " << instance.S[k][0] << " " << instance.S[k][1] <<" "<< instance.S[k][2] << endl;
 	} 
 	
 	for(int k = 0; k < K; k++){
-		if(z[k] < 0.1)
+		if(v.z[k] < 0.1)
 			continue;
 		outfile << "#Knapsack " << k << "-mo" << endl;
 		outfile << instance.S[k][0] << " " << instance.S[k][1] << " " << instance.S[k][2] << endl;
 	
 		for(int i = 0; i < N; i++){
-			if(t[k][i] < 0.1)
+			if(v.t[k][i] < 0.1)
 				continue;
 			//Print only inserted objects 
 			outfile << i << "\t";
 			
 			for(int delta = 0; delta < 3; delta++){
-				outfile << chi[k][i][delta];
+				outfile << v.chi[k][i][delta];
 				outfile << " ";
 			}
 			outfile << "\t";
 			for(int delta = 0; delta < 3; delta++){
-				outfile << instance.s[i][rotation[i][delta]] << " ";
+				outfile << instance.s[i][v.rotation[i][delta]] << " ";
 			}
 			
 			outfile << endl;
