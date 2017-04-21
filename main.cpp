@@ -16,6 +16,11 @@
 #include "Instance3BKP.h"
 #include <assert.h>     /* assert */
 
+#include <algorithm>
+
+
+
+
 char FILENAME[128];
 char OUTPUTFILENAME[128];
 
@@ -101,14 +106,14 @@ struct mapVar {
  */
 struct VarVal {
 	private : 
-	VarVal() : t(0, vector< double >(0)), b(0, vector<vector<vector<double>>>(0, vector<vector<double>>(0, vector< double >(0)))),
-			   rho(0, vector< double >(0)), chi(0, vector< vector<double> >(0, vector<double>(0))), rotation(0, vector<int>(0)) { }
+	VarVal() : t(0, vector< int >(0)), b(0, vector<vector<vector<int>>>(0, vector<vector<int>>(0, vector< int >(0)))),
+			   rho(0, vector< int >(0)), chi(0, vector< vector<double> >(0, vector<double>(0))), rotation(0, vector<int>(0)) { }
 	public : 
-	vector< vector< double > > t;
-	vector< vector < vector < vector < double > > > > b;
-	vector< vector < double > > rho;
+	vector< vector< int > > t;
+	vector< vector < vector < vector < int > > > > b;
+	vector< vector < int > > rho;
 	vector< vector < vector < double > > > chi;
-	vector< double > z;
+	vector< int > z;
 	vector< vector< int > > rotation;
 	
 	VarVal(int K, int N, int R){
@@ -716,23 +721,28 @@ Instance3BKP get_option(int argc,  char * argv[]){
 }
 
 
-
-struct VarVal fetchVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
+VarVal fetchVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	
 	int N = instance.N;
 	int K = instance.K;
 	
 	struct VarVal variable_values(K, N, 6);
 	
+	{
+		vector<double> tmp(K);
+		int begin = map.Z[0];
+		int end = map.Z[K-1];
+		CHECKED_CPX_CALL (CPXgetx, env, lp, &tmp[0], begin, end);
+		std::transform(tmp.begin(), tmp.end(), variable_values.z.begin(), [](double val){ return val < 0.5? 0:1; });
+	}
 	
-	int begin = map.Z[0];
-	int end = map.Z[K-1];
-	CHECKED_CPX_CALL (CPXgetx, env, lp, &variable_values.z[0], begin, end);
 	
 	for(int k = 0; k < K; k++){
+		vector<double> tmp(N);
 		int begin = map.T[k][0];
 		int end = map.T[k][N - 1];
-		CHECKED_CPX_CALL( CPXgetx, env, lp, &variable_values.t[k][0], begin, end);
+		CHECKED_CPX_CALL( CPXgetx, env, lp, &tmp[0], begin, end);
+		std::transform(tmp.begin(), tmp.end(), variable_values.t[k].begin(), [](double val){ return val < 0.5? 0:1; });
 	}
 	
 	for(int k = 0; k < K; k++){
@@ -744,10 +754,13 @@ struct VarVal fetchVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar ma
 	}
 	
 	for(int i = 0; i < N; i++){
+		vector<double> tmp(6);
 		int begin = map.Rho[i][0];
 		int end = map.Rho[i][5];
-		CHECKED_CPX_CALL( CPXgetx, env, lp, &(variable_values.rho[i][0]), begin, end);
+		CHECKED_CPX_CALL( CPXgetx, env, lp, &tmp[0], begin, end);
+		std::transform(tmp.begin(), tmp.end(), variable_values.rho[i].begin(), [](double val){ return val < 0.5? 0:1; });
 	}
+	
 	vector< vector< int > > rotation(N, vector< int >(3));
 	for(int i = 0; i < N; i++){
 		
@@ -771,7 +784,7 @@ struct VarVal fetchVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar ma
  * @param map
  */
  
-void output(CEnv env, Prob lp, Instance3BKP instance, struct VarVal v){
+void output(CEnv env, Prob lp, Instance3BKP instance, VarVal v){
 	int N = instance.N;
 	int K = instance.K;
 	
@@ -785,18 +798,18 @@ void output(CEnv env, Prob lp, Instance3BKP instance, struct VarVal v){
 	
 	outfile << "#Vengono inclusi solo gli oggetti messi nello zaino" << endl;
 	for(int k = 0; k < K; k++){
-		if(v.z[k] > 0.5)
+		if(v.z[k] == 1)
 			outfile << "#Dimensione del " << k << "-mo Zaino " << instance.S[k][0] << " " << instance.S[k][1] <<" "<< instance.S[k][2] << endl;
 	} 
 	
 	for(int k = 0; k < K; k++){
-		if(v.z[k] < 0.1)
+		if(v.z[k] == 0)
 			continue;
 		outfile << "#Knapsack " << k << "-mo" << endl;
 		outfile << instance.S[k][0] << " " << instance.S[k][1] << " " << instance.S[k][2] << endl;
 	
 		for(int i = 0; i < N; i++){
-			if(v.t[k][i] < 0.1)
+			if(v.t[k][i] == 0)
 				continue;
 			//Print only inserted objects 
 			outfile << i << "\t";
@@ -825,13 +838,15 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
 	//fix z variables with the known values
 	for(int k = 0; k < K; k++){
 		char bound = 'B'; //Set upper and lower bound
-		CPXchgbds(env, lp, 1, &map.Z[k], &bound, &fetched_variables.z[k]);
+		double value = fetched_variables.z[k];
+		CPXchgbds(env, lp, 1, &map.Z[k], &bound, &value);
 	}
 	//fix t variables with the known values
 	for(int k = 0; k < K; k++){
 		for(int i = 0; i < N; i++){
 			char bound = 'B';
-			CPXchgbds(env, lp, 1, &map.T[k], &bound, &fetched_variables.t[k]);
+			double value = fetched_variables.t[k][i];
+			CPXchgbds(env, lp, 1, &map.T[k][i], &bound, &value);
 		}
 	}
 	
@@ -867,7 +882,7 @@ int main (int argc, char *argv[])
 		VarVal fetched_variables = fetchVariables(env, lp, instance, map);
 		
 		// Setup Slave Problem
-		setupSP(env, lp, isntance, fetched_variables);
+		setupSP(env, lp, instance, map, fetched_variables);
 		
 		
 		// print output
