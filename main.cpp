@@ -895,6 +895,9 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
 		}
 	}
 	
+	/* Set problem to minimum */
+	CHECKED_CPX_CALL( CPXchgobjsen, env, lp, CPX_MIN); 
+	
 	
 	
 }	
@@ -928,6 +931,7 @@ int main (int argc, char *argv[])
 		
 		// Setup Slave Problem
 		setupSP(env, lp, instance, map, fetched_variables);
+		
 		
 		
 		// print output
