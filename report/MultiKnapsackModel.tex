@@ -4,6 +4,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[italian]{babel}
 
+
 \newcommand{\MutliLineEquation}[3]{ 
 	\ensuremath{
 		#1 = \left\{
@@ -18,31 +19,32 @@
 \title{Estensione con più Zaini}
 \begin{document}
 \maketitle
-Lo scopo di questo documento è fornire un modello esteso con più zaini di quello descritto
-nel paper ``The three-dimensional knapsack problem with balancing constraints''.
+Lo scopo di questo documento è fornire un estensione del modello con più zaini introdotto in Baldi et al. \cite{Baldi20129802}.
+
+Dato un insieme di zaini $K = \{1, \dots, m\}$, le loro dimensioni $S_k^0, S_k^1, S_k^2$ e il loro costo associato $f_k$ (modella quanto costa usare lo zaino $k$) e un insieme di oggetti $J = \{1, \dots, n\}$ di profitto $p_j$ e dimensione $w_j, d_j, h_j$.
+Si cercano $K' \subseteq K$ e $J' \subseteq J$ tali che il profitto sia massimo.
+
 
 \textbf{Disclaimer: Non sono stati considerati i Balancing constraints del paper originale}.
 
-	
-\section{Variabili}
-In questa sezione vengono descritte le variabili contenute nel modello esteso.
-\subsection{Variabili mantenute identiche}
+\section{Modello}
 \begin{itemize}
+	\item $J$ è l'insieme degli oggetti da inserire nello zaino di cardinalità $n$, cui sono associati gli indici $i$ e $j$;
+	\item $K$ è l'insieme di possibili zaini, cui è associato l'indice $k$;
+	\item $\Delta$ l'insieme delle dimensioni $\{1,2,3\}$ con l'indice associato $\delta$;
+	\item $R$ l'insieme delle rotazioni degli oggetti di cardinalità $6$ e indice $r$;
+	\item $s_{ir}^\delta$ dimensione dell'oggetto $i$--simo lungo la dimensione $\delta$ quando l'oggetto è rotato nella rotazione $r$;
+	\item $S_{k}^\delta$ la dimensione del $k$--simo zaino nella dimensione $k$;
+	\item $\chi_{ki}^\delta$ la coordinata del punto più in fondo, in basso a sinistra dell'oggetto $i$ lungo la dimensione $\delta$ nello zaino $k$;
+	\item \MutliLineEquation{t_{ki}}{Se l'oggetto $i$ è contenuto nello zaino $k$}{Altrimenti}
+	\item \MutliLineEquation{b_{kij}^\delta}{Se l'oggetto $i$ viene prima dell'oggetto $j$ lungo la dimensione $\delta$ nello zaino $k$}{Altrimenti}
 	\item \MutliLineEquation{\rho_{ir}}{Se l'oggetto $i$ è rotato con la rotazione $r$}{Altrimenti}
+	\item \MutliLineEquation{z_k}{Se lo zaino $k$--simo viene utilizzato}{Altrimenti}
+	
 \end{itemize}
-\subsection{Variabili semplicemente estese}
-Vengono elencate le variabili che sono presenti nel modello originario e sono state estese per tenere
-in considerazione il fatto che vengano usate nello zaino $k$.
-\begin{itemize}
-	\item \MutliLineEquation{t_{ki}}{Se l'oggetto $i$ è inserito nello zaino $k$}{Altrimenti}
-	\item $\chi_{ki}^\delta$ coordinata del punto più in basso a sinistra e più in fondo (bottom-left-back point) dell'oggetto
-	$i$ lungo la dimensione $\delta$ nello zaino $k$.
-	\item \MutliLineEquation{b_{kij}}{Se l'oggetto $i$ viene prima dell'oggetto $j$ nel $k$-simo zaino nella dimensione $\delta$}{Altrimenti}
-\end{itemize}
-\subsection{Variabili nuove}
-\begin{itemize}
-	\item \MutliLineEquation{z_k}{Se lo zaino $k-$simo viene utilizzato}{Altrimenti}
-\end{itemize}
+
+
+
 \section{Funzione Obiettivo - Con spiegazioni}
 Vengono descritti i parametri che compaiono nella funzione obiettivo
 \begin{itemize}
@@ -227,4 +229,8 @@ che è sempre nell'ordine $O(|J|^3)$.
 		\item $p_i$
 	\end{itemize}
 \end{itemize}
+\bibliographystyle{unsrt}
+
+\bibliography{sources}
+
 \end{document}
