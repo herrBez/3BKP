@@ -870,6 +870,30 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
 		}
 	}
 	
+	/* Change objective function */
+	
+	//Change objective coefficient of variabe z_k
+	for(int k = 0; k < K; k++){
+		double coeff = 0.0;
+		CHECKED_CPX_CALL(CPXchgobj, env, lp, 1, &map.Z[k], &coeff);
+	}
+	
+	//Change objective coefficient of variabe t_k
+	for(int k = 0; k < K; k++){
+		for(int i = 0; i < N; i++){
+			double coeff = 0.0;
+			CHECKED_CPX_CALL(CPXchgobj, env, lp, 1, &map.T[k][i], &coeff);
+		}
+	}
+	
+	 for(int k = 0; k < K; k++){
+		for(int i = 0; i < N; i++){
+			for(int delta = 0; delta < 3; delta++){
+				double coeff = 1.0;
+				CHECKED_CPX_CALL(CPXchgobj, env, lp, 1, &map.Chi[k][i][delta], &coeff);
+			}
+		}
+	}
 	
 	
 	
