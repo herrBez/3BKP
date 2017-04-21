@@ -96,6 +96,53 @@ struct mapVar {
 		Z.resize(K);
 	}
 };
+/**
+ * Struct that contains all the vectors used to keep track of the variables
+ */
+struct VarVal {
+	private : 
+	VarVal() : T(0, vector< double >(0)), B(0, vector<vector<vector<double>>>(0, vector<vector<double>>(0, vector< double >(0)))),
+			   Rho(0, vector< double >(0)), Chi(0, vector< vector<double> >(0, vector<double>(0))) { }
+	public : 
+	vector< vector< double > > T;
+	vector< vector < vector < vector < double > > > > B;
+	vector< vector < double > > Rho;
+	vector< vector < vector < double > > > Chi;
+	vector< double > Z;
+	
+	VarVal(int K, int N, int R){
+		T.resize(K);
+		for(auto &i : T)
+			i.resize(N);
+		
+		B.resize(K);
+		for(auto &i : B) {
+			i.resize(N);
+			for(auto &k : i) {
+				k.resize(N);
+				for(auto &j : k) {
+					j.resize(3);
+				}
+			}
+		}
+		
+		Rho.resize(N);
+		for(auto &i : Rho){
+			i.resize(R);
+		}
+		
+		Chi.resize(K);
+		for(auto &k : Chi){
+			k.resize(N);
+			for(auto &i : k){
+				i.resize(3);
+			}
+		}
+		Z.resize(K);
+	}
+};
+
+
 
 
 /**
