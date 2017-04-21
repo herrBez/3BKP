@@ -839,14 +839,14 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
 	for(int k = 0; k < K; k++){
 		char bound = 'B'; //Set upper and lower bound
 		double value = fetched_variables.z[k];
-		CPXchgbds(env, lp, 1, &map.Z[k], &bound, &value);
+		CHECKED_CPX_CALL(CPXchgbds, env, lp, 1, &map.Z[k], &bound, &value);
 	}
 	//fix t variables with the known values
 	for(int k = 0; k < K; k++){
 		for(int i = 0; i < N; i++){
 			char bound = 'B';
 			double value = fetched_variables.t[k][i];
-			CPXchgbds(env, lp, 1, &map.T[k][i], &bound, &value);
+			CHECKED_CPX_CALL(CPXchgbds, env, lp, 1, &map.T[k][i], &bound, &value);
 		}
 	}
 	//fix b variables with known values
@@ -856,7 +856,7 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
 				for(int delta = 0; delta < 3; delta++){
 					char bound = 'B';
 					double value = fetched_variables.b[k][i][j][delta];
-					CPXchgbds(env, lp, 1, &map.B[k][i][j][delta], &bound, &value);
+					CHECKED_CPX_CALL(CPXchgbds, env, lp, 1, &map.B[k][i][j][delta], &bound, &value);
 				}
 			}
 		}
@@ -866,9 +866,10 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
 		for(int r = 0; r < 6; r++){
 			char bound = 'B';
 			double value = fetched_variables.rho[i][r];
-			CPXchgbds(env, lp, 1, &map.Rho[i][r], &bound, &value);
+			CHECKED_CPX_CALL(CPXchgbds, env, lp, 1, &map.Rho[i][r], &bound, &value);
 		}
 	}
+	
 	
 	
 	
