@@ -819,6 +819,25 @@ void output(CEnv env, Prob lp, Instance3BKP instance, struct VarVal v){
 }
 
 
+void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetched_variables){
+	int N = instance.N;
+	int K = instance.K;
+	//fix z variables with the known values
+	for(int k = 0; k < K; k++){
+		char bound = 'B'; //Set upper and lower bound
+		CPXchgbds(env, lp, 1, &map.Z[k], &bound, &fetched_variables.z[k]);
+	}
+	//fix t variables with the known values
+	for(int k = 0; k < K; k++){
+		for(int i = 0; i < N; i++){
+			char bound = 'B';
+			CPXchgbds(env, lp, 1, &map.T[k], &bound, &fetched_variables.t[k]);
+		}
+	}
+	
+	
+	
+}	
 
 /**
  * the main function
@@ -846,6 +865,10 @@ int main (int argc, char *argv[])
 		
 		// fetch variables from the solved model
 		VarVal fetched_variables = fetchVariables(env, lp, instance, map);
+		
+		// Setup Slave Problem
+		setupSP(env, lp, isntance, fetched_variables);
+		
 		
 		// print output
 		output(env, lp, instance, fetched_variables);
