@@ -46,7 +46,7 @@ Si cercano $K' \subseteq K$ e $J' \subseteq J$ tali che il profitto sia massimo.
 
 
 
-\section{Funzione Obiettivo - Con spiegazioni}
+\subsection{Funzione Obiettivo - Con spiegazioni}
 Vengono descritti i parametri che compaiono nella funzione obiettivo
 \begin{itemize}
 	\item $f_k$ è il costo associato all'utilizzo del $k-$simo zaino e viene letto dal file di input.
@@ -84,7 +84,7 @@ Naturalmente questo metodo assume che i profitti degli oggetti e i costi associa
 Questa condizione può essere forzata a run-time con un \textit{assert}.
 
 
-\section{Vincoli}
+\subsection{Vincoli}
 \begin{equation}
 \sum_{j \in J} w_j d_j h_j t_{kj} \leq W_kD_kH_k \quad\quad \forall k \in K 
 \end{equation}
@@ -141,7 +141,7 @@ z_k \in \{0,1\} \quad \quad k \in K
 \subsection{Note}
 \begin{itemize}
 \item Tutti i vincoli a parte \ref{constraint:multi:tkzk}, \ref{constraint:multi:onlyInOneKnapsack} e \ref{zk:in:0:1} sono stati ottenuti adattando i vincoli del modello di partenza.
-\item Il vincolo \ref{constraint:multi:tkzk} fa sì che un oggetto possa essere inserito nel $k-$simo zaino soltanto se lo zaino viene effettivamente utilizzato nella soluzione.
+\item Il vincolo \ref{constraint:multi:tkzk} fa sì che un oggetto possa essere inserito nel $k$--simo zaino soltanto se lo zaino viene effettivamente utilizzato nella soluzione.
 \item Il vincolo \ref{constraint:multi:onlyInOneKnapsack} fa sì che un oggetto possa essere inserito al più in uno zaino. 
 \item Il vincolo 9 è ridondante rispetto ad 8. (Ogni vincolo creato con 9 ha il corrispettivo in 8).
 \item Per il vincolo 7 si può utilizzare invece di un generico $M$, l'$L$ definito per la funzione obiettivo.
@@ -244,7 +244,26 @@ che è sempre nell'ordine $O(|J|^3)$.
 	\end{itemize}
 \end{itemize}
 
-
+\section{Refusi nel paper originale}
+Nello sviluppo di questo lavoro sono stati riscontrati alcuni refusi nel paper di Baldi et al. \cite{Baldi20129802}.
+\begin{itemize}
+	\item Nel vincolo $n^\circ 10$ c'è un errore di stampa:
+	$$
+	\chi_j^\delta + \sum_{r\in R} s_{jr}\rho_{ir} \leq \chi_i^\delta + M(1-b_{ji})
+	$$
+	dovrebbe essere 
+	$$
+	\chi_j^\delta + \sum_{r\in R} s_{jr}\rho_{\mathbf{\color{red}j}r} \leq \chi_i^\delta + M(1-b_{ji})
+	$$
+	Infatti sostituendo la prima equazione con la seconda, tutte le sovrapposizioni tra gli oggetti scompaiono.
+	\item Il vincolo $n^\circ 8$ unito al vincolo $n^\circ 16$ fanno sì che qualora si inserisse in $J$ un oggetto che non ha abbastanza spazio all'interno dello zaino il modello sarà inammissibile. Per ovviare a questo problema si può modificare il vincolo $n^\circ 16$:
+	$$
+	\sum_{r \in R} \rho_{ir} = t_i
+	$$
+	Infatti l'oggetto deve avere una rotazione soltanto se viene effettivamente inserito nello zaino\footnote{ 
+	Naturalmente un'altra soluzione potrebbe essere semplicemente di controllare che tutti gli oggetti siano più piccoli dello zaino.}.
+	\item Il vincolo $n^\circ\ 12$ e $n^\circ\ 13$ sono ridondanti, infatti ogni vincolo in 12 ha un corrispettivo in 13. L'unica differenza è che vengono elencati in due maniere diverse.
+\end{itemize}
 
 \bibliographystyle{unsrt}
 
