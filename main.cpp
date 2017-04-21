@@ -610,7 +610,7 @@ mapVar setupLP(CEnv env, Prob lp, Instance3BKP instance)
 	
 	
 	if(output_required){
-		CHECKED_CPX_CALL( CPXwriteprob, env, lp, "Model.lp", NULL ); 
+		CHECKED_CPX_CALL( CPXwriteprob, env, lp, "/tmp/Model.lp", NULL ); 
 	}
 	
 	return map;
@@ -642,7 +642,7 @@ double solve( CEnv env, Prob lp, Instance3BKP instance) {
 	
 	
 	if(output_required){	
-		CHECKED_CPX_CALL( CPXsolwrite, env, lp, "Model.sol");
+		CHECKED_CPX_CALL( CPXsolwrite, env, lp, "/tmp/Model.sol");
 	}
 	
 	cout << "Problem Size N" << N << endl;
