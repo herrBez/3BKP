@@ -771,11 +771,10 @@ struct VarVal fetchVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar ma
  * @param map
  */
  
-void output(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
+void output(CEnv env, Prob lp, Instance3BKP instance, struct VarVal v){
 	int N = instance.N;
 	int K = instance.K;
 	
-	struct VarVal v = fetchVariables(env, lp, instance, map);
 	
 	sprintf(OUTPUTFILENAME, "output%s_%s", extended?"_extended":"", FILENAME);
 	ofstream outfile(OUTPUTFILENAME);
@@ -845,8 +844,11 @@ int main (int argc, char *argv[])
 		// find the solution
 		solve(env, lp, instance);
 		
+		// fetch variables from the solved model
+		VarVal fetched_variables = fetchVariables(env, lp, instance, map);
+		
 		// print output
-		output(env, lp, instance, map);
+		output(env, lp, instance, fetched_variables);
 		
 		// free-allocated resources
 		CPXfreeprob(env, &lp);
