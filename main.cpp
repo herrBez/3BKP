@@ -118,7 +118,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 	 for(int k = 0; k < K; k++){
 		char xtype = 'B';
 		printf("%.2lf %.2lf\n", instance.L, instance.fixedCost[k]);
-		double obj = optimizeKnapsackCost?-instance.L * instance.fixedCost[k]:0.0;
+		double obj = optimizeKnapsackCost?instance.fixedCost[k]:0.0;
 		double lb = 0.0;
 		double ub = 1.0;
 		sprintf(name, "z %d", k);
@@ -138,7 +138,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 		for(int i = 0; i < N; i++){
 			for(int delta = 0; delta < 3; delta++){
 				char xtype = 'C';
-				double obj = optimize[delta]?-1.0:0.0;
+				double obj = 0.0;
 				double lb = 0.0;
 				double ub = CPX_INFBOUND;
 				snprintf(name, NAME_SIZE, "chi %d %d %d", i, k, delta);
@@ -158,7 +158,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 		for(int j = 0; j < N; j++){
 		
 			char xtype = 'B';
-			double obj = instance.L * instance.profit[j]; //TODO MODIFIED OBJ FUNCTION
+			double obj = instance.profit[j]; 
 			double lb = 0.0;
 			double ub = 1.0;
 			sprintf(name, "t_%d %d", k, j);
