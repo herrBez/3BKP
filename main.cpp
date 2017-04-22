@@ -175,8 +175,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 	 */
 	 for(int k = 0; k < K; k++){
 		char xtype = 'B';
-		printf("%.2lf %.2lf\n", instance.L, instance.fixedCost[k]);
-		double obj = optimizeKnapsackCost?instance.fixedCost[k]:0.0;
+		double obj = optimizeKnapsackCost?-instance.fixedCost[k]:0.0;
 		double lb = 0.0;
 		double ub = 1.0;
 		sprintf(name, "z %d", k);
@@ -726,7 +725,7 @@ VarVal fetchVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	int N = instance.N;
 	int K = instance.K;
 	
-	struct VarVal variable_values(K, N, 6);
+	VarVal variable_values(K, N, 6);
 	
 	{
 		vector<double> tmp(K);
@@ -761,9 +760,7 @@ VarVal fetchVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 		std::transform(tmp.begin(), tmp.end(), variable_values.rho[i].begin(), [](double val){ return val < 0.5? 0:1; });
 	}
 	
-	vector< vector< int > > rotation(N, vector< int >(3));
 	for(int i = 0; i < N; i++){
-		
 		for(int r = 0; r < 6; r++){
 			if(variable_values.rho[i][r] >= 0.9) { //Taking into account round errors due to the double representation
 				for(int delta = 0; delta < 3; delta++){
@@ -926,16 +923,28 @@ int main (int argc, char *argv[])
 		// find the solution
 		solve(env, lp, instance);
 		
+		printf("Solved Master Problem\n");
+		
 		// fetch variables from the solved model
 		VarVal fetched_variables = fetchVariables(env, lp, instance, map);
+		
+		printf("Fetched variables Successfully\n");
 		
 		// Setup Slave Problem
 		setupSP(env, lp, instance, map, fetched_variables);
 		
+		printf("Set up problem Successfully\n");
 		
+		// Solve Slave Problem
+		solve(env, lp, instance); 
+		
+		
+		
+		VarVal slave_variables = fetchVariables(env, lp, instance, map);
 		
 		// print output
 		output(env, lp, instance, fetched_variables);
+		
 		
 		// free-allocated resources
 		CPXfreeprob(env, &lp);
