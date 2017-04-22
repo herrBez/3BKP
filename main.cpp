@@ -886,7 +886,10 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
 	 for(int k = 0; k < K; k++){
 		for(int i = 0; i < N; i++){
 			for(int delta = 0; delta < 3; delta++){
-				double coeff = 1.0;
+				double coeff = 0.0;
+				if(fetched_variables.t[k][i] == 1) //Optimize only with respect to objects that are included
+					coeff = 1.0;
+				
 				CHECKED_CPX_CALL(CPXchgobj, env, lp, 1, &map.Chi[k][i][delta], &coeff);
 			}
 		}
@@ -930,20 +933,26 @@ int main (int argc, char *argv[])
 		
 		printf("Fetched variables Successfully\n");
 		
+		output(env, lp, instance, fetched_variables);
+		
 		// Setup Slave Problem
 		setupSP(env, lp, instance, map, fetched_variables);
 		
 		printf("Set up problem Successfully\n");
 		
+		CHECKED_CPX_CALL( CPXwriteprob, env, lp, "/tmp/Model2.lp", NULL ); 
+		
+		
+		
 		// Solve Slave Problem
-		solve(env, lp, instance); 
+		//solve(env, lp, instance); 
 		
 		
 		
-		VarVal slave_variables = fetchVariables(env, lp, instance, map);
+		//VarVal slave_variables = fetchVariables(env, lp, instance, map);
 		
 		// print output
-		output(env, lp, instance, fetched_variables);
+		
 		
 		
 		// free-allocated resources
