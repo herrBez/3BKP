@@ -752,6 +752,18 @@ VarVal fetchVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 		}
 	}
 	
+	for(int k = 0; k < K; k++){
+		for(int i = 0; i < N; i++){
+			for(int j = 0; j < N; j++){
+				vector<double> tmp(3);
+				int begin = map.B[k][i][j][0];
+				int end = map.B[k][i][j][2];
+				CHECKED_CPX_CALL( CPXgetx, env, lp, &tmp[0], begin, end);
+				std::transform(tmp.begin(), tmp.end(), variable_values.b[k][i][j].begin(), [](double val){ return val < 0.5? 0:1; });
+			}
+		}
+	}
+	
 	for(int i = 0; i < N; i++){
 		vector<double> tmp(6);
 		int begin = map.Rho[i][0];
@@ -781,15 +793,15 @@ VarVal fetchVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
  * @param map
  */
  
-void output(CEnv env, Prob lp, Instance3BKP instance, VarVal v){
+void output(CEnv env, Prob lp, Instance3BKP instance, VarVal v, char * filename){
 	int N = instance.N;
 	int K = instance.K;
 	
 	
-	sprintf(OUTPUTFILENAME, "output%s_%s", extended?"_extended":"", FILENAME);
-	ofstream outfile(OUTPUTFILENAME);
+	
+	ofstream outfile(filename);
 	if(!outfile.good()) {
-		cerr << OUTPUTFILENAME << endl;
+		cerr << filename << endl;
 		throw std::runtime_error("Cannot open the file ");
 	}
 	
@@ -887,7 +899,7 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
 		for(int i = 0; i < N; i++){
 			for(int delta = 0; delta < 3; delta++){
 				double coeff = 0.0;
-				if(fetched_variables.t[k][i] == 1) //Optimize only with respect to objects that are included
+				if(optimize[delta] && fetched_variables.t[k][i] == 1) //Optimize only with respect to objects that are included
 					coeff = 1.0;
 				
 				CHECKED_CPX_CALL(CPXchgobj, env, lp, 1, &map.Chi[k][i][delta], &coeff);
@@ -933,27 +945,30 @@ int main (int argc, char *argv[])
 		
 		printf("Fetched variables Successfully\n");
 		
-		output(env, lp, instance, fetched_variables);
+		sprintf(OUTPUTFILENAME, "output_%s", FILENAME);
+		output(env, lp, instance, fetched_variables,  OUTPUTFILENAME);
 		
 		// Setup Slave Problem
 		setupSP(env, lp, instance, map, fetched_variables);
 		
 		printf("Set up problem Successfully\n");
 		
+		
 		CHECKED_CPX_CALL( CPXwriteprob, env, lp, "/tmp/Model2.lp", NULL ); 
 		
 		
 		
 		// Solve Slave Problem
-		//solve(env, lp, instance); 
+		solve(env, lp, instance); 
 		
 		
 		
-		//VarVal slave_variables = fetchVariables(env, lp, instance, map);
+		VarVal slave_variables = fetchVariables(env, lp, instance, map);
 		
 		// print output
 		
-		
+		sprintf(OUTPUTFILENAME, "output_%s2", FILENAME);
+		output(env, lp, instance, slave_variables,  OUTPUTFILENAME);
 		
 		// free-allocated resources
 		CPXfreeprob(env, &lp);
