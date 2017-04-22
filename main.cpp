@@ -748,7 +748,7 @@ VarVal fetchVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 		for(int i = 0; i < N; i++){
 			int begin = map.Chi[k][i][0];
 			int end = map.Chi[k][i][2];
-			CHECKED_CPX_CALL( CPXgetx, env, lp, &(variable_values.chi[k][i][0]), begin, end);
+			CHECKED_CPX_CALL( CPXgetx, env, lp, &variable_values.chi[k][i][0], begin, end);
 		}
 	}
 	
@@ -884,14 +884,14 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
 	//Change objective coefficient of variabe z_k
 	for(int k = 0; k < K; k++){
 		double coeff = 0.0;
-		CHECKED_CPX_CALL(CPXchgobj, env, lp, 1, &map.Z[k], &coeff);
+		CHECKED_CPX_CALL(CPXprechgobj, env, lp, 1, &map.Z[k], &coeff);
 	}
 	
 	//Change objective coefficient of variabe t_k
 	for(int k = 0; k < K; k++){
 		for(int i = 0; i < N; i++){
 			double coeff = 0.0;
-			CHECKED_CPX_CALL(CPXchgobj, env, lp, 1, &map.T[k][i], &coeff);
+			CHECKED_CPX_CALL(CPXprechgobj, env, lp, 1, &map.T[k][i], &coeff);
 		}
 	}
 	
@@ -899,10 +899,10 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
 		for(int i = 0; i < N; i++){
 			for(int delta = 0; delta < 3; delta++){
 				double coeff = 0.0;
-				if(optimize[delta] && fetched_variables.t[k][i] == 1) //Optimize only with respect to objects that are included
+				if(optimize[delta] && fetched_variables.t[k][i]) //Optimize only with respect to objects that are included
 					coeff = 1.0;
 				
-				CHECKED_CPX_CALL(CPXchgobj, env, lp, 1, &map.Chi[k][i][delta], &coeff);
+				CHECKED_CPX_CALL(CPXprechgobj, env, lp, 1, &map.Chi[k][i][delta], &coeff);
 			}
 		}
 	}
@@ -945,8 +945,23 @@ int main (int argc, char *argv[])
 		
 		printf("Fetched variables Successfully\n");
 		
-		sprintf(OUTPUTFILENAME, "output_%s", FILENAME);
+		sprintf(OUTPUTFILENAME, "output_%s%c", FILENAME, '\0');
 		output(env, lp, instance, fetched_variables,  OUTPUTFILENAME);
+		
+		{
+		double sum = 0.;
+		for(int k = 0; k < instance.K; k++){
+			for(int i = 0; i < instance.N; i++){
+				
+					for(int delta = 0; delta < 3; delta++){
+						if(optimize[delta])
+						sum += fetched_variables.chi[k][i][delta];
+					}
+				
+			}
+		}
+		cout << "START CHI VALUES " << sum << endl;
+		}
 		
 		// Setup Slave Problem
 		setupSP(env, lp, instance, map, fetched_variables);
@@ -955,7 +970,7 @@ int main (int argc, char *argv[])
 		
 		
 		CHECKED_CPX_CALL( CPXwriteprob, env, lp, "/tmp/Model2.lp", NULL ); 
-		
+		CHECKED_CPX_CALL(CPXchgprobtype, env, lp, CPXPROB_MILP);
 		
 		
 		// Solve Slave Problem
@@ -965,9 +980,26 @@ int main (int argc, char *argv[])
 		
 		VarVal slave_variables = fetchVariables(env, lp, instance, map);
 		
-		// print output
+	
+		cout << "OK -> OUTPUT" << endl;
+		sprintf(OUTPUTFILENAME, "output_%s2%c", FILENAME, '\0');
 		
-		sprintf(OUTPUTFILENAME, "output_%s2", FILENAME);
+		
+		{
+		double sum = 0.;
+		for(int k = 0; k < instance.K; k++){
+			for(int i = 0; i < instance.N; i++){
+				
+					for(int delta = 0; delta < 3; delta++){
+						if(optimize[delta])
+						sum += slave_variables.chi[k][i][delta];
+					}
+				
+			}
+		}
+		cout << "END CHI VALUES " << sum << endl;
+		}
+		
 		output(env, lp, instance, slave_variables,  OUTPUTFILENAME);
 		
 		// free-allocated resources
