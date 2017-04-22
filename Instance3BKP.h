@@ -17,29 +17,7 @@ class Instance3BKP {
 	private : 
 	Instance3BKP() : s(0, std::vector<double>(0)),mass(0) , profit(0), S(0, std::vector<double>(0)) { }
 		
-	double computeG() {
-		double min = +1e75;
-		for(int i = 0; i < N; ++i){
-			if(min > profit[i])
-				min = profit[i];
-		}
-		for(int k = 0; k < K; ++k){
-			if(min > fixedCost[k])
-				min = fixedCost[k];
-		}
-		return min;
-	}
 	
-	void normalizeProfitAndFixedCost(){
-		double min = computeG();
-		for(int i = 0; i < N; ++i) {
-			profit[i] /= min;
-		}
-		for(int k = 0; k < K; ++k){
-			fixedCost[k] /= min;
-		}
-		
-	}
 	
 	void computeL() {
 		L = -1e75;
@@ -55,10 +33,10 @@ class Instance3BKP {
 	
 	void verifyExistenceCondition() {
 		for(int i = 0; i < N; i++){
-			assert(profit[i] > 0);
+			assert(profit[i] >= 0);
 		}
 		for(int k = 0; k < K; k++){
-			assert(fixedCost[k] > 0);
+			assert(fixedCost[k] >= 0);
 		}
 	}
 	
@@ -167,7 +145,6 @@ class Instance3BKP {
 			}
 			infile.close();
 			verifyExistenceCondition();
-			normalizeProfitAndFixedCost();
 			computeL();
 		}
 		
