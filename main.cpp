@@ -840,7 +840,14 @@ void output(CEnv env, Prob lp, Instance3BKP instance, VarVal v, char * filename)
 	outfile.close();
 }
 
-
+/**
+ * setup slave problem
+ * @param env
+ * @param lp 
+ * @param instance an instance of 3KP
+ * @param map contains the index position of the variables in the problem
+ * @param fetched_variables contains the values of the variables of the solution of the master problem 
+ */
 void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetched_variables){
 	int N = instance.N;
 	int K = instance.K;
@@ -858,24 +865,43 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
 			CHECKED_CPX_CALL(CPXchgbds, env, lp, 1, &map.T[k][i], &bound, &value);
 		}
 	}
-	//fix b variables with known values
+	//fix b variables that are not used
 	for(int k = 0; k < K; k++){
-		for(int i = 0; i < N; i++){
-			for(int j = 0; j < N; j++){
-				for(int delta = 0; delta < 3; delta++){
+		
+			for(int i = 0; i < N; i++){
+				if(fetched_variables.t[k][i] == 0){
+				for(int j = 0; j < N; j++){
+					for(int delta = 0; delta < 3; delta++){
 					char bound = 'B';
-					double value = fetched_variables.b[k][i][j][delta];
+					double value = 0.0;
 					CHECKED_CPX_CALL(CPXchgbds, env, lp, 1, &map.B[k][i][j][delta], &bound, &value);
+					}
 				}
-			}
+			
+			}	
 		}
 	}
+	
+	
+	
+	
 	//fix rho variabes with known values
 	for(int i = 0; i < N; i++){
 		for(int r = 0; r < 6; r++){
 			char bound = 'B';
 			double value = fetched_variables.rho[i][r];
 			CHECKED_CPX_CALL(CPXchgbds, env, lp, 1, &map.Rho[i][r], &bound, &value);
+		}
+	}
+	
+	//fix chi variables that are not used (s.t. t[k][i] == 0)
+	for(int k = 0; k < K; k++){
+		for(int i = 0; i < N; i++){
+			if(fetched_variables.t[k][i] == 0){
+				char bound[3] = {'B', 'B', 'B'};
+				double value[3] = {0.0, 0.0,0.0};
+				CHECKED_CPX_CALL(CPXchgbds, env, lp, 3, &map.Chi[k][i][0], &bound[0], &value[0]);
+			}
 		}
 	}
 	
@@ -894,12 +920,12 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
 			CHECKED_CPX_CALL(CPXprechgobj, env, lp, 1, &map.T[k][i], &coeff);
 		}
 	}
-	
+	//Change objective coefficients of variable chi_ki only if t_ki
 	 for(int k = 0; k < K; k++){
 		for(int i = 0; i < N; i++){
 			for(int delta = 0; delta < 3; delta++){
 				double coeff = 0.0;
-				if(optimize[delta] && fetched_variables.t[k][i]) //Optimize only with respect to objects that are included
+				if(optimize[delta] && fetched_variables.t[k][i] == 1) //Optimize only with respect to objects that are included
 					coeff = 1.0;
 				
 				CHECKED_CPX_CALL(CPXprechgobj, env, lp, 1, &map.Chi[k][i][delta], &coeff);
@@ -909,6 +935,8 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
 	
 	/* Set problem to minimum */
 	CHECKED_CPX_CALL( CPXchgobjsen, env, lp, CPX_MIN); 
+	
+	CPXchgprobname (env, lp, "slave problem");
 	
 	
 	
@@ -934,6 +962,7 @@ int main (int argc, char *argv[])
 		
 		/* Set up timeout */
 		CHECKED_CPX_CALL(CPXsetdblparam, env,  CPX_PARAM_TILIM, timeout);
+		CHECKED_CPX_CALL(CPXsetintparam, env,  CPX_PARAM_THREADS, 1);
 		
 		// find the solution
 		solve(env, lp, instance);
