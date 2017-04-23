@@ -20,7 +20,7 @@
 \title{Estensione con più Zaini}
 \begin{document}
 \maketitle
-Lo scopo di questo documento è fornire un estensione del modello con più zaini introdotto in Baldi et al. \cite{Baldi20129802}.
+Lo scopo di questo documento è fornire un'estensione del modello esatto con più zaini introdotto in Baldi et al. \cite{Baldi20129802}.
 
 Dato un insieme di zaini $K = \{1, \dots, m\}$, le loro dimensioni $S_k^0, S_k^1, S_k^2$ e il loro costo associato $f_k$ (modella quanto costa usare lo zaino $k$) e un insieme di oggetti $J = \{1, \dots, n\}$ di profitto $p_j$ e dimensione $w_j, d_j, h_j$.
 Si cercano $K' \subseteq K$ e $J' \subseteq J$ tali che il profitto sia massimo.
@@ -32,11 +32,11 @@ Si cercano $K' \subseteq K$ e $J' \subseteq J$ tali che il profitto sia massimo.
 \begin{itemize}
 	\item $J$ è l'insieme degli oggetti da inserire nello zaino di cardinalità $n$, cui sono associati gli indici $i$ e $j$;
 	\item $K$ è l'insieme di possibili zaini, cui è associato l'indice $k$;
-	\item $\Delta$ l'insieme delle dimensioni $\{1,2,3\}$ con l'indice associato $\delta$;
-	\item $R$ l'insieme delle rotazioni degli oggetti di cardinalità $6$ e indice $r$;
-	\item $s_{ir}^\delta$ dimensione dell'oggetto $i$--simo lungo la dimensione $\delta$ quando l'oggetto è rotato nella rotazione $r$;
-	\item $S_{k}^\delta$ la dimensione del $k$--simo zaino nella dimensione $k$;
-	\item $\chi_{ki}^\delta$ la coordinata del punto più in fondo, in basso a sinistra dell'oggetto $i$ lungo la dimensione $\delta$ nello zaino $k$;
+	\item $\Delta$ l'insieme delle dimensioni $\{0,1,2\}$ con l'indice associato $\delta$;
+	\item $R$ è l'insieme delle possibili rotazioni degli oggetti, ha cardinalità $6$ e indice $r$;
+	\item $s_{ir}^\delta$ dimensione dell'oggetto $i$--simo lungo la dimensione $\delta$ quando l'oggetto è rotato con la rotazione $r$;
+	\item $S_{k}^\delta$ la dimensione del $k$--simo zaino nella dimensione $\delta$;
+	\item $\chi_{ki}^\delta$ la coordinata del punto più in fondo, in basso a sinistra dell'oggetto $i$ lungo la dimensione $\delta$ nello zaino $k$ (il punto di coordinate minime);
 	\item \MutliLineEquation{t_{ki}}{Se l'oggetto $i$ è contenuto nello zaino $k$}{Altrimenti}
 	\item \MutliLineEquation{b_{kij}^\delta}{Se l'oggetto $i$ viene prima dell'oggetto $j$ lungo la dimensione $\delta$ nello zaino $k$}{Altrimenti}
 	\item \MutliLineEquation{\rho_{ir}}{Se l'oggetto $i$ è rotato con la rotazione $r$}{Altrimenti}
@@ -46,42 +46,10 @@ Si cercano $K' \subseteq K$ e $J' \subseteq J$ tali che il profitto sia massimo.
 
 
 
-\subsection{Funzione Obiettivo - Con spiegazioni}
-Vengono descritti i parametri che compaiono nella funzione obiettivo
-\begin{itemize}
-	\item $f_k$ è il costo associato all'utilizzo del $k-$simo zaino e viene letto dal file di input.
-	\item $L$ è un fattore per cui viene moltiplicato il primo componente della funzione obiettivo per contare
-	di più rispetto alla minimizzazione dei valori delle coordinate.
-	Siccome deve essere più grande di qualsiasi valore $\chi_{ki}$ si può prendere per questo valore
-	$$
-	L = max(S_{k}^\delta : k \in K : \delta \in \Delta) + 1
-	$$
-	se si rendono tutti i valori $f_k$ e $p_i$ maggiori o uguali a $1$.
-
-	\item Di default $\Delta' = \Delta$, ma per rendere il modello più veloce si può cercare di ottimizzare rispetto una sola delle dimensioni, per esempio $y$ ($\Delta' = \{2\}$),	o nessuna ($\Delta = \varnothing$). In quest'ultimo caso
-	la seconda componente della funzione obiettivo viene ignorata.
-\end{itemize}
-
-
+\subsection{Funzione Obiettivo}
 \begin{equation}
-L \cdot \left(\left( \sum_{k \in K} \sum_{j \in J} \bar{p_{j}} \cdot t_{kj} \right) - \left( \sum_{k \in K} \bar{f_k} \cdot z_k \right) \right)
-- \left( \sum_{k \in K}\sum_{i \in J}\sum_{\delta \in \Delta'} \chi_{ki}^\delta \right)
+\text{ max }\left(\sum_{k \in K} \sum_{i \in J} p_i \cdot t_{ki}\right) - \left(\sum_{k \in K} f_k \cdot z_k\right)
 \end{equation}
-
-dove:
-\begin{itemize}
-	\item $$\bar{p_{j}} = \frac{p_{j}}{g}$$
-	\item $$\bar{f_{k}} = \frac{f_{k}}{g}$$
-	\item dove 
-	$$
-	g = min(p_j\ :\ j \in J, f_k\ :\ k \in K)
-	$$
-\end{itemize}
-In modo tale che tutti i valori $\bar{f_k}$ e $\bar{p_j}$ siano maggiori o uguali ad $1$ e quindi se moltiplicati
-con $L$ pesino più dell'ottimizzazione delle coordinate.
-
-Naturalmente questo metodo assume che i profitti degli oggetti e i costi associati agli zaini siano positivi e \emph{non nulli}.
-Questa condizione può essere forzata a run-time con un \textit{assert}.
 
 
 \subsection{Vincoli}
@@ -143,8 +111,11 @@ z_k \in \{0,1\} \quad \quad k \in K
 \item Tutti i vincoli a parte \ref{constraint:multi:tkzk}, \ref{constraint:multi:onlyInOneKnapsack} e \ref{zk:in:0:1} sono stati ottenuti adattando i vincoli del modello di partenza.
 \item Il vincolo \ref{constraint:multi:tkzk} fa sì che un oggetto possa essere inserito nel $k$--simo zaino soltanto se lo zaino viene effettivamente utilizzato nella soluzione.
 \item Il vincolo \ref{constraint:multi:onlyInOneKnapsack} fa sì che un oggetto possa essere inserito al più in uno zaino. 
-\item Il vincolo 9 è ridondante rispetto ad 8. (Ogni vincolo creato con 9 ha il corrispettivo in 8).
-\item Per il vincolo 7 si può utilizzare invece di un generico $M$, l'$L$ definito per la funzione obiettivo.
+\item Il vincolo 9 è ridondante rispetto ad 8, infatti ogni vincolo di tipo 9 ha un corrispettivo di tipo 8.
+\item Per il vincolo 7 si può utilizzare invece di un generico $M$, un parametro $L$ così definito:
+$$
+L = max(S_k^\delta : k \in K, \delta \in \Delta) + 1
+$$ 
 \end{itemize}
 
 \section{Dimensioni del problema}
@@ -179,8 +150,8 @@ nell'ordine di $O(|J|^3)$.
 \end{table}
 
 
-Nella tabella \ref{table:no:constraints} sono riportati Il numero di vincoli per ogni tipo di vincolo. 
-Assumendo come per le variabili che $|K| < |J|$ il numero di vincoli può essere sovrapprossimato in circa:
+Nella tabella \ref{table:no:constraints} sono riportati il numero di vincoli per ogni tipo di vincolo. 
+Assumendo come per le variabili che $|K|$ sia minore di $|J|$ il numero di vincoli può essere sovrapprossimato nel modo seguente:
 $$
 \frac{19}{2}|J|^3 + \frac{15}{2}|J|^2 + 10|J|
 $$
