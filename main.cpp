@@ -21,7 +21,6 @@
 
 
 
-char FILENAME[128];
 char OUTPUTFILENAME[128];
 
 
@@ -32,28 +31,7 @@ int status;
 char errmsg[BUF_SIZE];		
 const int NAME_SIZE = 512;
 char name[NAME_SIZE];
-bool output_required = true;
 
-bool optimize[3] = {
-	true, true, true
-};
-
-bool optimizeKnapsackCost = true;
-
-double timeout;
-
-bool extended = false;
-/** Struct containing the long options */
-static struct option long_options[] = {	
-	{"help", no_argument, 0, 'h'},		/* Print a help message and exit */
-	{"quiet", no_argument, 0, 'q'},		/* Do not produce extra files */
-	{"extended", no_argument, 0, 'e'},  
-	{"disable-x", no_argument, 0, 'x'}, /* Disable optimization wrt x */
-	{"disable-y", no_argument, 0, 'y'}, /* Disable optimization wrt y */
-	{"disable-z", no_argument, 0, 'z'}, /* Disable optimization wrt z */
-	{"ignore-knapsack-cost", no_argument, 0, 'i'}, /* Disable optimization of knapsacks */
-	{0, 0, 0, 0},
-};
 
 
 
@@ -65,7 +43,7 @@ static struct option long_options[] = {
  * @param map the map that is filled up with the indexes
  * 
  */
-void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
+void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map, optionFlag oFlag){
 	int current_var_position = 0;
 	int N = instance.N;
 	int K = instance.K;
@@ -76,7 +54,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 	 */
 	 for(int k = 0; k < K; k++){
 		char xtype = 'B';
-		double obj = optimizeKnapsackCost?-instance.fixedCost[k]:0.0;
+		double obj = oFlag.optimizeKnapsackCost?-instance.fixedCost[k]:0.0;
 		double lb = 0.0;
 		double ub = 1.0;
 		sprintf(name, "z %d", k);
@@ -177,7 +155,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
  * @param map
  * 
  */
-void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
+void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, optionFlag oFlag){
 	int N = instance.N;
 	int K = instance.K;
 	int R = 6; //Cardinality of the set R
@@ -497,7 +475,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
  * @param C the matrix containing the costs from i to j
  * @param mapY used in order to have the result outside the setup function.
  */	
-mapVar setupLP(CEnv env, Prob lp, Instance3BKP instance)
+mapVar setupLP(CEnv env, Prob lp, Instance3BKP instance, optionFlag oFlag)
 {	
 	
 	
@@ -509,12 +487,12 @@ mapVar setupLP(CEnv env, Prob lp, Instance3BKP instance)
 	/* We deal with a maximization problem */
 	CHECKED_CPX_CALL( CPXchgobjsen, env, lp, CPX_MAX); 
 	/* Set up the variables */
-	setupLPVariables(env, lp, instance, map);
+	setupLPVariables(env, lp, instance, map, oFlag);
 	/* Set up the constraints */
-	setupLPConstraints(env, lp, instance, map);
+	setupLPConstraints(env, lp, instance, map, oFlag);
 	
 	
-	if(output_required){
+	if(oFlag.output_required){
 		CHECKED_CPX_CALL( CPXwriteprob, env, lp, "/tmp/Model.lp", NULL ); 
 	}
 	
@@ -530,7 +508,7 @@ mapVar setupLP(CEnv env, Prob lp, Instance3BKP instance)
  * used in order to retrieve the values of the y variables and print them on the screen.
  * @return objval the optimal solution
  */
-double solve( CEnv env, Prob lp, Instance3BKP instance) {
+double solve( CEnv env, Prob lp, Instance3BKP instance, optionFlag oFlag) {
 	int N = instance.N;
 	clock_t t1,t2;
     t1 = clock();
@@ -546,7 +524,7 @@ double solve( CEnv env, Prob lp, Instance3BKP instance) {
 	double cpu_time = (double)(t2-t1) / CLOCKS_PER_SEC;
 	
 	
-	if(output_required){	
+	if(oFlag.output_required){	
 		CHECKED_CPX_CALL( CPXsolwrite, env, lp, "/tmp/Model.sol");
 	}
 	
@@ -558,67 +536,6 @@ double solve( CEnv env, Prob lp, Instance3BKP instance) {
 	return objval;
 }
 
-/** 
- * print the help message
- * @param argv in order to get the name of the compiled program
- */
-void print_help(char * argv[]){
-	cout << "Usage : " << argv[0] << " <instance.dat> " << " [OPT]... " << endl;
-	cout << endl;
-	cout << "-h, --help\t\t\t print this message and exit" << endl;
-	cout << "-q, --quiet\t\t\t do not write the solved problem in a file named /tmp/Model.sol, Model.lp" << endl;
-	cout << "-e, --extended\t\t\t use also the balancing constraint." << endl;
-	cout << "-x, --disable-x\t\t\t do not optimize w.r.t. x" << endl;
-	cout << "-y, --disable-y\t\t\t do not optimize w.r.t. y" << endl;
-	cout << "-z, --disable-z\t\t\t do not optimize w.r.t. z" << endl;
-	cout << "-t, --timeout\t\t\t set a timeout in seconds, after which CPLEX will stop (It returns the incumbent solution)" << endl;
-	cout << "-i, --ignore-kanpsack-cost\t\t the program will not try to optimize the number of knapsacks" << endl;
-	cout << endl;
-}
-
-
-/**
- * function that according to the given options set the flags
- * 	--output, in order to print the solved problem in the given file
- *  --print, in order to print the TSP-Solution 0 <1, 2 .. n> 0
- *  --benchmark_output print a special form of output N user_time cpu_time objval
- * @param argc 
- * @param argv
- */
-Instance3BKP get_option(int argc,  char * argv[]){
-	int c;
-	if(argc < 2) {
-		print_help(argv);
-		exit(EXIT_FAILURE);
-	}
-	// One can specify only the help flag without the instance file.
-	if(strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
-		print_help(argv);
-		exit(EXIT_SUCCESS);
-	}
-	optind = 2; //Starting from index 2, because the first place is destinated to the istance file.
-	int option_index;
-	timeout = 1e75; /* Default value in CPLEX ~ 3 centuries */
-	while((c = getopt_long (argc, argv, "hqet:xyzi", long_options, &option_index)) != EOF) {
-		switch(c){
-			case 'h': print_help(argv); exit(EXIT_SUCCESS); break;
-			case 'q': output_required=false; break;
-			case 'e': extended = true; break;
-			case 't': timeout = strtod(optarg, NULL); 
-				printf("Timeout set to %lf\n", timeout);
-				break;
-			case 'x': optimize[0] = false; break;
-			case 'y': optimize[1] = false; break;
-			case 'z': optimize[2] = false; break;
-			case 'i': optimizeKnapsackCost = false; break;
-		}
-    }
-    sprintf(FILENAME, "%s", argv[1]);
-    Instance3BKP instance(argv[1], extended);
-	instance.print();
-	
-    return instance;
-}
 
 
 VarVal fetchVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
@@ -749,7 +666,7 @@ void output(CEnv env, Prob lp, Instance3BKP instance, VarVal v, char * filename)
  * @param map contains the index position of the variables in the problem
  * @param fetched_variables contains the values of the variables of the solution of the master problem 
  */
-void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetched_variables){
+void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetched_variables, optionFlag oFlag){
 	int N = instance.N;
 	int K = instance.K;
 	//fix z variables with the known values
@@ -826,7 +743,7 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
 		for(int i = 0; i < N; i++){
 			for(int delta = 0; delta < 3; delta++){
 				double coeff = 0.0;
-				if(optimize[delta] && fetched_variables.t[k][i] == 1) //Optimize only with respect to objects that are included
+				if(oFlag.optimize[delta] && fetched_variables.t[k][i] == 1) //Optimize only with respect to objects that are included
 					coeff = 1.0;
 				
 				CHECKED_CPX_CALL(CPXprechgobj, env, lp, 1, &map.Chi[k][i][delta], &coeff);
@@ -854,19 +771,19 @@ int main (int argc, char *argv[])
 	bool exc_arised = false;	
 	try { 
 
-		Instance3BKP instance = get_option(argc, argv);	
-				
+		optionFlag oFlag = get_option(argc, argv);	
+		Instance3BKP instance(oFlag.filename, oFlag.extended);
 		DECL_ENV( env );
 		DECL_PROB( env, lp );
 		
-		mapVar map = setupLP(env, lp, instance);
+		mapVar map = setupLP(env, lp, instance, oFlag);
 		
 		/* Set up timeout */
-		CHECKED_CPX_CALL(CPXsetdblparam, env,  CPX_PARAM_TILIM, timeout);
+		CHECKED_CPX_CALL(CPXsetdblparam, env,  CPX_PARAM_TILIM, oFlag.timeout);
 		CHECKED_CPX_CALL(CPXsetintparam, env,  CPX_PARAM_THREADS, 2);
 		
 		// find the solution
-		solve(env, lp, instance);
+		solve(env, lp, instance, oFlag);
 		
 		printf("Solved Master Problem\n");
 		
@@ -876,11 +793,11 @@ int main (int argc, char *argv[])
 		
 		printf("Fetched variables Successfully\n");
 		
-		sprintf(OUTPUTFILENAME, "output_%s%c", FILENAME, '\0');
+		sprintf(OUTPUTFILENAME, "output_%s%c", oFlag.filename, '\0');
 		output(env, lp, instance, fetched_variables,  OUTPUTFILENAME);
 		
 		//We want to optimize at least in one direction
-		if(optimize[0] || optimize[1] || optimize[2]){
+		if(oFlag.optimize[0] || oFlag.optimize[1] || oFlag.optimize[2]){
 		
 			{
 			double sum = 0.;
@@ -888,7 +805,7 @@ int main (int argc, char *argv[])
 				for(int i = 0; i < instance.N; i++){
 					
 						for(int delta = 0; delta < 3; delta++){
-							if(optimize[delta])
+							if(oFlag.optimize[delta])
 							sum += fetched_variables.chi[k][i][delta];
 						}
 					
@@ -898,7 +815,7 @@ int main (int argc, char *argv[])
 			}
 			
 			// Setup Slave Problem
-			setupSP(env, lp, instance, map, fetched_variables);
+			setupSP(env, lp, instance, map, fetched_variables, oFlag);
 			
 			printf("Set up problem Successfully\n");
 			
@@ -908,7 +825,7 @@ int main (int argc, char *argv[])
 			
 			
 			// Solve Slave Problem
-			solve(env, lp, instance); 
+			solve(env, lp, instance, oFlag); 
 			
 			
 			
@@ -916,7 +833,7 @@ int main (int argc, char *argv[])
 			
 		
 			cout << "OK -> OUTPUT" << endl;
-			sprintf(OUTPUTFILENAME, "output_%s2%c", FILENAME, '\0');
+			sprintf(OUTPUTFILENAME, "output_%s2%c", oFlag.filename, '\0');
 			
 			
 			{
@@ -925,7 +842,7 @@ int main (int argc, char *argv[])
 				for(int i = 0; i < instance.N; i++){
 					
 						for(int delta = 0; delta < 3; delta++){
-							if(optimize[delta])
+							if(oFlag.optimize[delta])
 							sum += slave_variables.chi[k][i][delta];
 						}
 					

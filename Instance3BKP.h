@@ -4,6 +4,10 @@
  * @brief help class containing the 3BKP instance. It is accountable
  * for the parsing of the input file
  */
+
+#ifndef __INSTANCE_3BKP__H__
+#define __INSTANCE_3BKP__H__
+ 
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -165,4 +169,6 @@ class Instance3BKP {
 
 
 };
+
+#endif /* __INSTANCE_3BKP__H__ */
 
