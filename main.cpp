@@ -962,12 +962,13 @@ int main (int argc, char *argv[])
 		
 		/* Set up timeout */
 		CHECKED_CPX_CALL(CPXsetdblparam, env,  CPX_PARAM_TILIM, timeout);
-		CHECKED_CPX_CALL(CPXsetintparam, env,  CPX_PARAM_THREADS, 1);
+		CHECKED_CPX_CALL(CPXsetintparam, env,  CPX_PARAM_THREADS, 2);
 		
 		// find the solution
 		solve(env, lp, instance);
 		
 		printf("Solved Master Problem\n");
+		
 		
 		// fetch variables from the solved model
 		VarVal fetched_variables = fetchVariables(env, lp, instance, map);
@@ -977,60 +978,63 @@ int main (int argc, char *argv[])
 		sprintf(OUTPUTFILENAME, "output_%s%c", FILENAME, '\0');
 		output(env, lp, instance, fetched_variables,  OUTPUTFILENAME);
 		
-		{
-		double sum = 0.;
-		for(int k = 0; k < instance.K; k++){
-			for(int i = 0; i < instance.N; i++){
-				
-					for(int delta = 0; delta < 3; delta++){
-						if(optimize[delta])
-						sum += fetched_variables.chi[k][i][delta];
-					}
-				
+		//We want to optimize at least in one direction
+		if(optimize[0] || optimize[1] || optimize[2]){
+		
+			{
+			double sum = 0.;
+			for(int k = 0; k < instance.K; k++){
+				for(int i = 0; i < instance.N; i++){
+					
+						for(int delta = 0; delta < 3; delta++){
+							if(optimize[delta])
+							sum += fetched_variables.chi[k][i][delta];
+						}
+					
+				}
 			}
-		}
-		cout << "START CHI VALUES " << sum << endl;
-		}
-		
-		// Setup Slave Problem
-		setupSP(env, lp, instance, map, fetched_variables);
-		
-		printf("Set up problem Successfully\n");
-		
-		
-		CHECKED_CPX_CALL( CPXwriteprob, env, lp, "/tmp/Model2.lp", NULL ); 
-		CHECKED_CPX_CALL(CPXchgprobtype, env, lp, CPXPROB_MILP);
-		
-		
-		// Solve Slave Problem
-		solve(env, lp, instance); 
-		
-		
-		
-		VarVal slave_variables = fetchVariables(env, lp, instance, map);
-		
-	
-		cout << "OK -> OUTPUT" << endl;
-		sprintf(OUTPUTFILENAME, "output_%s2%c", FILENAME, '\0');
-		
-		
-		{
-		double sum = 0.;
-		for(int k = 0; k < instance.K; k++){
-			for(int i = 0; i < instance.N; i++){
-				
-					for(int delta = 0; delta < 3; delta++){
-						if(optimize[delta])
-						sum += slave_variables.chi[k][i][delta];
-					}
-				
+			cout << "START CHI VALUES " << sum << endl;
 			}
-		}
-		cout << "END CHI VALUES " << sum << endl;
-		}
+			
+			// Setup Slave Problem
+			setupSP(env, lp, instance, map, fetched_variables);
+			
+			printf("Set up problem Successfully\n");
+			
+			
+			CHECKED_CPX_CALL( CPXwriteprob, env, lp, "/tmp/Model2.lp", NULL ); 
+			CHECKED_CPX_CALL(CPXchgprobtype, env, lp, CPXPROB_MILP);
+			
+			
+			// Solve Slave Problem
+			solve(env, lp, instance); 
+			
+			
+			
+			VarVal slave_variables = fetchVariables(env, lp, instance, map);
+			
 		
-		output(env, lp, instance, slave_variables,  OUTPUTFILENAME);
-		
+			cout << "OK -> OUTPUT" << endl;
+			sprintf(OUTPUTFILENAME, "output_%s2%c", FILENAME, '\0');
+			
+			
+			{
+			double sum = 0.;
+			for(int k = 0; k < instance.K; k++){
+				for(int i = 0; i < instance.N; i++){
+					
+						for(int delta = 0; delta < 3; delta++){
+							if(optimize[delta])
+							sum += slave_variables.chi[k][i][delta];
+						}
+					
+				}
+			}
+			cout << "END CHI VALUES " << sum << endl;
+			}
+			
+			output(env, lp, instance, slave_variables,  OUTPUTFILENAME);
+		}
 		// free-allocated resources
 		CPXfreeprob(env, &lp);
 		CPXcloseCPLEX(&env);
