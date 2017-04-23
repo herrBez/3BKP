@@ -9,7 +9,6 @@
 #include <vector>
 #include <time.h>
 #include <sys/time.h>
-#include <cmath>
 #include "cpxmacro.h"
 #include <getopt.h>
 #include <unistd.h>

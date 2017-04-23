@@ -8,6 +8,7 @@ static struct option long_options[] = {
 	{"disable-x", no_argument, 0, 'x'}, /* Disable optimization wrt x */
 	{"disable-y", no_argument, 0, 'y'}, /* Disable optimization wrt y */
 	{"disable-z", no_argument, 0, 'z'}, /* Disable optimization wrt z */
+	{"timeout", required_argument, 0, 't'}, /* Timeout */
 	{"ignore-knapsack-cost", no_argument, 0, 'i'}, /* Disable optimization of knapsacks */
 	{0, 0, 0, 0},
 };
@@ -60,7 +61,7 @@ optionFlag get_option(int argc,  char * argv[]){
 			case 'q': oFlag.output_required=false; break;
 			case 'e': oFlag.extended = true; break;
 			case 't': oFlag.timeout = strtod(optarg, NULL); 
-				printf("Timeout set to %lf\n", oFlag.timeout);
+				printf("Timeout set to %.2lf\n", oFlag.timeout);
 				break;
 			case 'x': oFlag.optimize[0] = false; break;
 			case 'y': oFlag.optimize[1] = false; break;
