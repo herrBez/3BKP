@@ -779,7 +779,7 @@ int main (int argc, char *argv[])
 		
 		/* Set up timeout */
 		CHECKED_CPX_CALL(CPXsetdblparam, env,  CPX_PARAM_TILIM, oFlag.timeout);
-		CHECKED_CPX_CALL(CPXsetintparam, env,  CPX_PARAM_THREADS, 2);
+		CHECKED_CPX_CALL(CPXsetintparam, env,  CPX_PARAM_THREADS, oFlag.threads);
 		
 		// find the solution
 		solve(env, lp, instance, oFlag);

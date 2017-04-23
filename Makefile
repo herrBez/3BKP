@@ -11,7 +11,7 @@ CPX_LIBDIR  = /opt/CPLEX_Studio/cplex/cplex/lib/x86-64_linux/static_pic
 CPX_LDFLAGS = -lcplex -lm -pthread
 
 
-OBJ = main.o 
+OBJ = main.o utils.o
 
 %.o: %.cpp
 		$(CC) $(CPPFLAGS) -I$(CPX_INCDIR) -c $^ -o $@

@@ -130,6 +130,7 @@ struct optionFlag {
 	double timeout;
 	bool optimize[3];
 	char filename[128];
+	int threads;
 
 };
 

@@ -1,4 +1,5 @@
 #include "utils.h"
+#include <limits.h>
 
 /** Struct containing the long options */
 static struct option long_options[] = {	
@@ -9,6 +10,7 @@ static struct option long_options[] = {
 	{"disable-y", no_argument, 0, 'y'}, /* Disable optimization wrt y */
 	{"disable-z", no_argument, 0, 'z'}, /* Disable optimization wrt z */
 	{"timeout", required_argument, 0, 't'}, /* Timeout */
+	{"thread", required_argument, 0, 'w'}, /* No of threads or workers */
 	{"ignore-knapsack-cost", no_argument, 0, 'i'}, /* Disable optimization of knapsacks */
 	{0, 0, 0, 0},
 };
@@ -28,6 +30,7 @@ void print_help(char * argv[]){
 	cout << "-z, --disable-z\t\t\t do not optimize w.r.t. z" << endl;
 	cout << "-t, --timeout\t\t\t set a timeout in seconds, after which CPLEX will stop (It returns the incumbent solution)" << endl;
 	cout << "-i, --ignore-kanpsack-cost\t\t the program will not try to optimize the number of knapsacks" << endl;
+	cout << "-w, --thread\t\t\t set a fixed number of threads. If it is not specified CPLEX will decide on its own" << endl;
 	cout << endl;
 }
 
@@ -55,7 +58,7 @@ optionFlag get_option(int argc,  char * argv[]){
 	optind = 2; //Starting from index 2, because the first place is destinated to the istance file.
 	int option_index;
 	oFlag.timeout = 1e75; /* Default value in CPLEX ~ 3 centuries */
-	while((c = getopt_long (argc, argv, "hqet:xyzi", long_options, &option_index)) != EOF) {
+	while((c = getopt_long (argc, argv, "hqet:xyziw:", long_options, &option_index)) != EOF) {
 		switch(c){
 			case 'h': print_help(argv); exit(EXIT_SUCCESS); break;
 			case 'q': oFlag.output_required=false; break;
@@ -67,6 +70,10 @@ optionFlag get_option(int argc,  char * argv[]){
 			case 'y': oFlag.optimize[1] = false; break;
 			case 'z': oFlag.optimize[2] = false; break;
 			case 'i': oFlag.optimizeKnapsackCost = false; break;
+			case 'w': oFlag.threads = (int)strtol(optarg, NULL, 0);
+				assert(oFlag.threads >= 0);
+				printf("Number of threads: %d\n", oFlag.threads);
+				break;
 		}
     }
     sprintf(oFlag.filename, "%s", argv[1]);
