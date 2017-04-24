@@ -9,6 +9,7 @@ using namespace std;
  * 
  */
 void setupLPBalancingConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
+	printf("BALANCING CONSTRAINTS\n");
 	const int NAME_SIZE = 512;
 	char name[NAME_SIZE];
 	int N = instance.N;
@@ -542,6 +543,9 @@ mapVar setupLP(CEnv env, Prob lp, Instance3BKP instance, optionFlag oFlag)
 	setupLPVariables(env, lp, instance, map, oFlag);
 	/* Set up the constraints */
 	setupLPConstraints(env, lp, instance, map, oFlag);
+	if(oFlag.extended){
+		setupLPBalancingConstraints(env, lp, instance, map);
+	}
 	
 	
 	if(oFlag.output_required){

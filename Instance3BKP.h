@@ -126,14 +126,27 @@ class Instance3BKP {
 			std::cout << K << std::endl;
 			
 			S.resize(K);
+			if(extended){
+				L.resize(K);
+				U.resize(K);
+				
+			}
 			fixedCost.resize(K);
 			for(auto &i : S) i.resize(3);
+			if(extended){
+				for(auto &i : L) i.resize(3);
+				for(auto &i : U) i.resize(3);
+			}
 			
 			for(int k = 0; k < K; k++){
 				std::getline(infile, line);
 				ss.clear();
 				ss.str(line);
 				ss >> S[k][0] >> S[k][1] >> S[k][2] >> fixedCost[k];
+				if(extended){
+					ss >> L[k][0] >> L[k][1] >> L[k][2];
+					ss >> U[k][0] >> U[k][1] >> U[k][2];
+				}
 			}
 
 			std::getline(infile, line);

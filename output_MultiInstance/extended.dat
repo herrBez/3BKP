@@ -1,0 +1,6 @@
+#Vengono inclusi solo gli oggetti messi nello zaino
+#Dimensione del 0-mo Zaino 2 2 2
+#Knapsack 0-mo
+2 2 2
+0	0 0.8 0.8 	1 1 1 
+1	1 0 0 	1 1 1 
