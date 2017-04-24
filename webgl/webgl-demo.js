@@ -136,7 +136,6 @@ function start(_boxVertices, _itemIndices, _vertices, _centerOfMass, _innerBoxVe
   vertices = _vertices; 	
   centerOfMass = _centerOfMass;
   innerBoxVertices = _innerBoxVertices;
-  alert(innerBoxVertices[0]);
   extended = _extended;
   
   initAttributes();

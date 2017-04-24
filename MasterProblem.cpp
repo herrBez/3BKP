@@ -40,7 +40,7 @@ void setupLPBalancingConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVa
 			char sense = 'G';
 			int matbeg = 0;
 			
-			snprintf(name, NAME_SIZE, "(14) %d", delta);
+			snprintf(name, NAME_SIZE, "(14) %d %d", k, delta);
 			char * cname = (char*) (&name[0]);
 			CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
 		}
@@ -69,7 +69,7 @@ void setupLPBalancingConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVa
 				coeff[index] = -instance.U[k][delta]*instance.mass[i];
 				index++;
 			}
-			snprintf(name, NAME_SIZE, "(15) %d", delta);
+			snprintf(name, NAME_SIZE, "(15) %d %d", k, delta);
 			double rhs = 0.0;
 			char sense = 'L';
 			int matbeg = 0;

@@ -19,7 +19,8 @@
 
 class Instance3BKP {
 	private : 
-	Instance3BKP() : s(0, std::vector<double>(0)),mass(0) , profit(0), S(0, std::vector<double>(0)) { }
+	Instance3BKP() : s(0, std::vector<double>(0)),mass(0) , profit(0), S(0, std::vector<double>(0)), 
+	L(0, std::vector<double>(0)), U(0, std::vector<double>(0)) { }
 		
 	
 	
@@ -47,7 +48,7 @@ class Instance3BKP {
 	void checkLowerAndUpperBound(){
 		for(int k = 0; k < K; k++){
 			for(int delta = 0; delta < 3; delta++){
-				assert(L[k][delta] <= U[k][delta];
+				assert(L[k][delta] <= U[k][delta]);
 			}
 		}
 	}
@@ -61,12 +62,6 @@ class Instance3BKP {
 		
 		double E;
 		
-		/** Used only if the stability constraint are considered -> UPPER BOUND for k-th center of mass */
-		std::vector< std::vector< double > > U;
-		
-		
-		/** Used only if the stability constraint are considered -> LOWER BOUND for k-th center of mass */
-		std::vector< std::vector< double > > L;
 		
 		/** vector containing the three dimension of the items */
 		std::vector< std::vector< double > > s;
@@ -84,6 +79,17 @@ class Instance3BKP {
 		
 		
 		std::vector< double > fixedCost;
+		
+		/** Used only if the stability constraint are considered -> LOWER BOUND for k-th center of mass */
+		std::vector< std::vector< double > > L;
+		
+		
+		/** Used only if the stability constraint are considered -> UPPER BOUND for k-th center of mass */
+		std::vector< std::vector< double > > U;
+		
+		
+		
+		
 		
 		bool extended;
 		
