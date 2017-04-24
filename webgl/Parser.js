@@ -79,6 +79,7 @@ function calculateVertices(BoxDimension, itemIndices, position, dimension, L, U)
 	var vertices = new Array();
 	var centerOfMass = new Array();
 	var BoxVertices = new Array();
+	
 	for(var k = 0; k < position.length; k++){
 		var verticesTmp = new Array();
 		var centerOfMassTmp = new Array();
@@ -137,21 +138,30 @@ function calculateVertices(BoxDimension, itemIndices, position, dimension, L, U)
 			
 		]);
 	 }
+	 
+	
 	var innerBox = new Array();
-	/*if(L.length == 3 && U.length == 3){
-		innerBox = [
-			//Back Face
-			L[0], L[1], L[2],
-			U[0], L[1], L[2],
-			U[0], U[1], L[2],
-			L[0], U[1], L[2],
-			//Front Face
-			L[0], L[1], U[2],
-			U[0], L[1], U[2],
-			U[0], U[1], U[2],
-			L[0], U[1], U[2],	
-		];
-	}*/
+	
+	if(L.length == BoxDimension.length && U.length == BoxDimension.length){
+		for(var k = 0; k < BoxDimension.length; k++){
+			innerBox.push(
+				[
+				//Back Face
+				L[k][0], L[k][1], L[k][2],
+				U[k][0], L[k][1], L[k][2],
+				U[k][0], U[k][1], L[k][2],
+				L[k][0], U[k][1], L[k][2],
+				//Front Face
+				L[k][0], L[k][1], U[k][2],
+				U[k][0], L[k][1], U[k][2],
+				U[k][0], U[k][1], U[k][2],
+				L[k][0], U[k][1], U[k][2],	
+			]);
+		}
+	}
+	
+	
+	
 	
 
 	start(BoxVertices, itemIndices, vertices, centerOfMass, innerBox);
