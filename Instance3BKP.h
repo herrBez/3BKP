@@ -44,6 +44,14 @@ class Instance3BKP {
 		}
 	}
 	
+	void checkLowerAndUpperBound(){
+		for(int k = 0; k < K; k++){
+			for(int delta = 0; delta < 3; delta++){
+				assert(L[k][delta] <= U[k][delta];
+			}
+		}
+	}
+	
 	public:
 		/** Number of items, i.e. cardinality of J */
 		int N;
@@ -169,6 +177,9 @@ class Instance3BKP {
 			infile.close();
 			verifyExistenceCondition();
 			computeE();
+			if(extended){
+				checkLowerAndUpperBound();
+			}
 		}
 		
 		/**
