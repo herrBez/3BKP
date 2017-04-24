@@ -32,6 +32,7 @@ function processText(text){
 				var token = rawLines[i].split(/\s+/);
 				L.push([parseFloat(token[1]), parseFloat(token[2]), parseFloat(token[3])]);
 			} else if(firstChar == 'U') {
+				var token = rawLines[i].split(/\s+/);
 				U.push([parseFloat(token[1]), parseFloat(token[2]), parseFloat(token[3])]);
 			}
 		}
@@ -141,8 +142,8 @@ function calculateVertices(BoxDimension, itemIndices, position, dimension, L, U)
 	 
 	
 	var innerBox = new Array();
-	
-	if(L.length == BoxDimension.length && U.length == BoxDimension.length){
+	var extended = L.length == BoxDimension.length && U.length == BoxDimension.length;
+	if(extended){
 		for(var k = 0; k < BoxDimension.length; k++){
 			innerBox.push(
 				[
@@ -164,6 +165,6 @@ function calculateVertices(BoxDimension, itemIndices, position, dimension, L, U)
 	
 	
 
-	start(BoxVertices, itemIndices, vertices, centerOfMass, innerBox);
+	start(BoxVertices, itemIndices, vertices, centerOfMass, innerBox, extended);
 }
 
