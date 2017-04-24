@@ -174,7 +174,7 @@ void output(CEnv env, Prob lp, Instance3BKP instance, VarVal v, char * filename,
 		
 		if(oFlag.extended){
 			outfile << "L " << instance.L[k][0] << " " << instance.L[k][1] << " " << instance.L[k][2] << endl;
-			outfile << "U " << instance.L[k][0] << " " << instance.U[k][1] << " " << instance.U[k][2] << endl;
+			outfile << "U " << instance.U[k][0] << " " << instance.U[k][1] << " " << instance.U[k][2] << endl;
 		}
 	
 		for(int i = 0; i < N; i++){
