@@ -23,16 +23,16 @@ class Instance3BKP {
 		
 	
 	
-	void computeL() {
-		L = -1e75;
+	void computeE() {
+		E = -1e75;
 		for(int k = 0; k < K; k++){
 			for(int delta = 0; delta < 3; delta++){
-				if(L < S[k][delta])
-					L = S[k][delta];
+				if(E < S[k][delta])
+					E = S[k][delta];
 			}
 		}
-		L += 1;
-		printf("L = %lf\n", L);
+		E += 1;
+		printf("E = %lf\n", E);
 	}
 	
 	void verifyExistenceCondition() {
@@ -51,8 +51,14 @@ class Instance3BKP {
 		/** Number of knapsacks, i.e. cardinality of K */
 		int K;
 		
-		double L;
+		double E;
 		
+		/** Used only if the stability constraint are considered -> UPPER BOUND for k-th center of mass */
+		std::vector< std::vector< double > > U;
+		
+		
+		/** Used only if the stability constraint are considered -> LOWER BOUND for k-th center of mass */
+		std::vector< std::vector< double > > L;
 		
 		/** vector containing the three dimension of the items */
 		std::vector< std::vector< double > > s;
@@ -149,7 +155,7 @@ class Instance3BKP {
 			}
 			infile.close();
 			verifyExistenceCondition();
-			computeL();
+			computeE();
 		}
 		
 		/**

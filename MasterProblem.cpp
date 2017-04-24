@@ -2,6 +2,86 @@
 using namespace std;
 
 /**
+ * set up balancing constraints
+ * @param env
+ * @param lp
+ * @param instance
+ * 
+ */
+void setupLPBalancingConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
+	const int NAME_SIZE = 512;
+	char name[NAME_SIZE];
+	int N = instance.N;
+	int K = instance.K;
+	for(int k = 0; k < K; k++){
+		for(int delta = 0; delta < 3; delta++){
+			vector< int > idVar(N + N*6 + N);
+			vector< double > coeff(N + N*6 + N);
+			int index = 0;
+			for(int i = 0; i < N; i++){
+				idVar[index] = map.Chi[k][i][delta];
+				coeff[index] = instance.mass[i];
+				index++;
+			} 
+			for(int i = 0; i < N; i++){
+				for(int r = 0; r < 6; r++){
+					idVar[index] = map.Rho[i][r];
+					coeff[index] = instance.mass[i]*(instance.s[i][instance.R[r][delta]]/2.0);
+					index++;
+				}
+			}
+			for(int i = 0; i < N; i++){
+				idVar[index] = map.T[k][i];
+				coeff[index] = -instance.L[k][delta]*instance.mass[i];  
+				index++;
+			}
+			double rhs = 0.0;
+			char sense = 'G';
+			int matbeg = 0;
+			
+			snprintf(name, NAME_SIZE, "(14) %d", delta);
+			char * cname = (char*) (&name[0]);
+			CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
+		}
+	}
+		
+	// (15)
+	for(int k = 0; k < K; k++){
+		for(int delta = 0; delta < 3; delta++){
+			vector< int > idVar(N + N*6 + N);
+			vector< double > coeff(N + N*6 + N);
+			int index = 0;
+			for(int i = 0; i < N; i++){
+				idVar[index] = map.Chi[k][i][delta];
+				coeff[index] = instance.mass[i];
+				index++;
+			} 
+			for(int i = 0; i < N; i++){
+				for(int r = 0; r < 6; r++){
+					idVar[index] = map.Rho[i][r];
+					coeff[index] = instance.mass[i]*(instance.s[i][instance.R[r][delta]]/2.0);
+					index++;
+				}
+			}
+			for(int i = 0; i < N; i++){
+				idVar[index] = map.T[k][i];
+				coeff[index] = -instance.U[k][delta]*instance.mass[i];
+				index++;
+			}
+			snprintf(name, NAME_SIZE, "(15) %d", delta);
+			double rhs = 0.0;
+			char sense = 'L';
+			int matbeg = 0;
+			
+			char * cname = (char*) (&name[0]);
+			CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
+		}
+	}
+}
+
+
+
+/**
  * set up the variables
  * @param env
  * @param lp
@@ -312,7 +392,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 				idVar[0] = map.Chi[k][i][delta];
 				coeff[0] = 1.0;
 				idVar[1] = map.T[k][i];
-				coeff[1] = -instance.L;
+				coeff[1] = -instance.E;
 				char sense = 'L';
 				int matbeg = 0;
 				double rhs = 0;
