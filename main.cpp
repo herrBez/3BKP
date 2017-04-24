@@ -90,14 +90,13 @@ VarVal fetchVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 		std::transform(tmp.begin(), tmp.end(), variable_values.z.begin(), [](double val){ return val < 0.5? 0:1; });
 	}
 	
+	#ifdef HULL
 	for(int k = 0; k < K; k++){
 		int begin = map.Sigma[k][0];
 		int end = map.Sigma[k][2];
 		CHECKED_CPX_CALL( CPXgetx, env, lp, &variable_values.sigma[k][0], begin, end);
-		for(int delta = 0; delta < 3; delta++){
-			cout << " SIGMA " << k << " " << delta << " " << variable_values.sigma[k][0];
-		}
 	}
+	#endif
 	
 	
 	for(int k = 0; k < K; k++){
@@ -172,15 +171,22 @@ void output(CEnv env, Prob lp, Instance3BKP instance, VarVal v, char * filename,
 	outfile << "#Vengono inclusi solo gli oggetti messi nello zaino" << endl;
 	for(int k = 0; k < K; k++){
 		if(v.z[k] == 1)
-			outfile << "#Dimensione max. del " << k << "-mo Zaino " << instance.S[k][0] << " " << instance.S[k][1] <<" "<< instance.S[k][2] << endl;
+			outfile << "#Dimensione";
+			#ifdef HULL
+			outfile << "max. ";
+			#endif
+			outfile << " del " << k << "-mo Zaino " << instance.S[k][0] << " " << instance.S[k][1] <<" "<< instance.S[k][2] << endl;
 	} 
 	
 	for(int k = 0; k < K; k++){
 		if(v.z[k] == 0)
 			continue;
 		outfile << "#Knapsack " << k << "-mo" << endl;
+		#ifdef HULL
 		outfile << v.sigma[k][0] << " " << v.sigma[k][1] << " " << v.sigma[k][2] << endl;
-		
+		#else
+		outfile << instance.S[k][0] << " " << instance.S[k][1] << " " << instance.S[k][2] << endl;
+		#endif
 		if(oFlag.extended){
 			outfile << "L " << instance.L[k][0] << " " << instance.L[k][1] << " " << instance.L[k][2] << endl;
 			outfile << "U " << instance.U[k][0] << " " << instance.U[k][1] << " " << instance.U[k][2] << endl;
@@ -250,6 +256,7 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
 			}	
 		}
 	}
+	#ifdef HULL
 	//fix sigma variables
 	for(int k = 0; k < K; k++){
 		for(int delta = 0; delta < 3; delta++){
@@ -258,6 +265,7 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
 			CHECKED_CPX_CALL(CPXchgbds, env, lp, 1, &map.Sigma[k][delta], &bound, &value);
 		}
 	}
+	#endif
 	
 	
 	
