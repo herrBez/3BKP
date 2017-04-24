@@ -1,9 +1,9 @@
 # 3BKP
 The three-dimensional knapsack problem with balancing constraint
 
-#Compilation
+### Compilation
 make
-#Usage
+### Usage
 ./main <instance.dat>
-#Instance 
-are contained in the instance directory
+### Instance 
+Some sample instances are contained in the instance and MultiInstance directory
