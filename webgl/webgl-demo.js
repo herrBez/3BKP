@@ -130,12 +130,14 @@ function initAttributes(){
 // Called when the canvas is created to get the ball rolling.
 // Figuratively, that is. There's nothing moving in this demo.
 //
-function start(_boxVertices, _itemIndices, _vertices, _centerOfMass, _innerBoxVertices) {
+function start(_boxVertices, _itemIndices, _vertices, _centerOfMass, _innerBoxVertices, _extended) {
   console.log("Start");
   boxVertices = _boxVertices;
   vertices = _vertices; 	
   centerOfMass = _centerOfMass;
   innerBoxVertices = _innerBoxVertices;
+  alert(innerBoxVertices[0]);
+  extended = _extended;
   
   initAttributes();
 	//addSelector();
@@ -296,11 +298,14 @@ function initBuffers() {
 	}
 	
 	
-	/*if(extended){
-		innerBoxVerticesBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, innerBoxVerticesBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(innerBoxVertices), gl.STATIC_DRAW);
-	}*/
+	if(extended){
+		innerBoxVerticesBuffer = new Array();
+		for(var k = 0; k < innerBoxVertices.length; k++){
+			innerBoxVerticesBuffer.push(gl.createBuffer());
+			gl.bindBuffer(gl.ARRAY_BUFFER, innerBoxVerticesBuffer[k]);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(innerBoxVertices[k]), gl.STATIC_DRAW);
+		}
+	}
 	cubeVerticesBuffer = new Array();
 	for(var k = 0; k < boxVertices.length; k++){
 		cubeVerticesBuffer.push(gl.createBuffer());
@@ -407,10 +412,17 @@ function drawScene() {
 				drawArray(centerOfMassBuffer[k][i], ColorBuffer[k][i], gl.POINTS, 0, 1);
 				
 			}
+			
+		
+		}
+		if(enabledCenterOfMass && extended){
+			console.log("HERE");
+			drawParallelepiped(innerBoxVerticesBuffer[k], cubeVerticesColor, cubeVerticesIndexBuffer[1], gl.LINES, 24);
 		}
 	
 	
 		drawParallelepiped(cubeVerticesBuffer[k], cubeVerticesColor, cubeVerticesIndexBuffer[1], gl.LINES, 24);
+		
 	}
 }
 
