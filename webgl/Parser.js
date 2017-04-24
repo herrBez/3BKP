@@ -30,9 +30,9 @@ function processText(text){
 				counter++;
 			} else if(firstChar == 'L') {
 				var token = rawLines[i].split(/\s+/);
-				L = [parseFloat(token[1]), parseFloat(token[2]), parseFloat(token[3])];
+				L.push([parseFloat(token[1]), parseFloat(token[2]), parseFloat(token[3])]);
 			} else if(firstChar == 'U') {
-				U = [parseFloat(token[1]), parseFloat(token[2]), parseFloat(token[3])];
+				U.push([parseFloat(token[1]), parseFloat(token[2]), parseFloat(token[3])]);
 			}
 		}
 	}
