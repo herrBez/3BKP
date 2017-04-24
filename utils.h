@@ -18,13 +18,15 @@ using namespace std;
 struct mapVar {
 	private : 
 	mapVar() : T(0, vector< int >(0)), B(0, vector<vector<vector<int>>>(0, vector<vector<int>>(0, vector< int >(0)))),
-			   Rho(0, vector< int >(0)), Chi(0, vector< vector<int> >(0, vector<int>(0))) { }
+			   Rho(0, vector< int >(0)), Chi(0, vector< vector<int> >(0, vector<int>(0))),
+			   Sigma(0, vector< int >(0)) { }
 	public : 
 	vector< vector < int > > T;
 	vector< vector < vector < vector < int > > > > B;
 	vector< vector < int > > Rho;
 	vector< vector < vector <int > > > Chi;
 	vector< int > Z;
+	vector< vector < int > > Sigma;
 	
 	mapVar(int K, int N, int R){
 		T.resize(K);
@@ -55,6 +57,10 @@ struct mapVar {
 			}
 		}
 		Z.resize(K);
+		Sigma.resize(K);
+		for(auto &S : Sigma){
+			S.resize(3);
+		}
 	}
 };
 /**
@@ -63,7 +69,8 @@ struct mapVar {
 struct VarVal {
 	private : 
 	VarVal() : t(0, vector< int >(0)), b(0, vector<vector<vector<int>>>(0, vector<vector<int>>(0, vector< int >(0)))),
-			   rho(0, vector< int >(0)), chi(0, vector< vector<double> >(0, vector<double>(0))), rotation(0, vector<int>(0)) { }
+			   rho(0, vector< int >(0)), chi(0, vector< vector<double> >(0, vector<double>(0))), rotation(0, vector<int>(0)),
+			   sigma(0, vector< double >(0)) { }
 	public : 
 	vector< vector< int > > t;
 	vector< vector < vector < vector < int > > > > b;
@@ -71,6 +78,7 @@ struct VarVal {
 	vector< vector < vector < double > > > chi;
 	vector< int > z;
 	vector< vector< int > > rotation;
+	vector< vector< double > > sigma;
 	
 	VarVal(int K, int N, int R){
 		t.resize(K);
@@ -105,6 +113,10 @@ struct VarVal {
 		rotation.resize(N);
 		for(auto &r : rotation){
 			r.resize(3);
+		}
+		sigma.resize(K);
+		for(auto &S : sigma){
+			S.resize(3);
 		}
 	}
 };
