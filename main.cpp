@@ -148,7 +148,7 @@ VarVal fetchVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
  * @param map
  */
  
-void output(CEnv env, Prob lp, Instance3BKP instance, VarVal v, char * filename){
+void output(CEnv env, Prob lp, Instance3BKP instance, VarVal v, char * filename, optionFlag oFlag){
 	int N = instance.N;
 	int K = instance.K;
 	
@@ -171,6 +171,11 @@ void output(CEnv env, Prob lp, Instance3BKP instance, VarVal v, char * filename)
 			continue;
 		outfile << "#Knapsack " << k << "-mo" << endl;
 		outfile << instance.S[k][0] << " " << instance.S[k][1] << " " << instance.S[k][2] << endl;
+		
+		if(oFlag.extended){
+			outfile << "L " << instance.L[k][0] << " " << instance.L[k][1] << " " << instance.L[k][2] << endl;
+			outfile << "U " << instance.L[k][0] << " " << instance.U[k][1] << " " << instance.U[k][2] << endl;
+		}
 	
 		for(int i = 0; i < N; i++){
 			if(v.t[k][i] == 0)
@@ -331,7 +336,7 @@ int main (int argc, char *argv[])
 		printf("Fetched variables Successfully\n");
 		
 		sprintf(OUTPUTFILENAME, "output_%s%c", oFlag.filename, '\0');
-		output(env, lp, instance, fetched_variables,  OUTPUTFILENAME);
+		output(env, lp, instance, fetched_variables,  OUTPUTFILENAME, oFlag);
 		
 		//We want to optimize at least in one direction
 		if(oFlag.optimize[0] || oFlag.optimize[1] || oFlag.optimize[2]){
@@ -388,7 +393,7 @@ int main (int argc, char *argv[])
 			cout << "END CHI VALUES " << sum << endl;
 			}
 			
-			output(env, lp, instance, slave_variables,  OUTPUTFILENAME);
+			output(env, lp, instance, slave_variables,  OUTPUTFILENAME, oFlag);
 		}
 		// free-allocated resources
 		CPXfreeprob(env, &lp);
