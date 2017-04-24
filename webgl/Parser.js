@@ -28,16 +28,15 @@ function processText(text){
 			if(firstChar != '#' && firstChar != 'L' && firstChar != 'U'){
 				lines.push(rawLines[i].trim());
 				counter++;
-			} 
-			var token = rawLines[i].split(/\s+/);
-			if(firstChar == 'L'){
+			} else if(firstChar == 'L') {
+				var token = rawLines[i].split(/\s+/);
 				L = [parseFloat(token[1]), parseFloat(token[2]), parseFloat(token[3])];
-			}
-			if(firstChar == 'U'){
+			} else if(firstChar == 'U') {
 				U = [parseFloat(token[1]), parseFloat(token[2]), parseFloat(token[3])];
 			}
 		}
 	}
+	
 	
 	console.log(lines.length);
 	console.log("There are " + (counter-1) + " lines to parse");
