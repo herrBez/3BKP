@@ -399,7 +399,6 @@ int main (int argc, char *argv[])
 			VarVal slave_variables = fetchVariables(env, lp, instance, map);
 			
 		
-			cout << "OK -> OUTPUT" << endl;
 			sprintf(OUTPUTFILENAME, "output_%s2%c", oFlag.filename, '\0');
 			
 			
