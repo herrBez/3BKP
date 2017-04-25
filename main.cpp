@@ -156,7 +156,7 @@ VarVal fetchVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
  * @param map
  */
  
-void output(CEnv env, Prob lp, Instance3BKP instance, VarVal v, char * filename, optionFlag oFlag){
+void output(CEnv env, Prob lp, Instance3BKP instance, double objval, VarVal v, char * filename, optionFlag oFlag){
 	int N = instance.N;
 	int K = instance.K;
 	
@@ -167,7 +167,7 @@ void output(CEnv env, Prob lp, Instance3BKP instance, VarVal v, char * filename,
 		cerr << filename << endl;
 		throw std::runtime_error("Cannot open the file ");
 	}
-	
+	outfile << "#Valore della funzione obiettivo " << objval << endl; 
 	outfile << "#Vengono inclusi solo gli oggetti messi nello zaino" << endl;
 	for(int k = 0; k < K; k++){
 		if(v.z[k] == 1)
@@ -350,7 +350,7 @@ int main (int argc, char *argv[])
 		CHECKED_CPX_CALL(CPXsetintparam, env,  CPX_PARAM_THREADS, oFlag.threads);
 		
 		// find the solution
-		solve(env, lp, instance, oFlag);
+		double objvalMP = solve(env, lp, instance, oFlag);
 		
 		printf("Solved Master Problem\n");
 		
@@ -361,7 +361,7 @@ int main (int argc, char *argv[])
 		printf("Fetched variables Successfully\n");
 		
 		sprintf(OUTPUTFILENAME, "output_%s%c", oFlag.filename, '\0');
-		output(env, lp, instance, fetched_variables,  OUTPUTFILENAME, oFlag);
+		output(env, lp, instance, objvalMP, fetched_variables,  OUTPUTFILENAME, oFlag);
 		
 		//We want to optimize at least in one direction
 		if(oFlag.optimize[0] || oFlag.optimize[1] || oFlag.optimize[2]){
@@ -392,7 +392,7 @@ int main (int argc, char *argv[])
 			
 			
 			// Solve Slave Problem
-			solve(env, lp, instance, oFlag); 
+			double objvalSP = solve(env, lp, instance, oFlag); 
 			
 			
 			
@@ -418,7 +418,7 @@ int main (int argc, char *argv[])
 			cout << "END CHI VALUES " << sum << endl;
 			}
 			
-			output(env, lp, instance, slave_variables,  OUTPUTFILENAME, oFlag);
+			output(env, lp, instance, objvalSP,  slave_variables,  OUTPUTFILENAME, oFlag);
 		}
 		// free-allocated resources
 		CPXfreeprob(env, &lp);
