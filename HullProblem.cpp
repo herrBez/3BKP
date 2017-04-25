@@ -128,7 +128,6 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map, opt
 				char * xname = (char*)(&name[0]);
 				CHECKED_CPX_CALL( CPXnewcols, env, lp, 1, &obj, &lb, &ub, &xtype, &xname );
 				map.Sigma[k][delta] = current_var_position++;
-				cout << "SIGMA " << k << delta << " = " << map.Sigma[k][delta] << endl;
 			}
 	 }
 	
