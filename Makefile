@@ -32,7 +32,7 @@ hullobj: $(HULL_SRC)
 		$(CC) -DHULL $(CPPFLAGS) -I$(CPX_INCDIR) -c HullProblem.cpp -o HullProblem.o
 
 hull: hullobj
-		$(CC) $(CPPFLAGS) $(HULL_OBJ) -o hull_main -L$(CPX_LIBDIR) $(CPX_LDFLAGS)
+		$(CC) $(CPPFLAGS) $(HULL_OBJ) -o main_hull -L$(CPX_LIBDIR) $(CPX_LDFLAGS)
 		
 compile: normalobj
 		$(CC) $(CPPFLAGS) $(OBJ) -o main -L$(CPX_LIBDIR) $(CPX_LDFLAGS)
