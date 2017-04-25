@@ -352,7 +352,7 @@ int main (int argc, char *argv[])
 		// find the solution
 		double objvalMP = solve(env, lp, instance, oFlag);
 		
-		printf("Solved Master Problem\n");
+		printf("Solved Main Problem\n");
 		
 		
 		// fetch variables from the solved model
@@ -362,6 +362,9 @@ int main (int argc, char *argv[])
 		
 		sprintf(OUTPUTFILENAME, "output_%s%c", oFlag.filename, '\0');
 		output(env, lp, instance, objvalMP, fetched_variables,  OUTPUTFILENAME, oFlag);
+		
+		
+		printf("Written solution for Main Problem in %s\n", OUTPUTFILENAME);
 		
 		//We want to optimize at least in one direction
 		if(oFlag.optimize[0] || oFlag.optimize[1] || oFlag.optimize[2]){
@@ -418,6 +421,8 @@ int main (int argc, char *argv[])
 			}
 			
 			output(env, lp, instance, objvalSP,  slave_variables,  OUTPUTFILENAME, oFlag);
+			printf("Written solution for Extra Problem in %s\n", OUTPUTFILENAME);
+			
 		}
 		// free-allocated resources
 		CPXfreeprob(env, &lp);
