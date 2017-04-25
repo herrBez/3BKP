@@ -35,12 +35,12 @@ hull: hullobj
 		$(CC) $(CPPFLAGS) $(HULL_OBJ) -o hull_main -L$(CPX_LIBDIR) $(CPX_LDFLAGS)
 		
 compile: normalobj
-		$(CC) $(CPPFLAGS) $(HULL_OBJ) -o main -L$(CPX_LIBDIR) $(CPX_LDFLAGS)
+		$(CC) $(CPPFLAGS) $(OBJ) -o main -L$(CPX_LIBDIR) $(CPX_LDFLAGS)
 
 
 
 
 clean:
-		rm -rf $(OBJ) $(OBJ_HULL) main
+		rm -rf $(OBJ) $(OBJ_HULL) main main_hull
 
 .PHONY: clean
