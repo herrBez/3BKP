@@ -2,9 +2,11 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{xcolor}
+
 \usepackage[utf8]{inputenc}
 \usepackage[italian]{babel}
 
+\usepackage{hyperref}
 
 \newcommand{\MutliLineEquation}[3]{ 
 	\ensuremath{
@@ -20,15 +22,26 @@
 \title{Estensione con più Zaini}
 \begin{document}
 \maketitle
+\tableofcontents
+\newpage
 Lo scopo di questo documento è fornire un'estensione del modello esatto con più zaini introdotto in Baldi et al. \cite{Baldi20129802}.
 
-Dato un insieme di zaini $K = \{1, \dots, m\}$, le loro dimensioni $S_k^0, S_k^1, S_k^2$ e il loro costo associato $f_k$ (modella quanto costa usare lo zaino $k$) e un insieme di oggetti $J = \{1, \dots, n\}$ di profitto $p_j$ e dimensione $w_j, d_j, h_j$.
-Si cercano $K' \subseteq K$ e $J' \subseteq J$ tali che il profitto sia massimo.
+\section{Descrizione generale del problema}
+
+Siano dati:
+\begin{itemize} 
+	
+	\item un insieme di parallelepipedi $K = \{1, \dots, m \}$ (gli \emph{zaini}) le loro dimensioni $W_k, H_k, D_k$ e il loro costo associato $f_k$ (modella quanto costa usare lo zaino $k$);
+	\item un insieme di parallelepipedi $J = \{1, \dots, n\}$ (gli \emph{oggetti}) di profitto $p_j$ e dimensione $w_j, h_j, d_j$.
+\end{itemize}
+
+Si cercano $K' \subseteq K$ e $J' \subseteq J$ tali che gli oggetti in $J'$ siano contenuti nei limiti degli zaini $K'$ e il profitto sia massimo.
 
 
-\textbf{Disclaimer: Non sono stati considerati i Balancing constraints del paper originale}.
+\textbf{N.B.: Non sono stati considerati i Balancing constraints del paper originale}.
 
-\section{Modello}
+\subsection{Modello}
+\label{sec:original:model}
 \begin{itemize}
 	\item $J$ è l'insieme degli oggetti da inserire nello zaino di cardinalità $n$, cui sono associati gli indici $i$ e $j$;
 	\item $K$ è l'insieme di possibili zaini, cui è associato l'indice $k$;
@@ -46,14 +59,15 @@ Si cercano $K' \subseteq K$ e $J' \subseteq J$ tali che il profitto sia massimo.
 
 
 
-\subsection{Funzione Obiettivo}
+\subsubsection{Funzione Obiettivo}
 \begin{equation}
 \text{ max }\left(\sum_{k \in K} \sum_{i \in J} p_i \cdot t_{ki}\right) - \left(\sum_{k \in K} f_k \cdot z_k\right)
 \end{equation}
 
 
-\subsection{Vincoli}
+\subsubsection{Vincoli}
 \begin{equation}
+\label{eq:constraint:volume}
 \sum_{j \in J} w_j d_j h_j t_{kj} \leq W_kD_kH_k \quad\quad \forall k \in K 
 \end{equation}
 
@@ -61,6 +75,7 @@ Si cercano $K' \subseteq K$ e $J' \subseteq J$ tali che il profitto sia massimo.
 \sum_{\delta\in\Delta}(b_{kij}^\delta + b_{kji}^\delta) \geq t_{ki} + t_{kj} - 1, \quad i < j,\ k \in K,\ i \in J,\ j \in J
 \end{equation}
 \begin{equation}
+\label{eq:constraint:coodinateLessThanSkdelta}
 \chi_{ki}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{ir} \leq S_k^\delta \quad \quad k \in K,\ i \in J,\ \delta \in \Delta
 \end{equation}
 \begin{equation}
@@ -106,15 +121,15 @@ b_{kij}^\delta \in \{0,1\} \quad \quad k \in K, i \in J, j \in J, \delta \in \de
 z_k \in \{0,1\} \quad \quad k \in K
 \end{equation}
 
-\subsection{Note}
+\subsubsection{Note}
 \begin{itemize}
 \item Tutti i vincoli a parte \ref{constraint:multi:tkzk}, \ref{constraint:multi:onlyInOneKnapsack} e \ref{zk:in:0:1} sono stati ottenuti adattando i vincoli del modello di partenza.
 \item Il vincolo \ref{constraint:multi:tkzk} fa sì che un oggetto possa essere inserito nel $k$--simo zaino soltanto se lo zaino viene effettivamente utilizzato nella soluzione.
 \item Il vincolo \ref{constraint:multi:onlyInOneKnapsack} fa sì che un oggetto possa essere inserito al più in uno zaino. 
 \item Il vincolo 9 è ridondante rispetto ad 8, infatti ogni vincolo di tipo 9 ha un corrispettivo di tipo 8.
-\item Per il vincolo 7 si può utilizzare invece di un generico $M$, un parametro $L$ così definito:
+\item Per il vincolo 7 si può utilizzare invece di un generico $M$, un parametro $E$ così definito:
 $$
-L = max(S_k^\delta : k \in K, \delta \in \Delta) + 1
+E = max(S_k^\delta : k \in K, \delta \in \Delta) + 1
 $$ 
 \end{itemize}
 
@@ -128,6 +143,7 @@ si ottiene che il numero di variabili è minore di $3|J|^3 + 4|J|^2 + 7|J|$, qui
 nell'ordine di $O(|J|^3)$.
 
 
+
 \begin{table}[h!]
 	\center
 	\begin{tabular}{|l|l|}
@@ -138,7 +154,7 @@ nell'ordine di $O(|J|^3)$.
 		$z_k$ & $|K|$ \\
 		$\rho_{ir}$ & $|J| \cdot 6$\\
 		$t_{ki}$ & $|J| \cdot |K|$ \\
-		$X_{ki}^\delta$ & $|J| \cdot |K| \cdot | \Delta |$\\
+		$\chi_{ki}^\delta$ & $|J| \cdot |K| \cdot | \Delta |$\\
 		$b_{kij}^\delta$ & $|J| \cdot |J| \cdot |K| \cdot |\Delta|$\\ 
 		& \\
 		\hline
@@ -194,17 +210,104 @@ che è sempre nell'ordine $O(|J|^3)$.
 	\label{table:no:constraints}
 \end{table}
 
+\section{Balancing Constraints}
+È stata anche considerata la possibilità di estendere i balancing constraint del paper originale:
+\begin{equation}
+\sum_{i \in J} m_i \chi_{i}^\delta + \sum_{i \in J}\sum_{r \in R} m_i \gamma_{ir}^\delta \rho_{ir} \geq L^\delta \sum_{i \in J} m_i t_i \quad\quad \delta \in \Delta
+\end{equation}
+\begin{equation}
+\sum_{i \in J} m_i \chi_{i}^\delta + \sum_{i \in J}\sum_{r \in R} m_i \gamma_{ir}^\delta \rho_{ir} \leq U^\delta \sum_{i \in J} m_i t_i \quad\quad \delta \in \Delta
+\end{equation}
+dove 
+\begin{itemize}
+	\item $\gamma_{ir}^\delta$ è la coordinata del centro di massa dell'oggetto $i$ nella rotazione $r$ nella dimensione $\delta$.
+	\item $L^\delta$ è il lower bound 
+	\item $U^\delta$ è l'upper bound
+\end{itemize}
+
+per il modello con più zaini:
+\begin{equation}
+\sum_{i \in J} m_i \chi_{ki}^\delta + \sum_{i \in J}\sum_{r \in R} m_i \gamma_{ir}^\delta \rho_{ir} \geq L_k^\delta \sum_{i \in J} m_i t_{ki} \quad\quad k \in K, \delta \in \Delta
+\end{equation}
+\begin{equation}
+\sum_{i \in J} m_i \chi_{ki}^\delta + \sum_{i \in J}\sum_{r \in R} m_i \gamma_{ir}^\delta \rho_{ir} \leq U_k^\delta \sum_{i \in J} m_i t_{ki} \quad\quad k \in K, \delta \in \Delta
+\end{equation}
+
+In questo caso vengono aggiunti $2 \cdot (|K| \cdot 3)$ vincoli a quelli del modello di partenza.
+
+\section{Problema Accessorio}
+Una volta risolto il problema, potrebbe essere desiderabile cercare di ridurre i valori delle coordinate
+$\chi$ il più possibile.
+
+Il modello rimane lo stesso ma cambia la funzione obiettivo
+\begin{equation}
+\text{ min. } \sum_{k\in k}\sum_{i \in J}\sum_{\delta \in \Delta'} \chi_{ki}^\delta
+\end{equation}
+dove $\Delta' \subseteq \Delta$.
+
+Inoltre si fissano tutte le variabili $z_k, \rho_{ir}, t_{ki}$ e tutte le variabili $b_{kij}^\delta$ con $z_k = 0$.
+Questo perché $b_{kij}^\delta$ definisce delle precedenze molto forti tra oggetti -- spesse volte non necessarie in alcune direzioni -- che potrebbero limitare l'ottimizzazione delle variabili $\chi$, per questo è stato preferito non fissarle.
+
+
+\section{Problema Alternativo}
+
+Un problema alternativo che è  stato analizzato è quello di considerare le dimensioni degli zaini delle variabili, con un upper bound fissato ($S_k^0, S_k^1, S_k^2$), in cui lo scopo è quello di trovare le dimensioni più piccole che contengano tutti gli zaini.
+
+\subsection{Modello}
+Il modello differisce di poco dal modello fornito nel capitolo \ref{sec:original:model}, vengono elencate le differenze:
+\begin{itemize}
+	\item $S_k^\delta$ definisce l'upper bound dello zaino $k$ lungo la dimensione $\delta$.
+	\item $\sigma_k^\delta$ è l'estensione dello zaino $k$ lungo la dimensione $\delta$. È limitato superiormente dal valore $S_k^\delta$ fornito in input\footnote{Qualora si volesse trovare le dimensioni di uno zaino che racchiuda tutti gli oggetti $J$ è sufficiente
+	mettere in input uno zaino solo e fissare gli upper bound a valori molto alti.}. 
+\end{itemize}
+\subsubsection{Funzione obiettivo}
+Lo scopo è quello di minimizzare il volume degli zaini restando nei limiti $S_k^\delta$. Siccome il modello deve restare lineare non è possibile calcolare il volume, per questo motivo si utilizza come euristica del volume la somma delle lunghezze degli spigoli $\sigma_k^\delta$.
+\begin{equation}
+\text{ min. } \sum_{k \in K} \sum_{\delta \in \Delta} \sigma_k^\delta
+\end{equation}
+
+\subsubsection{Vincoli}
+Siccome il volume degli oggetti ora non è più dato dalla moltiplicazione di parametri ma bensì di variabili, il vincolo
+(\ref{eq:constraint:volume}) non può più essere considerato. Siccome è ridondante rispetto ai vincoli (\ref{eq:constraint:coodinateLessThanSkdelta}), che assumono ora la forma:
+
+\begin{equation}
+\label{eq:constraint:coodinateLessThanSigmakdelta}
+\chi_{ki}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{ir} \leq \sigma_k^\delta \quad \quad k \in K,\ i \in J,\ \delta \in \Delta
+\end{equation}
+può non essere considerato\footnote{In Baldi et. al viene considerato per questioni numeriche.}.
+
+Il vincolo numero \ref{constraint:multi:onlyInOneKnapsack} deve essere modificato in modo tale che \emph{tutti} gli oggetti siano inclusi nella soluzione:
+\begin{equation}
+\label{constraint:multi:onlyInExactlyOneKnapsack}
+\sum_{k \in K} t_{kj} = 1 \quad \quad j \in J
+\end{equation}
+Inoltre come già accennato vanno aggiunti i bound per le variabili $\sigma_k^\delta$:
+\begin{equation}
+\sigma_k^\delta \in [ 0, S_k^\delta ]
+\end{equation}
+
+\section{Problema Accessorio}
+Il problema accessorio è esattamente lo stesso di quello di capitolo \ref{} ma bisogna fissare anche le variabili $\sigma_k^\delta$.
 
 \section{File di Input}
 \begin{itemize}
 	\item $K$, il numero di zaini
 	\item Seguono $K$ righe contenente nella riga $k$ i dati per lo zaino $k$ intervallati da uno spazio:
 	\begin{itemize}
+		\item $S_k^0$
 		\item $S_k^1$
 		\item $S_k^2$
-		\item $S_k^3$
 		\item $f_k$
 	\end{itemize} 
+	Se il problema è esteso (con i \emph{balancing constraints}) si aggiungono anche:
+	\begin{itemize}
+		\item $L_k^0$
+		\item $L_k^1$
+		\item $L_k^2$
+		\item $U_k^0$
+		\item $U_k^1$
+		\item $U_k^2$
+	\end{itemize}
 	\item $N$, il numero di oggetti ($|J|$)
 	\begin{itemize}
 		\item $s_i^1$
