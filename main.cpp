@@ -368,21 +368,20 @@ int main (int argc, char *argv[])
 		
 		//We want to optimize at least in one direction
 		if(oFlag.optimize[0] || oFlag.optimize[1] || oFlag.optimize[2]){
-		
-			{
-			double sum = 0.;
+			double start_chi_values = 0; /* contains the sum of the chi values in the master problem */
+			double end_chi_values = 0;  /* contains the sum of the chi values after the extra problem */
+			
+			
 			for(int k = 0; k < instance.K; k++){
-				for(int i = 0; i < instance.N; i++){
-					
+				for(int i = 0; i < instance.N; i++){		
 						for(int delta = 0; delta < 3; delta++){
 							if(oFlag.optimize[delta])
-							sum += fetched_variables.chi[k][i][delta];
+							start_chi_values += fetched_variables.chi[k][i][delta];
 						}
-					
 				}
 			}
-			cout << "START CHI VALUES " << sum << endl;
-			}
+			cout << "Sum of chi values after master problem" << start_chi_values << endl;
+			
 			
 			// Setup Slave Problem
 			setupSP(env, lp, instance, map, fetched_variables, oFlag);
@@ -405,20 +404,16 @@ int main (int argc, char *argv[])
 			sprintf(OUTPUTFILENAME, "output_%s2%c", oFlag.filename, '\0');
 			
 			
-			{
-			double sum = 0.;
 			for(int k = 0; k < instance.K; k++){
 				for(int i = 0; i < instance.N; i++){
-					
 						for(int delta = 0; delta < 3; delta++){
 							if(oFlag.optimize[delta])
-							sum += slave_variables.chi[k][i][delta];
+							end_chi_values += slave_variables.chi[k][i][delta];
 						}
-					
 				}
 			}
-			cout << "END CHI VALUES " << sum << endl;
-			}
+			cout << "Sum of chi values after slave problem" << end_chi_values << endl;
+			
 			
 			output(env, lp, instance, objvalSP,  slave_variables,  OUTPUTFILENAME, oFlag);
 			printf("Written solution for Extra Problem in %s\n", OUTPUTFILENAME);
