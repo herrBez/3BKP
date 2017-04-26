@@ -43,11 +43,14 @@ Gli oggetti posizionati non devono avere sovrapposizioni e possono essere rotati
 	Estensione del 3KP in cui il centro di massa dello zaino deve risiedere all'interno di un'area specificata dello zaino (vincoli di bilanciamento).
 \end{problem}
 
+
+
 Nella sezione \ref{sec:extension1} verrà analizzata un'estensione del 3KP con più zaini, cui viene associato un costo fisso differente per ciascuno zaino. All'interno del capitolo \ref{sec:Balancing:Constraint} viene descritto come si potrebbero estendere i vincoli di bilanciamento per più zaini. 
 
 Nella sezione \ref{sec:extension2} viene considerato un problema analogo, ma differente il cui scopo è quello di inserire tutti gli oggetti all'interno degli zaini e cercare di minimizzare le dimensioni degli stessi. 
 
-Segue un capitolo in cui si descrive come compilare il programma e i formati dei file di input e di output e per concludere verranno evidenziati alcuni refusi del paper originale riscontrati durante lo sviluppo di questo progetto.  
+Segue un capitolo in cui si descrive come compilare il programma e i formati dei file di input e di output e per concludere verranno evidenziati alcuni refusi del paper originale riscontrati durante lo sviluppo di questo progetto.
+
 
 \section{Estensione del 3KP con più zaini}
 \label{sec:extension1}
@@ -277,7 +280,7 @@ Inoltre si fissano tutte le variabili $z_k, \rho_{ir}, t_{ki}$ e tutte le variab
 
 \section{Problema alternativo}
 \label{sec:extension2}
-Un problema alternativo che è  stato analizzato è quello di considerare le dimensioni degli zaini come delle variabili, con un upper bound fissato ($S_k^0, S_k^1, S_k^2$), in cui lo scopo è quello di trovare le dimensioni più piccole che contengano tutti gli oggetti.
+Un problema alternativo che è  stato analizzato è quello di considerare le dimensioni degli zaini come delle variabili, con un upper bound fissato ($S_k^0, S_k^1, S_k^2$), in cui lo scopo è quello di trovare le dimensioni minime che gli zaini devono avere, affinchè contengano tutti gli oggetti.
 
 \subsection{Modello}
 Il modello differisce di poco dal modello fornito nel capitolo \ref{sec:original:model}, quindi vengono elencate soltanto le differenze:
@@ -287,20 +290,20 @@ Il modello differisce di poco dal modello fornito nel capitolo \ref{sec:original
 	mettere in input uno zaino solo e fissare gli upper bound a valori molto alti.}. 
 \end{itemize}
 \subsubsection{Funzione obiettivo}
-Lo scopo è quello di minimizzare il volume degli zaini restando nei limiti $S_k^\delta$. Siccome il modello deve restare lineare non è possibile calcolare il volume, per questo motivo si utilizza come euristica per il calcolo del volume la somma delle lunghezze degli spigoli $\sigma_k^\delta$:
+Lo scopo è quello di minimizzare il volume degli zaini restando nei limiti $S_k^\delta$. Siccome il modello deve restare lineare non è possibile calcolare il volume degli zaini, per questo motivo si utilizza come euristica per il calcolo del volume la somma delle lunghezze degli spigoli $\sigma_k^\delta$:
 \begin{equation}
 \text{ min. } \sum_{k \in K} \sum_{\delta \in \Delta} \sigma_k^\delta
 \end{equation}
 
 \subsubsection{Vincoli}
 Siccome il volume degli zaini in questo modello non è più dato dalla moltiplicazione di parametri ma bensì di variabili, il vincolo
-(\ref{eq:constraint:volume}) non può più essere considerato. Siccome è ridondante rispetto ai vincoli (\ref{eq:constraint:coodinateLessThanSkdelta}), che assumono ora la forma:
+(\ref{eq:constraint:volume}) non può più essere considerato, ma poiché è ridondante rispetto ai vincoli (\ref{eq:constraint:coodinateLessThanSkdelta}), che assumono ora la forma:
 
 \begin{equation}
 \label{eq:constraint:coodinateLessThanSigmakdelta}
 \chi_{ki}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{ir} \leq \sigma_k^\delta \quad \quad k \in K,\ i \in J,\ \delta \in \Delta
 \end{equation}
-può non essere considerato\footnote{Nel paper originale viene considerato esclusivamente per questioni numeriche.}.
+può essere tralasciato senza intaccare l'ammissibilità del problema.\footnote{Nel paper originale viene considerato esclusivamente per questioni numeriche.}.
 
 Il vincolo numero \ref{constraint:multi:onlyInOneKnapsack} deve essere modificato in modo tale che \emph{tutti} gli oggetti siano contenuti in uno zaino nella soluzione:
 \begin{equation}
@@ -411,7 +414,7 @@ Nello sviluppo di questo lavoro sono stati riscontrati alcuni refusi nel paper d
 	$$
 	Infatti l'oggetto deve avere una rotazione soltanto se viene effettivamente inserito nello zaino\footnote{ 
 	Naturalmente un'altra soluzione potrebbe essere semplicemente di controllare che tutti gli oggetti siano più piccoli dello zaino.}. 
-	\item Il vincolo $n^\circ\ 12$ e $n^\circ\ 13$ sono ridondanti, infatti ogni vincolo in 12 ha un corrispettivo in 13. L'unica differenza è che i vincoli vengono elencati in due maniere diverse.
+	\item Il vincolo $n^\circ\ 12$ e $n^\circ\ 13$ sono ridondanti, infatti ogni vincolo in 12 ha un corrispettivo in 13. L'unica differenza è che i vincoli vengono elencati in due maniere diverse. 
 \end{itemize}
 
 \bibliographystyle{unsrt}
