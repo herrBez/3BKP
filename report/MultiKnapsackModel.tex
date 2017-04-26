@@ -3,6 +3,8 @@
 \usepackage{amssymb}
 \usepackage{xcolor}
 
+
+
 \usepackage[utf8]{inputenc}
 \usepackage[italian]{babel}
 
@@ -19,6 +21,8 @@
 	}
 }
 
+\newtheorem{problem}{Problema}
+
 \title{Possibili Estensioni del 3(B)KP}
 \author{Mirko Bez \\
 	mirko.bez@studenti.unipd.it
@@ -27,9 +31,25 @@
 \maketitle
 \tableofcontents
 \newpage
-Lo scopo di questo documento è fornire un'estensione del modello esatto con più zaini introdotto in Baldi et al. \cite{Baldi20129802}.
+\section{Introduzione}
+Lo scopo di questo documento è proporre alcune possibili estensioni per il modello esatto definito in Baldi et al. \cite{Baldi20129802}, che d'ora in poi verrà riferito come \emph{paper originale}.
 
-\section{Descrizione generale del problema}
+\begin{problem}[3KP]
+Il problema consiste nel posizionare ortogonalmente un sottoinsieme di oggetti tridimensionali all'interno di uno zaino in modo tale da massimizzare il profitto totale degli oggetti caricati. 
+Gli oggetti posizionati non devono avere sovrapposizioni e possono essere rotati.
+\end{problem}
+
+\begin{problem}[3BKP]
+	Estensione del 3KP in cui il centro di massa dello zaino deve risiedere all'interno di un'area specificata dello zaino (vincoli di bilanciamento).
+\end{problem}
+
+Nella sezione \ref{sec:extension1} verrà analizzata un'estensione del 3KP con più zaini, cui viene associato un costo fisso differente per ciascuno zaino. All'interno del capitolo \ref{sec:Balancing:Constraint} viene descritto come si potrebbero estendere i vincoli di bilanciamento per più zaini. 
+
+Nella sezione \ref{sec:extension2} viene considerato un problema analogo, ma differente il cui scopo è quello di inserire tutti gli oggetti all'interno degli zaini e cercare di minimizzare le dimensioni degli stessi. 
+
+Segue un capitolo in cui si descrive come compilare il programma e i formati dei file di input e di output e per concludere verranno evidenziati alcuni refusi del paper originale riscontrati durante lo sviluppo di questo progetto.  
+
+\section{Estensione del 3KP con più zaini}
 \label{sec:extension1}
 
 Siano dati:
@@ -216,6 +236,7 @@ che è sempre nell'ordine $O(|J|^3)$.
 \end{table}
 
 \subsection{Balancing Constraints}
+\label{sec:Balancing:Constraint}
 È stata anche considerata la possibilità di estendere i balancing constraint del paper originale:
 \begin{equation}
 \sum_{i \in J} m_i \chi_{i}^\delta + \sum_{i \in J}\sum_{r \in R} m_i \gamma_{ir}^\delta \rho_{ir} \geq L^\delta \sum_{i \in J} m_i t_i \quad\quad \delta \in \Delta
@@ -254,7 +275,7 @@ dove $\Delta' \subseteq \Delta$.
 Inoltre si fissano tutte le variabili $z_k, \rho_{ir}, t_{ki}$ e tutte le variabili $b_{kij}^\delta$ con $z_k = 0$, ma non quelle con $z_k = 1$, perché $b_{kij}^\delta$ definisce delle precedenze molto forti tra oggetti -- spesse volte non necessarie in alcune direzioni -- che potrebbero limitare l'ottimizzazione delle variabili $\chi$, per questo è stato preferito non fissarle.
 
 
-\section{Problema Alternativo}
+\section{Problema alternativo}
 \label{sec:extension2}
 Un problema alternativo che è  stato analizzato è quello di considerare le dimensioni degli zaini come delle variabili, con un upper bound fissato ($S_k^0, S_k^1, S_k^2$), in cui lo scopo è quello di trovare le dimensioni più piccole che contengano tutti gli oggetti.
 
@@ -279,9 +300,9 @@ Siccome il volume degli zaini in questo modello non è più dato dalla moltiplic
 \label{eq:constraint:coodinateLessThanSigmakdelta}
 \chi_{ki}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{ir} \leq \sigma_k^\delta \quad \quad k \in K,\ i \in J,\ \delta \in \Delta
 \end{equation}
-può non essere considerato\footnote{In Baldi et. al viene considerato esclusivamente per questioni numeriche.}.
+può non essere considerato\footnote{Nel paper originale viene considerato esclusivamente per questioni numeriche.}.
 
-Il vincolo numero \ref{constraint:multi:onlyInOneKnapsack} deve essere modificato in modo tale che \emph{tutti} gli oggetti siano inclusi nella soluzione:
+Il vincolo numero \ref{constraint:multi:onlyInOneKnapsack} deve essere modificato in modo tale che \emph{tutti} gli oggetti siano contenuti in uno zaino nella soluzione:
 \begin{equation}
 \label{constraint:multi:onlyInExactlyOneKnapsack}
 \sum_{k \in K} t_{kj} = 1 \quad \quad j \in J
@@ -351,7 +372,7 @@ $J^k$ gli oggeti che sono stati inseriti nel $k$--simo zaino e sia $r'$ la rotaz
 
 Il programma genera un file di output così costituito:
 \begin{itemize}
-	\item Una serie di righe di commento
+	\item Una serie di righe di commento che includono anche il valore ottimo trovato
 	\item $|K'|$ blocchi così formati:
 		\begin{itemize}
 			\item \verb|# Knapsack k-mo|
