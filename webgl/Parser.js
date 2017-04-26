@@ -89,11 +89,11 @@ function calculateVertices(BoxDimension, itemIndices, position, dimension, L, U)
 			var x = position[k][i][0];
 			var y = position[k][i][1];
 			var z = position[k][i][2];
-		
+			
 			var dx = dimension[k][i][0];
 			var dy = dimension[k][i][1];
 			var dz = dimension[k][i][2];
-		
+			
 		
 			verticesTmp.push([
 				//Back Face
