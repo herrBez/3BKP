@@ -46,7 +46,6 @@ char errmsg[BUF_SIZE];
  * @return objval the optimal solution
  */
 double solve( CEnv env, Prob lp, Instance3BKP instance, optionFlag oFlag) {
-	int N = instance.N;
 	clock_t t1,t2;
     t1 = clock();
     struct timeval  tv1, tv2;
@@ -65,9 +64,11 @@ double solve( CEnv env, Prob lp, Instance3BKP instance, optionFlag oFlag) {
 		CHECKED_CPX_CALL( CPXsolwrite, env, lp, "/tmp/Model.sol");
 	}
 	
-	cout << "Problem Size N" << N << endl;
-	cout << "in " << user_time << " seconds (user time)\n";
-	cout << "in " << cpu_time << " seconds (CPU time)\n";
+	printf("User time:\t %.4lf seconds ~ %.6lf minutes\n", user_time, (user_time/60));
+	printf("CPU time:\t %.4lf seconds ~ %.6lf minutes \n", cpu_time, (cpu_time/60));
+	if(oFlag.threads != 0){
+		printf("(%d threads)", oFlag.threads);
+	}
 	cout << "Objval: " << objval << endl;
 	
 	return objval;
