@@ -104,7 +104,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map, opt
 	 */
 	 for(int k = 0; k < K; k++){
 		char xtype = 'B';
-		double obj = 0.0;
+		double obj = 1.0;
 		double lb = 0.0;
 		double ub = 1.0;
 		sprintf(name, "z %d", k);
@@ -123,7 +123,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map, opt
 				char xtype = 'C';
 				double obj = 1.0;
 				double lb = 0.0;
-				double ub = instance.S[k][delta];
+				double ub = CPX_INFBOUND;
 				snprintf(name, NAME_SIZE, "Sigma %d %d", k, delta);
 				char * xname = (char*)(&name[0]);
 				CHECKED_CPX_CALL( CPXnewcols, env, lp, 1, &obj, &lb, &ub, &xtype, &xname );
@@ -210,6 +210,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map, opt
 			map.Rho[i][r] = current_var_position++;
 		}
 	}
+	
 	
 	 cout << "Number of variables: " << current_var_position << endl;
 }
@@ -555,6 +556,24 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 		char * cname = (char*) (&name[0]);
 		CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
 		number_of_constraint++;
+	}
+	//Constraint -- new
+	for(int k = 0; k < K; k++){
+			for(int delta = 0; delta < 3; delta++){
+				vector< int > idVar(2);
+				vector< double > coeff(2);
+				idVar[0] = map.Sigma[k][delta];
+				coeff[0] = 1.0;
+				idVar[1] = map.Z[k];
+				coeff[1] = -(instance.S[k][delta] + 1);
+				char sense = 'L';
+				int matbeg = 0;
+				double rhs = 0;
+				snprintf(name, NAME_SIZE, "(SIGMA) %d %d",k,delta);
+				char* cname = (char*)(&name[0]);
+				CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
+				number_of_constraint++;
+			}
 	}
 	
 	printf("Number of constraints (not considering the variable bounds): %d\n", number_of_constraint);
