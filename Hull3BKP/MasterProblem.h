@@ -1,8 +1,8 @@
 #ifndef __MASTER__PROBLEM__H__
 
-#include "utils.h"
-#include "Instance3BKP.h"
-#include "cpxmacro.h"
+#include "../Utils/fetch_option.h"
+#include "../Utils/Instance3BKP.h"
+#include "../Utils/cpxmacro.h"
 
 /**
  * set up the model for CPLEX
