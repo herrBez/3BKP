@@ -1,4 +1,3 @@
-#include "cpxmacro.h"
 #include "MasterProblem.h"
 using namespace std;
 
