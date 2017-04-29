@@ -3,6 +3,7 @@
 #include "../Utils/fetch_option.h"
 #include "../Utils/Instance3BKP.h"
 #include "../Utils/cpxmacro.h"
+#include "utils.h"
 
 /**
  * set up the model for CPLEX
