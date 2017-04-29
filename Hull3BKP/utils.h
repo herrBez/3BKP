@@ -5,8 +5,6 @@
 #define __UTILS__H__
 
 #include <vector>
-#include "Instance3BKP.h"
-#include <getopt.h>
 #include <string.h>
 
 using namespace std;

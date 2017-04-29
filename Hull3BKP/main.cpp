@@ -9,10 +9,10 @@
 #include <vector>
 #include <time.h>
 #include <sys/time.h>
-#include "cpxmacro.h"
+#include "../Utils/cpxmacro.h"
 #include <getopt.h>
 #include <unistd.h>
-#include "Instance3BKP.h"
+#include "../Utils/Instance3BKP.h"
 #include <assert.h>     /* assert */
 #include "utils.h"
 #include "MasterProblem.h"
