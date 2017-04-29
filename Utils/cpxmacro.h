@@ -1,6 +1,6 @@
 /**
  * @author Luigi De Giovanni
- * @file cpx_macro.h
+ * @file cpxmacro.h
  * Cplex Helper Macros
  *
  */
@@ -34,7 +34,7 @@ const unsigned int BUF_SIZE = 4096;
 
 extern char errmsg[BUF_SIZE];
 
-/* Shortcut for declaring a Cplex Env */
+/** Shortcut for declaring a Cplex Env */
 #define DECL_ENV(name) \
 Env name = CPXopenCPLEX(&status);\
 if (status){\
@@ -44,7 +44,7 @@ if (status){\
 	throw std::runtime_error(std::string(__FILE__) + ":" + STRINGIZE(__LINE__) + ": " + errmsg);\
 }
 
-/* Shortcut for declaring a Cplex Problem */
+/** Shortcut for declaring a Cplex Problem */
 #define DECL_PROB(env, name) \
 Prob name = CPXcreateprob(env, &status, "");\
 if (status){\
@@ -54,7 +54,7 @@ if (status){\
 	throw std::runtime_error(std::string(__FILE__) + ":" + STRINGIZE(__LINE__) + ": " + errmsg);\
 }
 
-/* Make a checked call to a Cplex API function */
+/** Make a checked call to a Cplex API function */
 #define CHECKED_CPX_CALL(func, env, ...) do {\
 status = func(env, __VA_ARGS__);\
 if (status){\

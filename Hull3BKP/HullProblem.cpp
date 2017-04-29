@@ -1,3 +1,8 @@
+/*!
+ * @author Mirko Bez
+ * @file HullProblem.cpp
+ * 
+ */
 #include "MasterProblem.h"
 using namespace std;
 

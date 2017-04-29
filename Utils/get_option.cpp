@@ -38,12 +38,10 @@ void print_help(char * argv[]){
 
 
 /**
- * function that according to the given options set the flags
- * 	--output, in order to print the solved problem in the given file
- *  --print, in order to print the TSP-Solution 0 <1, 2 .. n> 0
- *  --benchmark_output print a special form of output N user_time cpu_time objval
- * @param argc 
- * @param argv
+ * Function that reads command line parameter options and put the configuration in an optionFlag data stracture.
+ * @param argc the command line argument counter
+ * @param argv the command line arguments
+ * @return an optionFlag containing the configuration of that particular instantiation of the program.
  */
 optionFlag get_option(int argc,  char * argv[]){
 	optionFlag oFlag;

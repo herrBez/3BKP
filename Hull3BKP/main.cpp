@@ -1,6 +1,6 @@
-/**
+/*!
  * @author Mirko Bez
- * @file main.cpp
+ * @file hull_main.cpp
  * 
  * Usage: ./main <filename.dat>
  */
@@ -14,7 +14,7 @@
 #include <unistd.h>
 #include "../Utils/Instance3BKP.h"
 #include <assert.h>     /* assert */
-#include "utils.h"
+#include "hull_utils.h"
 #include "MasterProblem.h"
 #include <algorithm>
 

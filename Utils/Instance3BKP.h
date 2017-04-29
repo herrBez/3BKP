@@ -1,6 +1,6 @@
 /**
  * @author Mirko Bez
- * @file main.cpp
+ * @file Instance3BKP.h
  * @brief help class containing the 3BKP instance. It is accountable
  * for the parsing of the input file
  */

@@ -1,5 +1,7 @@
 /**
- * This file contains some data structure that are used in the problem
+ * This file contains some data structure specific for the Multi3BKP
+ * @author Mirko Bez
+ * @file utils.h 
  */
 #ifndef __UTILS__H__
 #define __UTILS__H__

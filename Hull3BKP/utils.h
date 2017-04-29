@@ -1,4 +1,6 @@
 /**
+ * @author Mirko Bez
+ * @file utils.h
  * This file contains some data structure that are specific for the HULL Problem and
  * contains a data structure to map the variables to their CPLEX indexes and to map
  * the variables to the computed values.

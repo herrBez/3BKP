@@ -1,3 +1,8 @@
+/*!
+ * @author Mirko Bez
+ * @file MasterProblem.h
+ * 
+ */
 #ifndef __MASTER__PROBLEM__H__
 
 #include "../Utils/fetch_option.h"
