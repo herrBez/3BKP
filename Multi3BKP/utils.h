@@ -5,9 +5,6 @@
 #define __UTILS__H__
 
 #include <vector>
-#include "Instance3BKP.h"
-#include <getopt.h>
-#include <string.h>
 
 using namespace std;
 
@@ -133,35 +130,6 @@ struct VarVal {
 		
 	}
 };
-
-
-struct optionFlag {
-	
-	optionFlag(){
-		 output_required = true;
-		 optimizeKnapsackCost = true;
-		 extended = false;
-		 timeout = 0.0;
-		 optimize[0] = true;
-		 optimize[1] = true;
-		 optimize[2] = true;
-	 }
-	
-	public:
-	
-	bool output_required;
-	bool optimizeKnapsackCost;
-	bool extended;
-	double timeout;
-	bool optimize[3];
-	char filename[128];
-	int threads;
-
-};
-
-
-
-optionFlag get_option(int argc,  char * argv[]);
 
 #endif
 

@@ -9,10 +9,10 @@
 #include <vector>
 #include <time.h>
 #include <sys/time.h>
-#include "cpxmacro.h"
+#include "../Utils/cpxmacro.h"
 #include <getopt.h>
 #include <unistd.h>
-#include "Instance3BKP.h"
+#include "../Utils/Instance3BKP.h"
 #include <assert.h>     /* assert */
 #include "utils.h"
 #include "MasterProblem.h"
@@ -164,9 +164,10 @@ void output(CEnv env, Prob lp, Instance3BKP instance, double objval, VarVal v, c
 	outfile << "#Valore della funzione obiettivo " << objval << endl; 
 	outfile << "#Vengono inclusi solo gli oggetti messi nello zaino" << endl;
 	for(int k = 0; k < K; k++){
-		if(v.z[k] == 1)
+		if(v.z[k] == 1) {
 			outfile << "#Dimensione";
 			outfile << " del " << k << "-mo Zaino " << instance.S[k][0] << " " << instance.S[k][1] <<" "<< instance.S[k][2] << endl;
+		}
 	} 
 	
 	for(int k = 0; k < K; k++){
@@ -338,11 +339,11 @@ int main (int argc, char *argv[])
 		
 		printf("Fetched variables Successfully\n");
 		
-		sprintf(OUTPUTFILENAME, "output_%s%c", oFlag.filename, '\0');
-		output(env, lp, instance, objvalMP, fetched_variables,  OUTPUTFILENAME, oFlag);
+		//sprintf(OUTPUTFILENAME, "output_%s%c", oFlag.output_filename, '\0');
+		output(env, lp, instance, objvalMP, fetched_variables,  oFlag.output_filename, oFlag);
 		
 		
-		printf("Written solution for Main Problem in %s\n", OUTPUTFILENAME);
+		printf("Written solution for Main Problem in %s\n", oFlag.output_filename);
 		
 		//We want to optimize at least in one direction
 		if(oFlag.optimize[0] || oFlag.optimize[1] || oFlag.optimize[2]){
@@ -381,7 +382,6 @@ int main (int argc, char *argv[])
 			VarVal slave_variables = fetchVariables(env, lp, instance, map);
 			
 		
-			sprintf(OUTPUTFILENAME, "output_%s2%c", oFlag.filename, '\0');
 			
 			
 			
@@ -398,7 +398,8 @@ int main (int argc, char *argv[])
 			}
 			cout << "end chi values " << end_chi_value << endl;
 			
-			
+			sprintf(OUTPUTFILENAME, "%s2", oFlag.output_filename);
+
 			output(env, lp, instance, objvalSP,  slave_variables,  OUTPUTFILENAME, oFlag);
 			printf("Written solution for Extra Problem in %s\n", OUTPUTFILENAME);
 			
