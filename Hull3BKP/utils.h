@@ -1,5 +1,7 @@
 /**
- * This file contains some data structure that are used in the problem
+ * This file contains some data structure that are specific for the HULL Problem and
+ * contains a data structure to map the variables to their CPLEX indexes and to map
+ * the variables to the computed values.
  */
 #ifndef __UTILS__H__
 #define __UTILS__H__
@@ -138,35 +140,6 @@ struct VarVal {
 	}
 };
 
-
-struct optionFlag {
-	
-	optionFlag(){
-		 output_required = true;
-		 optimizeKnapsackCost = true;
-		 extended = false;
-		 timeout = 0.0;
-		 optimize[0] = true;
-		 optimize[1] = true;
-		 optimize[2] = true;
-	 }
-	
-	public:
-	
-	bool output_required;
-	bool optimizeKnapsackCost;
-	bool extended;
-	double timeout;
-	bool optimize[3];
-	char filename[128];
-	char output_filename[128];
-	int threads;
-
-};
-
-
-
-optionFlag get_option(int argc,  char * argv[]);
 
 #endif
 
