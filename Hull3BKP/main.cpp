@@ -175,8 +175,9 @@ void output(CEnv env, Prob lp, Instance3BKP instance, double objval, VarVal v, c
 	outfile << "#Valore della funzione obiettivo " << objval << endl; 
 	outfile << "#Vengono inclusi solo gli oggetti messi nello zaino" << endl;
 	for(int k = 0; k < K; k++){
-		if(v.z[k] == 1)
+		if(v.z[k] == 1) {
 			outfile << "#Dimensione max. del " << k << "-mo Zaino " << instance.S[k][0] << " " << instance.S[k][1] <<" "<< instance.S[k][2] << endl;
+		}
 	} 
 	
 	for(int k = 0; k < K; k++){
