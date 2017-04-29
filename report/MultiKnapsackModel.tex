@@ -7,6 +7,7 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[italian]{babel}
+\usepackage{hyperref}
 
 
 
@@ -45,9 +46,12 @@ Gli oggetti posizionati non devono avere sovrapposizioni e possono essere rotati
 
 
 
-Nella sezione \ref{sec:extension1} verrà analizzata un'estensione del 3KP con più zaini, cui viene associato un costo fisso differente per ciascuno zaino. All'interno del capitolo \ref{sec:Balancing:Constraint} viene descritto come si potrebbero estendere i vincoli di bilanciamento per più zaini. 
+Nella sezione \ref{sec:extension1} verrà analizzata un'estensione del 3KP con più zaini, cui viene associato un costo fisso differente per ciascuno zaino.
 
-Nella sezione \ref{sec:extension2} viene considerato un problema analogo, ma differente il cui scopo è quello di inserire tutti gli oggetti all'interno degli zaini e cercare di minimizzare le dimensioni degli stessi. 
+Nel capitolo \ref{sec:extension2} viene considerato un problema analogo, ma differente il cui scopo è quello di inserire tutti gli oggetti all'interno degli zaini e cercare di minimizzare le dimensioni degli stessi. 
+
+ All'interno del capitolo \ref{sec:Balancing:Constraint} viene descritto come si potrebbero estendere i vincoli di bilanciamento per più zaini. 
+
 
 Segue un capitolo in cui si descrive come compilare il programma e i formati dei file di input e di output e per concludere verranno evidenziati alcuni refusi del paper originale riscontrati durante lo sviluppo di questo progetto.
 
@@ -121,6 +125,7 @@ b_{kij}^\delta \leq t_{ki}\quad \quad k \in K, i \in J, j \in J, \delta \in \Del
 b_{kji}^\delta \leq t_{kj} \quad \quad k \in K, i \in J, j \in J, \delta \in \Delta
 \end{equation}
 \begin{equation}
+\label{eq:constraint:rho:ir:leq:sumk}
 \sum_{r \in R} \rho_{ir} = \sum_{k \in K} t_{ki}\quad \quad i \in J
 \end{equation}
 \begin{equation}
@@ -238,7 +243,165 @@ che è sempre nell'ordine $O(|J|^3)$.
 	\label{table:no:constraints}
 \end{table}
 
-\subsection{Balancing Constraints}
+\subsection{Problema Accessorio}
+\label{sec:orig:problemaAcessorio}
+Una volta risolto il problema, potrebbe essere desiderabile cercare di ridurre i valori delle coordinate
+$\chi$ il più possibile.
+
+Il modello rimane lo stesso ma cambia la funzione obiettivo
+\begin{equation}
+\text{ min. } \sum_{k\in k}\sum_{i \in J}\sum_{\delta \in \Delta'} \chi_{ki}^\delta
+\end{equation}
+dove $\Delta' \subseteq \Delta$ e $\Delta' \neq \varnothing$.
+
+Inoltre si fissano tutte le variabili $z_k, \rho_{ir}, t_{ki}$ e tutte le variabili $b_{kij}^\delta$ con $z_k = 0$, ma non quelle con $z_k = 1$, perché $b_{kij}^\delta$ definisce delle precedenze molto forti tra oggetti -- spesse volte non necessarie in alcune direzioni -- che potrebbero limitare l'ottimizzazione delle variabili $\chi$, per questo è stato preferito non fissarle.
+
+
+\section{Problema alternativo}
+\label{sec:extension2}
+Un problema alternativo che è  stato analizzato è quello di considerare le dimensioni degli zaini come delle variabili, con un upper bound fissato ($S_k^0, S_k^1, S_k^2$), in cui lo scopo è quello di trovare le dimensioni minime che gli zaini devono avere, affinché possano contenere tutti gli oggetti.
+
+\subsection{Modello}
+Il modello differisce di poco dal modello fornito nel capitolo \ref{sec:original:model}, quindi vengono elencate soltanto le differenze:
+\begin{itemize}
+	\item $S_k^\delta$ definisce l'upper bound della lunghezza dello zaino $k$ lungo la dimensione $\delta$.
+	
+	\item $\sigma_k^\delta$ è una variabile che codifica l'estensione dello zaino $k$ lungo la dimensione $\delta$. È limitato superiormente dal valore $S_k^\delta$ fornito in input\footnote{Qualora si volesse trovare le dimensioni di uno zaino che racchiuda tutti gli oggetti $J$ è sufficiente
+	mettere in input uno zaino solo e fissare gli upper bound a valori molto alti.}. 
+	
+	\item Al posto della variabile $\rho_{ir}$ qui viene definita una variabile che itera anche tra gli zaini:
+	$\rho_{kir}$\footnote{Se si mantiene la $\rho$ su due dimensioni si creavano vincoli non necessari.}.
+\end{itemize}
+\subsubsection{Funzione obiettivo}
+Lo scopo è quello di minimizzare il volume degli zaini restando nei limiti $S_k^\delta$. Siccome il modello deve restare lineare non è possibile calcolare il volume degli zaini, per questo motivo si utilizza come euristica per il calcolo del volume la somma delle lunghezze degli spigoli $\sigma_k^\delta$:
+\begin{equation}
+\text{ min. } \sum_{k \in K} \sum_{\delta \in \Delta} \sigma_k^\delta
+\end{equation}
+Siccome è desiderabile, a parità di somma delle dimensione dei vari zaini, diminuire il numero di zaini inclusi nella soluzione è stata preferita la seguente funzione obiettivo:
+\begin{equation}
+\text{ min. } \sum_{k \in K} \sum_{\delta \in \Delta} \sigma_k^\delta + \sum_{k \in K} z_k
+\end{equation}
+\subsubsection{Vincoli}
+
+\begin{equation}
+\sum_{\delta\in\Delta}(b_{kij}^\delta + b_{kji}^\delta) \geq t_{ki} + t_{kj} - 1, \quad i < j,\ k \in K,\ i \in J,\ j \in J
+\end{equation}
+\begin{equation}
+\label{eq:rho:kir:leq:sigmakdelta}
+\chi_{ki}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{kir} \leq \sigma_k^\delta \quad \quad k \in K,\ i \in J,\ \delta \in \Delta
+\end{equation}
+\begin{equation}
+\label{eq:rho:kir:leq:precedenceA}
+\chi_{ki}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{kir} \leq \chi_{kj}^\delta + M(1 - b_{kij}^\delta), \quad \quad i < j,\ k \in K, i \in J, j \in J, \delta \in \Delta
+\end{equation}
+\begin{equation}
+\label{eq:rho:kir:leq:precedenceB}
+\chi_{kj}^\delta + \sum_{r \in R} s_{jr}^\delta \rho_{kjr} \leq \chi_{ki}^\delta + M(1 - b_{kji}^\delta), \quad \quad i < j,\ k \in K, i \in J, j \in J, \delta \in \Delta
+\end{equation}
+\begin{equation}
+\chi_{ki}^\delta \leq M t_{ki}\quad\quad k \in K, i \in J, \delta \in \Delta
+\end{equation}
+\begin{equation}
+b_{kij}^\delta \leq t_{ki}\quad \quad k \in K, i \in J, j \in J, \delta \in \Delta
+\end{equation}
+\begin{equation}
+b_{kji}^\delta \leq t_{kj} \quad \quad k \in K, i \in J, j \in J, \delta \in \Delta
+\end{equation}
+\begin{equation}
+\label{eq:rho:kir:sumofallrotation:tki}
+\sum_{r \in R} \rho_{kir} = t_{ki}\quad \quad k \in K, i \in J
+\end{equation}
+\begin{equation}
+\label{2:constraint:multi:tkzk}
+t_{kj} \leq z_k\quad \quad k \in K, j \in J
+\end{equation}
+\begin{equation}
+\label{2:constraint:multi:onlyInOneKnapsack}
+\sum_{k \in K} t_{kj} = 1 \quad \quad j \in J
+\end{equation}
+\begin{equation}
+\label{sigma_kdelta:leq:Skdelta}
+\sigma_k^\delta \leq S_k^\delta z_k \quad \quad \forall k \in K, \forall \delta \in \Delta
+\end{equation}
+
+\begin{equation}
+\chi_{ki}^\delta \geq 0 \quad \quad k \in K, i \in J, \delta \in \Delta
+\end{equation}
+\begin{equation}
+t_{ki} \in \{0,1\} \quad \quad k \in K, i \in J
+\end{equation}
+\begin{equation}
+b_{kij}^\delta \in \{0,1\} \quad \quad k \in K, i \in J, j \in J, \delta \in \delta
+\end{equation}
+\begin{equation}
+\rho_{kir} \in \{0,1\} \quad\quad k \in K, i \in J, r \in R
+\end{equation}
+\begin{equation}
+\label{2:zk:in:0:1}
+z_k \in \{0,1\} \quad \quad k \in K
+\end{equation}
+\begin{equation}
+\label{sigma_kdelta:geq:0}
+\sigma_k^\delta \geq 0 \quad\quad  k\in K, \delta \in \Delta
+\end{equation}
+
+
+\subsubsection{Note}
+Vengono qui elencate brevemente le differenze con l'altro modello e spiegate le motivazioni delle modifiche.
+\begin{itemize}
+\item Avendo esteso $\rho$ su tre dimensioni tutti i vincoli (\ref{eq:rho:kir:leq:sigmakdelta}, \ref{eq:rho:kir:leq:precedenceA}, \ref{eq:rho:kir:leq:precedenceB}, \ref{eq:rho:kir:sumofallrotation:tki}) che coinvolgono questa variabile devono essere modificati tenendo in considerazione anche l'indice $k$.
+
+\item Siccome il volume degli zaini in questo modello non è più dato dalla moltiplicazione di parametri, ma bensì di variabili, il vincolo
+(\ref{eq:constraint:volume}) non può più essere considerato. 
+Ma poiché è ridondante rispetto ai vincoli \ref{eq:constraint:coodinateLessThanSkdelta}
+può essere tralasciato senza intaccare l'ammissibilità del problema\footnote{Nel paper originale il vincolo (\ref{eq:constraint:volume}) viene considerato esclusivamente per questioni numeriche.}. Al posto del vincolo \ref{eq:constraint:coodinateLessThanSkdelta} viene ora considerato il vincolo \ref{eq:rho:kir:leq:sigmakdelta} che coinvolge la variabile $\sigma_k^\delta$ invece del parametro $S_k^\delta$.
+
+\item Il vincolo numero \ref{constraint:multi:onlyInOneKnapsack} deve essere modificato in modo tale che \emph{tutti} gli oggetti siano contenuti in uno zaino nella soluzione, dando forma al vincolo \ref{2:constraint:multi:onlyInOneKnapsack}.
+
+\item Il vincolo \ref{eq:constraint:rho:ir:leq:sumk} è stato sostituito dal nuovo vincolo \ref{eq:rho:kir:sumofallrotation:tki}. Qualora si tenesse il vincolo \ref{eq:constraint:rho:ir:leq:sumk} si otterrebbe che qualsiasi zaino  dovrebbe essere più grande di tutti i singoli oggetti, per via della modifica al vincolo: \ref{2:constraint:multi:onlyInOneKnapsack}.
+
+\item Inoltre come già accennato vanno aggiunti i bound per le variabili $\sigma_k^\delta$:
+\begin{equation}
+\sigma_k^\delta \in [ 0, S_k^\delta ]
+\end{equation}
+che vengono codificati nei due vincoli
+\ref{sigma_kdelta:leq:Skdelta} e \ref{sigma_kdelta:geq:0}.
+\end{itemize}
+\subsection{Dimensione del problema}
+
+La dimensione viene qui definita come differenza rispetto a quella calcolata in \ref{sec:orig:dimensioneDelProblema}.
+
+Siccome si aggiungono le variabili $\sigma_k^\delta$ e le variabili $\rho_{kir}$ al posto delle variabili $\rho_{ir}$ il numero di variabili aumenta di:
+\begin{itemize}
+	\item $|K|\cdot|\Delta|$ unità per $\sigma_k^\delta$
+	
+	\item $6(|K|-1)\cdot |J|$ per $\rho_{kir}$
+\end{itemize} 
+
+Portando ad un numero approssimato usando l'assunzione $|K| < |J|$:
+$$
+3|J|^3 + 10|J|^2 + 4|J| 
+$$
+
+
+I vincoli decrescono di $|K|$ perché rimuoviamo il vincolo \ref{eq:constraint:volume}. E aumentano di $2 \cdot |K|\cdot|\Delta|$ per via della definizione dei domini delle variabili $\sigma_k^\delta$ (i vincoli \ref{sigma_kdelta:leq:Skdelta} e \ref{sigma_kdelta:geq:0}) e di $(|K|-1) |J|$ per via dei vincoli \ref{eq:rho:kir:sumofallrotation:tki}.
+
+In totale
+$$
+\frac{19}{2} |J|^3 + \frac{21}{2} |J|^2 + 10|J|
+$$
+
+
+Visto che le differenze avvengono solo al livello di grado $1$ e $2$ la dimensione asintotica delle variabili e dei vincoli è la stessa, tuttavia il secondo problema richiede molto più tempo per essere risolto soprattutto al crescere di $K$ visto che deve determinare il valore di un numero di variabili sensibilmente maggiore.
+
+
+\subsection{Problema Accessorio}
+
+Il problema accessorio è esattamente lo stesso di quello di capitolo \ref{sec:orig:problemaAcessorio} ma bisogna fissare anche le variabili $\sigma_k^\delta$ e $\rho_{kir}$.
+
+
+
+\section{Balancing Constraints}
 \label{sec:Balancing:Constraint}
 È stata anche considerata la possibilità di estendere i balancing constraint del paper originale:
 \begin{equation}
@@ -264,95 +427,17 @@ per il modello con più zaini:
 
 In questo caso vengono aggiunti $2 \cdot (|K| \cdot 3)$ vincoli a quelli del modello di partenza.
 
-\subsection{Problema Accessorio}
-\label{sec:orig:problemaAcessorio}
-Una volta risolto il problema, potrebbe essere desiderabile cercare di ridurre i valori delle coordinate
-$\chi$ il più possibile.
-
-Il modello rimane lo stesso ma cambia la funzione obiettivo
-\begin{equation}
-\text{ min. } \sum_{k\in k}\sum_{i \in J}\sum_{\delta \in \Delta'} \chi_{ki}^\delta
-\end{equation}
-dove $\Delta' \subseteq \Delta$.
-
-Inoltre si fissano tutte le variabili $z_k, \rho_{ir}, t_{ki}$ e tutte le variabili $b_{kij}^\delta$ con $z_k = 0$, ma non quelle con $z_k = 1$, perché $b_{kij}^\delta$ definisce delle precedenze molto forti tra oggetti -- spesse volte non necessarie in alcune direzioni -- che potrebbero limitare l'ottimizzazione delle variabili $\chi$, per questo è stato preferito non fissarle.
 
 
-\section{Problema alternativo}
-\label{sec:extension2}
-Un problema alternativo che è  stato analizzato è quello di considerare le dimensioni degli zaini come delle variabili, con un upper bound fissato ($S_k^0, S_k^1, S_k^2$), in cui lo scopo è quello di trovare le dimensioni minime che gli zaini devono avere, affinchè contengano tutti gli oggetti.
-
-\subsection{Modello}
-Il modello differisce di poco dal modello fornito nel capitolo \ref{sec:original:model}, quindi vengono elencate soltanto le differenze:
-\begin{itemize}
-	\item $S_k^\delta$ definisce l'upper bound della lunghezza dello zaino $k$ lungo la dimensione $\delta$.
-	
-	\item $\sigma_k^\delta$ è una variabile che codifica l'estensione dello zaino $k$ lungo la dimensione $\delta$. È limitato superiormente dal valore $S_k^\delta$ fornito in input\footnote{Qualora si volesse trovare le dimensioni di uno zaino che racchiuda tutti gli oggetti $J$ è sufficiente
-	mettere in input uno zaino solo e fissare gli upper bound a valori molto alti.}. 
-	
-	\item Al posto della variabile $\rho_{ir}$ qui viene definita una variabile che itera anche tra gli zaini:
-	$\rho_{kir}$\footnote{Se si mantiene la $\rho$ su due dimensioni si creavano vincoli non necessari.}.
-\end{itemize}
-\subsubsection{Funzione obiettivo}
-Lo scopo è quello di minimizzare il volume degli zaini restando nei limiti $S_k^\delta$. Siccome il modello deve restare lineare non è possibile calcolare il volume degli zaini, per questo motivo si utilizza come euristica per il calcolo del volume la somma delle lunghezze degli spigoli $\sigma_k^\delta$:
-\begin{equation}
-\text{ min. } \sum_{k \in K} \sum_{\delta \in \Delta} \sigma_k^\delta
-\end{equation}
-Siccome è desiderabile, a parità di somma delle dimensione dei vari zaini, diminuire il numero di zaini inclusi nella soluzione è stata preferita la seguente funzione obiettivo:
-\begin{equation}
-\text{ min. } \sum_{k \in K} \sum_{\delta \in \Delta} \sigma_k^\delta + \sum_{k \in K} z_k
-\end{equation}
-\subsubsection{Vincoli}
-Avendo esteso $\rho$ su tre dimensioni tutti i vincoli che coinvolgono questa variabile devono essere modificati tenendo in considerazione anche l'indice k.
-Siccome il volume degli zaini in questo modello non è più dato dalla moltiplicazione di parametri ma bensì di variabili, il vincolo
-(\ref{eq:constraint:volume}) non può più essere considerato, ma poiché è ridondante rispetto ai vincoli (\ref{eq:constraint:coodinateLessThanSkdelta}), che assumono ora la forma:
-
-\begin{equation}
-\label{eq:constraint:coodinateLessThanSigmakdelta}
-\chi_{ki}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{kir} \leq \sigma_k^\delta \quad \quad k \in K,\ i \in J,\ \delta \in \Delta
-\end{equation}
-può essere tralasciato senza intaccare l'ammissibilità del problema.\footnote{Nel paper originale il vincolo (\ref{eq:constraint:volume}) viene considerato esclusivamente per questioni numeriche.}.
-
-Il vincolo numero \ref{constraint:multi:onlyInOneKnapsack} deve essere modificato in modo tale che \emph{tutti} gli oggetti siano contenuti in uno zaino nella soluzione:
-\begin{equation}
-\label{constraint:multi:onlyInExactlyOneKnapsack}
-\sum_{k \in K} t_{kj} = 1 \quad \quad j \in J
-\end{equation}
-Inoltre come già accennato vanno aggiunti i bound per le variabili $\sigma_k^\delta$:
-\begin{equation}
-\sigma_k^\delta \in [ 0, S_k^\delta ]
-\end{equation}
-che può essere codificato anche nel seguente vincolo:
-\begin{equation}
-\sigma_k^\delta \leq S_k^\delta \cdot z_k \quad \forall k \in K, \forall \delta \in \Delta
-\end{equation}
-
-Il vincolo 
-\subsection{Dimensione del problema}
-
-La dimensione viene qui definita come differenza rispetto a quella calcolata in \ref{sec:orig:dimensioneDelProblema}.
-
-Siccome si aggiungono le variabili $\sigma_k^\delta$ il numero di variabili cresce di $|K|\cdot|\Delta|$.
-
-
-I vincoli decrescono di $|K|$ perché rimuoviamo il vincolo \ref{eq:constraint:volume}. E aumentano di $|K|\cdot|\Delta|$ per via della definizione dei domini delle variabili $\sigma_k^\delta$.
-
-Visto che le differenze avvengono solo al livello di grado $1$ la dimensione dei due problemi possono essere considerate sostanzialmente equivalenti.
-
-\subsection{Problema Accessorio}
-
-Il problema accessorio è esattamente lo stesso di quello di capitolo \ref{sec:orig:problemaAcessorio} ma bisogna fissare anche le variabili $\sigma_k^\delta$.
 
 \section{Come eseguire il programma}
 \subsection{Compilazione}
-Il \verb|makefile| può produrre due differenti eseguibili in base alla regola utilizzata:
-\begin{itemize}
-	\item \verb|make| genera il codice per il problema descritto nella sezione \ref{sec:extension1} nel file \verb|main|
-	\item \verb|make hull| genera il programma per il problema descritto nel capitolo \ref{sec:extension2} nel file \verb|main_hull|\footnote{Il nome \emph{hull} è stato scelto perchè il secondo problema ricorda il problema dell'involucro convesso.}.
-\end{itemize}
+La cartella \verb|Multi3BKP| contiene l'implementazione del primo modello, mentre \verb|Hull3BKP| contiene l'implementazione del problema alternativo.
+Per compilare è sufficiente utilizzare il \verb|Makefile| contenuto nella rispettiva cartella.
+
 
 \subsection{File di Input}
-Per comodità sia \verb|main_hull| che \verb|main| utilizzano lo stesso file di input anche se magari non tutti i parametri vengono utilizzati in tutti e due i programmi.
+Per comodità entrambi i programmi utilizzano lo stesso file di input, anche se magari non tutti i parametri vengono utilizzati in tutti e due i programmi.
 \begin{itemize}
 	\item $K$, il numero di zaini
 	\item Seguono $K$ righe contenente nella riga $k$ i dati per lo zaino $k$ intervallati da uno spazio:
@@ -407,7 +492,10 @@ Il programma genera un file di output così costituito:
 \end{itemize}
 
 \subsection{Visualizzazione}
-Per visualizzare il file di output ed evidenziare eventuali errori nel modello è stato implementato un programma che rappresenta gli zaini e gli oggetti selezionati nello spazio, utilizzando la libreria grafica \verb|webgl|.
+Per visualizzare il file di output ed evidenziare eventuali errori nel modello è stato implementato un programma che rappresenta gli zaini e gli oggetti selezionati nello spazio, utilizzando la libreria grafica \verb|webgl|\footnote{\url{https://www.khronos.org/webgl/}}.
+
+\subsection{Documentazione}
+La documentazione del codice può essere generata utilizzando il programma \verb|doxygen|\footnote{\url{https://github.com/doxygen/doxygen}} all'interno delle rispettive cartelle.
 
 \section{Refusi nel paper originale}
 Nello sviluppo di questo lavoro sono stati riscontrati alcuni refusi nel paper di Baldi et al. \cite{Baldi20129802}.
