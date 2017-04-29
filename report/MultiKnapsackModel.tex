@@ -8,7 +8,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[italian]{babel}
 
-\usepackage{hyperref}
+
 
 \newcommand{\MutliLineEquation}[3]{ 
 	\ensuremath{
@@ -286,24 +286,32 @@ Un problema alternativo che è  stato analizzato è quello di considerare le dim
 Il modello differisce di poco dal modello fornito nel capitolo \ref{sec:original:model}, quindi vengono elencate soltanto le differenze:
 \begin{itemize}
 	\item $S_k^\delta$ definisce l'upper bound della lunghezza dello zaino $k$ lungo la dimensione $\delta$.
+	
 	\item $\sigma_k^\delta$ è una variabile che codifica l'estensione dello zaino $k$ lungo la dimensione $\delta$. È limitato superiormente dal valore $S_k^\delta$ fornito in input\footnote{Qualora si volesse trovare le dimensioni di uno zaino che racchiuda tutti gli oggetti $J$ è sufficiente
 	mettere in input uno zaino solo e fissare gli upper bound a valori molto alti.}. 
+	
+	\item Al posto della variabile $\rho_{ir}$ qui viene definita una variabile che itera anche tra gli zaini:
+	$\rho_{kir}$\footnote{Se si mantiene la $\rho$ su due dimensioni si creavano vincoli non necessari.}.
 \end{itemize}
 \subsubsection{Funzione obiettivo}
 Lo scopo è quello di minimizzare il volume degli zaini restando nei limiti $S_k^\delta$. Siccome il modello deve restare lineare non è possibile calcolare il volume degli zaini, per questo motivo si utilizza come euristica per il calcolo del volume la somma delle lunghezze degli spigoli $\sigma_k^\delta$:
 \begin{equation}
 \text{ min. } \sum_{k \in K} \sum_{\delta \in \Delta} \sigma_k^\delta
 \end{equation}
-
+Siccome è desiderabile, a parità di somma delle dimensione dei vari zaini, diminuire il numero di zaini inclusi nella soluzione è stata preferita la seguente funzione obiettivo:
+\begin{equation}
+\text{ min. } \sum_{k \in K} \sum_{\delta \in \Delta} \sigma_k^\delta + \sum_{k \in K} z_k
+\end{equation}
 \subsubsection{Vincoli}
+Avendo esteso $\rho$ su tre dimensioni tutti i vincoli che coinvolgono questa variabile devono essere modificati tenendo in considerazione anche l'indice k.
 Siccome il volume degli zaini in questo modello non è più dato dalla moltiplicazione di parametri ma bensì di variabili, il vincolo
 (\ref{eq:constraint:volume}) non può più essere considerato, ma poiché è ridondante rispetto ai vincoli (\ref{eq:constraint:coodinateLessThanSkdelta}), che assumono ora la forma:
 
 \begin{equation}
 \label{eq:constraint:coodinateLessThanSigmakdelta}
-\chi_{ki}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{ir} \leq \sigma_k^\delta \quad \quad k \in K,\ i \in J,\ \delta \in \Delta
+\chi_{ki}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{kir} \leq \sigma_k^\delta \quad \quad k \in K,\ i \in J,\ \delta \in \Delta
 \end{equation}
-può essere tralasciato senza intaccare l'ammissibilità del problema.\footnote{Nel paper originale viene considerato esclusivamente per questioni numeriche.}.
+può essere tralasciato senza intaccare l'ammissibilità del problema.\footnote{Nel paper originale il vincolo (\ref{eq:constraint:volume}) viene considerato esclusivamente per questioni numeriche.}.
 
 Il vincolo numero \ref{constraint:multi:onlyInOneKnapsack} deve essere modificato in modo tale che \emph{tutti} gli oggetti siano contenuti in uno zaino nella soluzione:
 \begin{equation}
@@ -314,7 +322,12 @@ Inoltre come già accennato vanno aggiunti i bound per le variabili $\sigma_k^\d
 \begin{equation}
 \sigma_k^\delta \in [ 0, S_k^\delta ]
 \end{equation}
+che può essere codificato anche nel seguente vincolo:
+\begin{equation}
+\sigma_k^\delta \leq S_k^\delta \cdot z_k \quad \forall k \in K, \forall \delta \in \Delta
+\end{equation}
 
+Il vincolo 
 \subsection{Dimensione del problema}
 
 La dimensione viene qui definita come differenza rispetto a quella calcolata in \ref{sec:orig:dimensioneDelProblema}.
