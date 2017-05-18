@@ -30,8 +30,8 @@ void print_help(char * argv[]){
 	cout << "-y, --disable-y\t\t\t do not optimize w.r.t. y" << endl;
 	cout << "-z, --disable-z\t\t\t do not optimize w.r.t. z" << endl;
 	cout << "-t, --timeout\t\t\t set a timeout in seconds, after which CPLEX will stop (It returns the incumbent solution)" << endl;
-	cout << "-i, --ignore-kanpsack-cost\t\t the program will not try to optimize the number of knapsacks" << endl;
-	cout << "-w, --thread\t\t set a fixed number of threads. If it is not specified CPLEX will decide on its own" << endl;
+	cout << "-i, --ignore-kanpsack-cost\t the program will not try to optimize the number of knapsacks" << endl;
+	cout << "-w, --thread\t\t\t set a fixed number of threads. If it is not specified CPLEX will decide on its own" << endl;
 	cout << "-o, --outputfile\t\t set the output file " << endl;
 	cout << endl;
 }
