@@ -267,11 +267,11 @@ Sezione \ref{sec:original:model}, quindi vengono elencate soltanto le differenze
 \begin{itemize}
 	\item $S_k^\delta$ definisce l'upper bound della lunghezza dello zaino $k$ lungo la dimensione $\delta$.
 	
-	\item $\sigma_k^\delta$ è una variabile che codifica l'estensione dello zaino $k$ lungo la dimensione $\delta$. È limitato superiormente dal valore $S_k^\delta$ fornito in input\footnote{Qualora si volesse trovare le dimensioni di uno zaino che racchiuda tutti gli oggetti $J$ è sufficiente
-	mettere in input uno zaino solo e fissare gli upper bound a valori molto alti.}. 
+	\item $\sigma_k^\delta$ è una variabile che codifica l'estensione dello zaino $k$ lungo la dimensione $\delta$. È limitato superiormente dal valore $S_k^\delta$ fornito in input.
+	Qualora si volesse trovare le dimensioni di un unico zaino che racchiuda tutti gli oggetti $J$ è sufficiente	mettere in input uno zaino solo e fissare gli upper bound a valori molto alti. 
 	
-	\item Al posto della variabile $\rho_{ir}$ qui viene definita una variabile che itera anche tra gli zaini:
-	$\rho_{kir}$\footnote{Se si mantiene la $\rho$ su due dimensioni si creavano vincoli non necessari.}.
+	\item Al posto della variabile $\rho_{ir}$ qui viene definita una variabile che itera anche tra gli zaini: $\rho_{kir}$. 
+	Se si mantiene la $\rho$ su due dimensioni e si utilizza il vincolo (\ref{eq:constraint:rho:ir:leq:sumk}) si creano dei vincoli che fanno si che tutti gli oggetti debbano essere più piccoli di ogni zaino, come spiegato nella sezione \ref{sec:extension2:Note}.
 \end{itemize}
 \subsubsection{Funzione obiettivo}
 Lo scopo è quello di minimizzare il volume degli zaini restando nei limiti $S_k^\delta$. Siccome il modello deve restare lineare non è possibile calcolare il volume degli zaini, per questo motivo si utilizza come euristica per il calcolo del volume la somma delle lunghezze degli spigoli $\sigma_k^\delta$:
@@ -348,11 +348,13 @@ z_k \in \{0,1\} \quad \quad k \in K
 
 
 \subsubsection{Note}
-Vengono qui elencate brevemente le differenze con l'altro modello e spiegate le motivazioni delle modifiche.
+\label{sec:extension2:Note}
+Vengono qui elencate brevemente le differenze con il modello descritto nella 
+Sezione \ref{sec:extension1} e spiegate le motivazioni delle modifiche.
 \begin{itemize}
 \item Avendo esteso $\rho$ su tre dimensioni tutti i vincoli ((\ref{eq:rho:kir:leq:sigmakdelta}), (\ref{eq:rho:kir:leq:precedenceA}), (\ref{eq:rho:kir:leq:precedenceB}), (\ref{eq:rho:kir:sumofallrotation:tki})) che coinvolgono questa variabile devono essere modificati tenendo in considerazione anche l'indice $k$.
 
-\item Siccome il volume degli zaini in questo modello non è più dato dalla moltiplicazione di parametri, ma bensì di variabili, il vincolo
+\item Siccome il volume degli zaini in questo modello è dato dalla moltiplicazione di variabili, il vincolo
 (\ref{eq:constraint:volume}) non può più essere considerato. 
 Ma poiché è ridondante rispetto ai vincoli \ref{eq:constraint:coodinateLessThanSkdelta}
 può essere tralasciato senza intaccare la validità del modello\footnote{Nel paper originale il vincolo (\ref{eq:constraint:volume}) viene considerato esclusivamente per questioni numeriche.}. Al posto del vincolo (\ref{eq:constraint:coodinateLessThanSkdelta}) viene ora considerato il vincolo (\ref{eq:rho:kir:leq:sigmakdelta}) che coinvolge la variabile $\sigma_k^\delta$ invece del parametro $S_k^\delta$.
@@ -469,7 +471,7 @@ Per comodità entrambi i programmi utilizzano lo stesso file di input, anche se 
 
 \subsection{File di output}
 In questa sezione siano $K' \subseteq K$ l'insieme di zaini selezionati, 
-$J^k$ gli oggeti che sono stati inseriti nel $k$--simo zaino e sia $r'$ la rotazione selezionata per l'oggetto $i$.
+$J^k$ gli oggetti che sono stati inseriti nel $k$--simo zaino e sia $r'$ la rotazione selezionata per l'oggetto $i$.
 
 
 Il programma genera un file di output così costituito:
@@ -512,13 +514,16 @@ Nello sviluppo di questo lavoro sono stati riscontrati alcuni refusi nel paper d
 	$$
 	Infatti sostituendo la prima equazione con la seconda, tutte le sovrapposizioni tra gli oggetti scompaiono.
 	
-	\item Il vincolo $n^\circ 8$ unito al vincolo $n^\circ 16$ fanno sì che, qualora si inserisca in $J$ un oggetto che non abbia abbastanza spazio all'interno dello zaino, il modello sia inammissibile. Per ovviare a questo problema si può modificare il vincolo $n^\circ 16$:
+	\item Il vincolo (8) unito al vincolo (16) di \cite{Baldi20129802}, fanno sì che, qualora si inserisca nell'insieme $J$ un oggetto che non abbia abbastanza spazio all'interno dello zaino, il modello sia inammissibile. Per ovviare a questo problema si può modificare il vincolo (16) di \cite{Baldi20129802} nel modo seguente:
 	$$
 	\sum_{r \in R} \rho_{ir} = \color{red}\mathbf{t_i}
 	$$
-	Infatti l'oggetto deve avere una rotazione soltanto se viene effettivamente inserito nello zaino\footnote{ 
-	Naturalmente un'altra soluzione potrebbe essere semplicemente di controllare che tutti gli oggetti siano più piccoli dello zaino.}. 
-	\item Il vincolo $n^\circ\ 12$ e $n^\circ\ 13$ sono ridondanti, infatti ogni vincolo in 12 ha un corrispettivo in 13. L'unica differenza è che i vincoli vengono elencati in due maniere diverse. 
+	
+	
+	Infatti l'oggetto deve avere una rotazione soltanto se viene effettivamente inserito nello zaino.
+	Una soluzione alternativa a questo problema potrebbe consistere nel controllare che tutti gli oggetti siano più piccoli dello zaino, prima di istanziare il modello.
+	La prima soluzione è stata preferita alla seconda perchè si prestava meglio alle estensioni mostrate in questo documetno.
+	\item Il vincolo (12) e (13) di \cite{Baldi20129802} sono ridondanti, infatti ogni vincolo in (12) ha un corrispettivo in (13). L'unica differenza è che i vincoli vengono elencati in due maniere diverse. 
 \end{itemize}
 
 \bibliographystyle{unsrt}
