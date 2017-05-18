@@ -14,7 +14,6 @@
 #include <unistd.h>
 #include "../Utils/Instance3BKP.h"
 #include <assert.h>     /* assert */
-#include "hull_utils.h"
 #include "MasterProblem.h"
 #include <algorithm>
 
