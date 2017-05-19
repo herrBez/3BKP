@@ -271,7 +271,7 @@ Sezione \ref{sec:original:model}, quindi vengono elencate soltanto le differenze
 	Qualora si volesse trovare le dimensioni di un unico zaino che racchiuda tutti gli oggetti $J$ è sufficiente	mettere in input uno zaino solo e fissare gli upper bound a valori molto alti. 
 	
 	\item Al posto della variabile $\rho_{ir}$ qui viene definita una variabile che itera anche tra gli zaini: $\rho_{kir}$. 
-	Se si mantiene la $\rho$ su due dimensioni e si utilizza il vincolo (\ref{eq:constraint:rho:ir:leq:sumk}) si creano dei vincoli che fanno si che tutti gli oggetti debbano essere più piccoli di ogni zaino, come spiegato nella sezione \ref{sec:extension2:Note}.
+	Se si mantiene la $\rho$ su due dimensioni e si utilizza il vincolo (\ref{eq:constraint:rho:ir:leq:sumk}) si creano dei vincoli che fanno sì che tutti gli oggetti debbano essere più piccoli di ogni zaino, come spiegato nella sezione \ref{sec:extension2:Note}.
 \end{itemize}
 \subsubsection{Funzione obiettivo}
 Lo scopo è quello di minimizzare il volume degli zaini restando nei limiti $S_k^\delta$. Siccome il modello deve restare lineare non è possibile calcolare il volume degli zaini, per questo motivo si utilizza come euristica per il calcolo del volume la somma delle lunghezze degli spigoli $\sigma_k^\delta$:
@@ -494,7 +494,7 @@ Il programma genera un file di output così costituito:
 		\end{itemize}
 \end{itemize}
 
-\section{Risultati}
+
 
 
 
@@ -504,6 +504,9 @@ Per visualizzare il file di output ed agevolare le fasi di verifica e validazion
 
 \subsection{Documentazione}
 La documentazione del codice può essere generata utilizzando il programma \verb|doxygen|\footnote{\url{https://github.com/doxygen/doxygen}} all'interno delle rispettive cartelle.
+
+\subsection{Risultati}
+
 
 \section{Refusi nel paper originale}
 Nello sviluppo di questo lavoro sono stati riscontrati alcuni refusi nel paper di Baldi et al. \cite{Baldi20129802}.
