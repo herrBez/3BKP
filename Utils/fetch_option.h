@@ -29,6 +29,7 @@ struct optionFlag {
 		 optimize[0] = true;
 		 optimize[1] = true;
 		 optimize[2] = true;
+		 benchmark = false;
 	 }
 	
 	public:
@@ -67,6 +68,11 @@ struct optionFlag {
 	 * Default = 0, i.e. CPLEX will decide on its own how many threads to use.
 	 */
 	int threads;
+	/**
+	 * Benchmark flag. If it is set to thread it make the output suitable for CSV-Files
+	 * with comma separated tokens.
+	 */
+	bool benchmark;
 
 };
 

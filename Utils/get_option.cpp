@@ -13,6 +13,7 @@ static struct option long_options[] = {
 	{"thread", required_argument, 0, 'w'}, /* No of threads or workers */
 	{"ignore-knapsack-cost", no_argument, 0, 'i'}, /* Disable optimization of knapsacks */
 	{"output-file", required_argument, 0, 'o'}, /* Output file */
+	{"benchmark", no_argument, 0, 'b'}, /* Benchmark flag */
 	{0, 0, 0, 0},
 };
 
@@ -33,6 +34,7 @@ void print_help(char * argv[]){
 	cout << "-i, --ignore-kanpsack-cost\t the program will not try to optimize the number of knapsacks" << endl;
 	cout << "-w, --thread\t\t\t set a fixed number of threads. If it is not specified CPLEX will decide on its own" << endl;
 	cout << "-o, --outputfile\t\t set the output file " << endl;
+	cout << "-b, --benchmark\t\t\t format the output for the benchmark " << endl;
 	cout << endl;
 }
 
@@ -60,13 +62,12 @@ optionFlag get_option(int argc,  char * argv[]){
 	optind = 2; //Starting from index 2, because the first place is destinated to the istance file.
 	int option_index;
 	oFlag.timeout = 1e75; /* Default value in CPLEX ~ 3 centuries */
-	while((c = getopt_long (argc, argv, "hqet:xyziw:", long_options, &option_index)) != EOF) {
+	while((c = getopt_long (argc, argv, "hqet:xyziw:b", long_options, &option_index)) != EOF) {
 		switch(c){
 			case 'h': print_help(argv); exit(EXIT_SUCCESS); break;
 			case 'q': oFlag.output_required=false; break;
 			case 'e': oFlag.extended = true; break;
 			case 't': oFlag.timeout = strtod(optarg, NULL); 
-				printf("Timeout set to %.2lf\n", oFlag.timeout);
 				break;
 			case 'x': oFlag.optimize[0] = false; break;
 			case 'y': oFlag.optimize[1] = false; break;
@@ -74,14 +75,19 @@ optionFlag get_option(int argc,  char * argv[]){
 			case 'i': oFlag.optimizeKnapsackCost = false; break;
 			case 'w': oFlag.threads = (int)strtol(optarg, NULL, 0);
 				assert(oFlag.threads >= 0);
-				printf("Number of threads: %d\n", oFlag.threads);
+				
 				break;
 			case 'o': output_file_set = true; strcpy(oFlag.output_filename, optarg); break;
+			case 'b': oFlag.benchmark = true; break;
 		}
     }
     sprintf(oFlag.filename, "%s", argv[1]);
     if(!output_file_set){
 		sprintf(oFlag.output_filename, "/tmp/output.dat");
+	}
+	if(!oFlag.benchmark && oFlag.timeout < 1e75){
+		printf("Timeout set to %.2lf\n", oFlag.timeout);
+		printf("Number of threads: %d\n", oFlag.threads);
 	}
     return oFlag;
 }
