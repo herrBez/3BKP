@@ -33,7 +33,6 @@ class Instance3BKP {
 			}
 		}
 		E += 1;
-		printf("E = %lf\n", E);
 	}
 	
 	void verifyExistenceCondition() {
@@ -137,7 +136,6 @@ class Instance3BKP {
 			std::getline(infile, line);
 			ss.str(line);
 			ss >> K;
-			std::cout << K << std::endl;
 			
 			S.resize(K);
 			if(extended){
