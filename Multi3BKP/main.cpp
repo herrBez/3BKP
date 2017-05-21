@@ -63,15 +63,17 @@ double solve( CEnv env, Prob lp, Instance3BKP instance, optionFlag oFlag) {
 	if(oFlag.output_required){	
 		CHECKED_CPX_CALL( CPXsolwrite, env, lp, "/tmp/Model.sol");
 	}
-	
-	printf("User time:\t %.4lf seconds ~ %.6lf minutes\n", user_time, (user_time/60));
-	printf("CPU time:\t %.4lf seconds ~ %.6lf minutes \n", cpu_time, (cpu_time/60));
-	
-	if(oFlag.threads != 0){
-		printf("(%d threads)", oFlag.threads);
-	}
-	cout << "Objval: " << objval << endl;
-	
+	if(!oFlag.benchmark){
+		printf("User time:\t %.4lf seconds ~ %.6lf minutes\n", user_time, (user_time/60));
+		printf("CPU time:\t %.4lf seconds ~ %.6lf minutes \n", cpu_time, (cpu_time/60));
+		printf("On average %.4lf (virtual) CPUs were used\n", cpu_time/user_time);
+		if(oFlag.threads != 0){
+			printf("(%d threads)\n", oFlag.threads);
+		}
+		cout << "Objval: " << objval << endl;
+	} else {
+		printf("%.4lf, %.4lf\n", user_time, cpu_time);
+	}	
 	return objval;
 }
 
@@ -331,19 +333,21 @@ int main (int argc, char *argv[])
 		// find the solution
 		double objvalMP = solve(env, lp, instance, oFlag);
 		
-		printf("Solved Main Problem\n");
+		if(!oFlag.benchmark)
+			printf("Solved Main Problem\n");
 		
 		
 		// fetch variables from the solved model
 		VarVal fetched_variables = fetchVariables(env, lp, instance, map);
 		
-		printf("Fetched variables Successfully\n");
+		if(!oFlag.benchmark)
+			printf("Fetched variables Successfully\n");
 		
 		//sprintf(OUTPUTFILENAME, "output_%s%c", oFlag.output_filename, '\0');
 		output(env, lp, instance, objvalMP, fetched_variables,  oFlag.output_filename, oFlag);
 		
-		
-		printf("Written solution for Main Problem in %s\n", oFlag.output_filename);
+		if(!oFlag.benchmark)
+			printf("Written solution for Main Problem in %s\n", oFlag.output_filename);
 		
 		//We want to optimize at least in one direction
 		if(oFlag.optimize[0] || oFlag.optimize[1] || oFlag.optimize[2]){
@@ -361,13 +365,14 @@ int main (int argc, char *argv[])
 					
 				}
 			}
-			cout << "start chi values " << start_chi_value << endl;
+			if(!oFlag.benchmark)
+				cout << "start chi values " << start_chi_value << endl;
 			
 			
 			// Setup Slave Problem
 			setupSP(env, lp, instance, map, fetched_variables, oFlag);
-			
-			printf("Set up problem Successfully\n");
+			if(!oFlag.benchmark)
+				printf("Set up problem Successfully\n");
 			
 			
 			CHECKED_CPX_CALL( CPXwriteprob, env, lp, "/tmp/Model2.lp", NULL ); 
@@ -396,12 +401,14 @@ int main (int argc, char *argv[])
 					
 				}
 			}
-			cout << "end chi values " << end_chi_value << endl;
+			if(!oFlag.benchmark)
+				cout << "end chi values " << end_chi_value << endl;
 			
 			sprintf(OUTPUTFILENAME, "%s2", oFlag.output_filename);
 
 			output(env, lp, instance, objvalSP,  slave_variables,  OUTPUTFILENAME, oFlag);
-			printf("Written solution for Extra Problem in %s\n", OUTPUTFILENAME);
+			if(!oFlag.benchmark)
+				printf("Written solution for Extra Problem in %s\n", OUTPUTFILENAME);
 			
 		}
 		// free-allocated resources

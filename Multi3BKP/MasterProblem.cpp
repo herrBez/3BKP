@@ -191,8 +191,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map, opt
 			map.Rho[i][r] = current_var_position++;
 		}
 	}
-	
-	 cout << "Number of variables: " << current_var_position << endl;
+	//cout << "Number of variables: " << current_var_position << endl;
 }
 
 
@@ -517,7 +516,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 		number_of_constraint++;
 	}
 	
-	printf("Number of constraints (not considering the variable bounds): %d\n", number_of_constraint);
+	//printf("Number of constraints (not considering the variable bounds): %d\n", number_of_constraint);
 }
 
 /**

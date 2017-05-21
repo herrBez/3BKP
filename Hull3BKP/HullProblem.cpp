@@ -14,7 +14,7 @@ using namespace std;
  * 
  */
 void setupLPBalancingConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
-	printf("BALANCING CONSTRAINTS\n");
+
 	const int NAME_SIZE = 512;
 	char name[NAME_SIZE];
 	int N = instance.N;
@@ -217,8 +217,8 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map, opt
 		 }
 	}
 	
-	
-	 cout << "Number of variables: " << current_var_position << endl;
+	if(!oFlag.benchmark)
+		cout << "Number of variables: " << current_var_position << endl;
 }
 
 
