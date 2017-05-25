@@ -10,7 +10,6 @@ from random import randint
 cmdargs = str(sys.argv)
 
 try:
-	print(cmdargs)
 	f = open(sys.argv[1], "w")
 	K = int(sys.argv[2]);
 	J = int(sys.argv[3]);
@@ -18,13 +17,13 @@ try:
 	f.write(str(K) + "\n");
 	# Generating K knapsacks
 	for k in range(0,K):
-		f.write(str(randint(100, 1000)) + " " + str(randint(100, 1000)) + " " + str(randint(100, 1000)) + "  " +str(randint(1, 1000)) + "\n")
+		f.write(str(randint(500, 1000)) + " " + str(randint(500, 1000)) + " " + str(randint(500, 1000)) + "  " + str(randint(500, 1000)) + "\n")
 	
+	#Write the number of items in file
 	f.write(str(J) + "\n");
+	# Generating J items
 	for i in range(0,J):
 		f.write(str(randint(1, 500)) + " " + str(randint(1, 500)) + " " + str(randint(1, 500)) + "  " + str(randint(1, 500)) + " " +  str(randint(1, 500)) +  "\n")
-		
-	f.write("");
 	f.close()
 	print("Success\n");
 except Exception, ex:
