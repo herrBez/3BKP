@@ -35,7 +35,6 @@ char errmsg[BUF_SIZE];
 
 
 
-
 /**
  * solve the model write the result in a file and returns the return value of the function
  * @param env the CPLEX environment
@@ -45,14 +44,32 @@ char errmsg[BUF_SIZE];
  * used in order to retrieve the values of the y variables and print them on the screen.
  * @return objval the optimal solution
  */
-double solve( CEnv env, Prob lp, Instance3BKP instance, optionFlag oFlag) {
+double solve( CEnv env, Prob lp, Instance3BKP instance, optionFlag oFlag, bool * timeout_reached) {
 	clock_t t1,t2;
-    t1 = clock();
-    struct timeval  tv1, tv2;
-    gettimeofday(&tv1, NULL);
+	t1 = clock();
+	struct timeval  tv1, tv2;
+	gettimeofday(&tv1, NULL);
 	CHECKED_CPX_CALL( CPXmipopt, env, lp );
 	t2 = clock();
-    gettimeofday(&tv2, NULL);
+	gettimeofday(&tv2, NULL);
+	
+	int status = CPXgetstat(env, lp);
+	printf("Status = %d\n", status);
+	switch(status){
+		case CPXMIP_OPTIMAL: /* Optimal solution found */
+			break;
+		case CPXMIP_TIME_LIM_FEAS: /* Time limit exceeded, integer solution exists */
+			*timeout_reached = true;
+			break;
+		case CPXMIP_TIME_LIM_INFEAS: /* Time limit exceeded */
+			*timeout_reached = true;
+		default: break;
+	}
+	if(status == CPXMIP_TIME_LIM_FEAS){
+		printf("TIMEOUT REACHED\n");
+	}
+	
+	
 	double objval = 0.0;
 	CHECKED_CPX_CALL( CPXgetobjval, env, lp, &objval );
 	
@@ -316,7 +333,8 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
  */
 int main (int argc, char *argv[])
 {
-	bool exc_arised = false;	
+	bool exc_arised = false;
+	bool timeout_reached[] = {false, false};
 	try { 
 
 		optionFlag oFlag = get_option(argc, argv);	
@@ -327,11 +345,13 @@ int main (int argc, char *argv[])
 		mapVar map = setupLP(env, lp, instance, oFlag);
 		
 		/* Set up timeout */
-		CHECKED_CPX_CALL(CPXsetdblparam, env,  CPX_PARAM_TILIM, oFlag.timeout);
-		CHECKED_CPX_CALL(CPXsetintparam, env,  CPX_PARAM_THREADS, oFlag.threads);
+		CHECKED_CPX_CALL(CPXsetintparam, env, CPX_PARAM_CLOCKTYPE, 1); //Use CPU as timer
+		CHECKED_CPX_CALL(CPXsetdblparam, env, CPX_PARAM_TILIM, oFlag.timeout);
+		
+		CHECKED_CPX_CALL(CPXsetintparam, env, CPX_PARAM_THREADS, oFlag.threads);
 		
 		// find the solution
-		double objvalMP = solve(env, lp, instance, oFlag);
+		double objvalMP = solve(env, lp, instance, oFlag, &timeout_reached[0]);
 		
 		if(!oFlag.benchmark)
 			printf("Solved Main Problem\n");
@@ -378,9 +398,8 @@ int main (int argc, char *argv[])
 			CHECKED_CPX_CALL( CPXwriteprob, env, lp, "/tmp/Model2.lp", NULL ); 
 			CHECKED_CPX_CALL(CPXchgprobtype, env, lp, CPXPROB_MILP);
 			
-			
 			// Solve Slave Problem
-			double objvalSP = solve(env, lp, instance, oFlag); 
+			double objvalSP = solve(env, lp, instance, oFlag, &timeout_reached[1]); 
 			
 			
 			
@@ -418,5 +437,11 @@ int main (int argc, char *argv[])
 		cout << ">>Exception in processing " << argv[1] << ": " << e.what() << endl;
 		exc_arised = true;
 	}
-	return exc_arised?EXIT_FAILURE:EXIT_SUCCESS;
+	if(exc_arised){
+		return EXIT_FAILURE;
+	} 
+	if(timeout_reached[0]){
+		return 124;
+	}
+	return EXIT_SUCCESS;
 }

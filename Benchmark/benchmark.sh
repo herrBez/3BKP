@@ -16,7 +16,7 @@ for filename in ../MultiInstance/$output_directory/*.dat; do
 	echo "create $output"
 	echo "User.Time, CPU.Time" > $output
 	for i in {1..7}; do
-		out=`timeout 20m $program $filename -b -x -y -z -w 6`
+		out=`$program $filename -t 10 -b -x -y -z -w 6`
 		if [ $? -eq 124 ]; then
 			echo "Timeout Reached. $output not successful";
 		else
