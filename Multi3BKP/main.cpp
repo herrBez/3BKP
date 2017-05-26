@@ -54,7 +54,6 @@ double solve( CEnv env, Prob lp, Instance3BKP instance, optionFlag oFlag, bool *
 	gettimeofday(&tv2, NULL);
 	
 	int status = CPXgetstat(env, lp);
-	printf("Status = %d\n", status);
 	switch(status){
 		case CPXMIP_OPTIMAL: /* Optimal solution found */
 			break;
