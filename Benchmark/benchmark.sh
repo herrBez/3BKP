@@ -12,7 +12,7 @@ for filename in ../MultiInstance/$output_directory/*.dat; do
 	echo $filename
 	last_part_of_path=`basename -s .dat $filename`
 	echo $last_part_of_path
-	output=$output_directory/$last_part_of_path.multi.csv
+	output=$output_directory/$last_part_of_path.$program_type.csv
 	echo "create $output"
 	echo "User.Time, CPU.Time" > $output
 	for i in {1..7}; do
