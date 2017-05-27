@@ -58,7 +58,6 @@ double solve( CEnv env, Prob lp, Instance3BKP instance, optionFlag oFlag) {
 	double user_time = (double)(tv2.tv_sec+tv2.tv_usec*1e-6 - (tv1.tv_sec+tv1.tv_usec*1e-6));
 	double cpu_time = (double)(t2-t1) / CLOCKS_PER_SEC;
 	
-	cout << oFlag.benchmark << endl << endl;
 	if(oFlag.output_required){	
 		CHECKED_CPX_CALL( CPXsolwrite, env, lp, "/tmp/Model.sol");
 	}
