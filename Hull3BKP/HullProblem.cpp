@@ -101,14 +101,14 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map, opt
 	int current_var_position = 0;
 	int N = instance.N;
 	int K = instance.K;
-	
+	double sumOfDimension = instance.getSumOfS();
 	/*
 	 * Adding z variables
 	 * z_k = 1 if the k-th knapsack is used, 0 otherwise
 	 */
 	 for(int k = 0; k < K; k++){
 		char xtype = 'B';
-		double obj = 1.0;
+		double obj = sumOfDimension;
 		double lb = 0.0;
 		double ub = 1.0;
 		sprintf(name, "z %d", k);
@@ -584,7 +584,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 			}
 	}
 	
-	printf("Number of constraints (not considering the variable bounds): %d\n", number_of_constraint);
+	//printf("Number of constraints (not considering the variable bounds): %d\n", number_of_constraint);
 }
 
 /**

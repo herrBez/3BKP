@@ -35,6 +35,8 @@ class Instance3BKP {
 		E += 1;
 	}
 	
+	
+	
 	void verifyExistenceCondition() {
 		for(int i = 0; i < N; i++){
 			assert(profit[i] >= 0);
@@ -115,6 +117,18 @@ class Instance3BKP {
 		 */
 		double getVolume(int i){
 			return s[i][0]*s[i][1]*s[i][2];
+		}
+		/**
+		 * @return the sum of all S[k][delta]
+		 */
+		double getSumOfS(){
+			double sum = 0.0;
+			for(int k = 0; k < K; k++){
+				for(int delta = 0; delta < 3; delta++){
+					sum += S[k][delta];
+				}
+			}
+			return sum;
 		}
 		
 		
