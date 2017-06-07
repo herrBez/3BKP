@@ -65,7 +65,7 @@ double solve( CEnv env, Prob lp, Instance3BKP instance, optionFlag oFlag, bool *
 		default: break;
 	}
 	if(status == CPXMIP_TIME_LIM_FEAS){
-		printf("TIMEOUT REACHED\n");
+		cerr << "TIMEOUT REACHED\n" << endl;
 	}
 	
 	
