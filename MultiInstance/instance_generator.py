@@ -17,7 +17,7 @@ try:
 	f.write(str(K) + "\n");
 	# Generating K knapsacks
 	for k in range(0,K):
-		f.write(str(randint(500, 1000)) + " " + str(randint(500, 1000)) + " " + str(randint(500, 1000)) + "  " + str(randint(500, 1000)) + "\n")
+		f.write(str(randint(1, 500)) + " " + str(randint(1, 500)) + " " + str(randint(1, 500)) + "  " + str(randint(1, 1000)) + "\n")
 	
 	#Write the number of items in file
 	f.write(str(J) + "\n");
