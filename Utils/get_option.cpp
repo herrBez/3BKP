@@ -62,6 +62,7 @@ optionFlag get_option(int argc,  char * argv[]){
 	optind = 2; //Starting from index 2, because the first place is destinated to the istance file.
 	int option_index;
 	oFlag.timeout = 1e75; /* Default value in CPLEX ~ 3 centuries */
+	oFlag.threads = 0;	  /* Let CPLEX decide on its own */
 	while((c = getopt_long (argc, argv, "hqet:xyziw:b", long_options, &option_index)) != EOF) {
 		switch(c){
 			case 'h': print_help(argv); exit(EXIT_SUCCESS); break;
