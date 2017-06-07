@@ -8,7 +8,7 @@ analyse <- function(mydata) {
 }
 
 #mydata = read.csv(args[1], header=TRUE, sep=",")
-filenames <- list.files("OneKnapsack", pattern="\\.multi\\.csv$", full.names=TRUE)
+filenames <- list.files("OneKnapsack", pattern="\\.orig\\.csv$", full.names=TRUE)
 
 con <- file("filename.tex", "w")
 cat(
