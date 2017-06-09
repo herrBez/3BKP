@@ -61,6 +61,7 @@ class Instance3BKP {
 		/** Number of knapsacks, i.e. cardinality of K */
 		int K;
 		
+		/** least number bigger than each S[k][delta] */
 		double E;
 		
 		
