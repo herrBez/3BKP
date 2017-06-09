@@ -191,7 +191,8 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map, opt
 			map.Rho[i][r] = current_var_position++;
 		}
 	}
-	//cout << "Number of variables: " << current_var_position << endl;
+	if(!oFlag.benchmark)
+		cout << "Number of variables: " << current_var_position << endl;
 }
 
 
@@ -205,6 +206,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map, opt
  * 
  */
 void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, optionFlag oFlag){
+	
 	const int NAME_SIZE = 512;
 	char name[NAME_SIZE];
 	
@@ -212,7 +214,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 	int K = instance.K;
 	int R = 6; //Cardinality of the set R
 	//int DELTA = 3; //Cardinality of the set \Delta
-	int M = 1e6; //Used in constraint 9-10 
+	double M = 1e7; //Used in constraint 9-10 
 	
 	unsigned int number_of_constraint = 0;
 	
@@ -240,7 +242,6 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 			
 				if(i >= j)
 					continue;
-					
 				vector < int > idVar(8);
 				vector < double > coeff(8);
 				unsigned int index = 0;
@@ -276,8 +277,8 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 	for(int k = 0; k < K; k++){
 		for(int i = 0; i < N; i++){
 			for(int delta = 0; delta < 3; delta++){
-				vector< int > idVar(7);
-				vector< double > coeff(7);
+				vector< int > idVar(1 + R + 1);
+				vector< double > coeff(1 + R + 1);
 				unsigned int index = 0;
 				idVar[index] = map.Chi[k][i][delta];
 				coeff[index] = 1.0;
@@ -287,9 +288,12 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 					coeff[index] = instance.s[i][instance.R[r][delta]];
 					index++;
 				}
+				idVar[index] = map.Z[k];
+				coeff[index] = -instance.S[k][delta]+M;
+				index++;
 				char sense = 'L';
 				int matbeg = 0;
-				double rhs = instance.S[k][delta];
+				double rhs = M;
 				snprintf(name, NAME_SIZE, "(8) %d %d",i,delta);
 				char* cname = (char*)(&name[0]);
 				CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
@@ -429,7 +433,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 	
 	
 	//Constraint (13): b_{ji}^\delta <= t_j ==> b_{ji}^\delta - t_j = 0
-	/*for(int k = 0; k < K; k++){
+	for(int k = 0; k < K; k++){
 		for(int i = 0; i < N; i++){
 			for(int j = 0;  j < N; j++){
 				for(int delta = 0; delta < 3; delta++){
@@ -449,7 +453,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 				}
 			}
 		}
-	}*/
+	}
 	
 	
 	/* Constraint (16) */
@@ -516,7 +520,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 		number_of_constraint++;
 	}
 	
-	//printf("Number of constraints (not considering the variable bounds): %d\n", number_of_constraint);
+	
 }
 
 /**
