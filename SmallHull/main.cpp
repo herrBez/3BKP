@@ -343,9 +343,10 @@ int main (int argc, char *argv[])
 		mapVar map = setupLP(env, lp, instance, oFlag);
 		
 		/* Set up timeout */
+		CHECKED_CPX_CALL(CPXsetintparam, env, CPX_PARAM_CLOCKTYPE, 1); //Use CPU as timer
 		CHECKED_CPX_CALL(CPXsetdblparam, env,  CPX_PARAM_TILIM, oFlag.timeout);
 		CHECKED_CPX_CALL(CPXsetintparam, env,  CPX_PARAM_THREADS, oFlag.threads);
-		CHECKED_CPX_CALL(CPXsetdblparam, env, CPX_PARAM_BAREPCOMP, 1e-3);
+
 		// find the solution
 		double objvalMP = solve(env, lp, instance, oFlag);
 		
@@ -435,5 +436,8 @@ int main (int argc, char *argv[])
 		cerr << ">>Exception in processing " << argv[1] << ": " << e.what() << endl;
 		exc_arised = true;
 	}
-	return exc_arised?EXIT_FAILURE:EXIT_SUCCESS;
+	if(exc_arised){
+		return EXIT_FAILURE;
+	} 
+	return EXIT_SUCCESS;
 }
