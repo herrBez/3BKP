@@ -288,7 +288,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 					coeff[index] = instance.s[i][instance.R[r][delta]];
 					index++;
 				}
-				idVar[index] = map.Z[k];
+				idVar[index] = map.T[k][i];
 				coeff[index] = -instance.S[k][delta]+M;
 				index++;
 				char sense = 'L';
