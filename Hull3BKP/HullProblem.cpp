@@ -239,7 +239,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 	int K = instance.K;
 	int R = 6; //Cardinality of the set R
 	//int DELTA = 3; //Cardinality of the set \Delta
-	int M = 1e6; //Used in constraint 9-10 
+	double M = 1e13; //Used in constraint 9-10 
 	
 	unsigned int number_of_constraint = 0;
 	
