@@ -2,11 +2,13 @@
 using namespace std;
 
 /**
- * set up balancing constraints
- * @param env
- * @param lp
- * @param instance
- * 
+ * set up balancing constraints (this function is called only if the flag
+ * extended is given, i.e. if the option -e is used)
+ * @param env the CPLEX environment
+ * @param lp the CPLEX problem
+ * @param instance the problem instance
+ * @param map an object containing the indexes used by CPLEX to represent the 
+ * variables
  */
 void setupLPBalancingConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	printf("BALANCING CONSTRAINTS\n");
@@ -84,11 +86,12 @@ void setupLPBalancingConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVa
 
 /**
  * set up the variables
- * @param env
- * @param lp
- * @param instance
+ * @param env the CPLEX environment
+ * @param lp the CPLEX problem
+ * @param instance the problem instance
  * @param map the map that is filled up with the indexes
- * 
+ * @param oFlag an object containing the configuration information of this program
+ * instance
  */
 void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map, optionFlag oFlag){
 	const int NAME_SIZE = 512;
@@ -199,10 +202,10 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map, opt
 
 /**
  * Set up the constraints 
- * @param env
- * @param lp
- * @param instance
- * @param map
+ * @param env the CPLEX environment
+ * @param lp the CPLEX problem
+ * @param instance the problem instance
+ * @param map the map initialized by the setupLPVariables function
  * 
  */
 void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, optionFlag oFlag){
@@ -214,7 +217,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 	int K = instance.K;
 	int R = 6; //Cardinality of the set R
 	//int DELTA = 3; //Cardinality of the set \Delta
-	double M = 1e7; //Used in constraint 9-10 
+	double M = 1e23; //Used in constraint 9-10 
 	
 	unsigned int number_of_constraint = 0;
 	
@@ -289,11 +292,11 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 					index++;
 				}
 				idVar[index] = map.T[k][i];
-				coeff[index] = -instance.S[k][delta]+M;
+				coeff[index] = -instance.S[k][delta]+instance.E;
 				index++;
 				char sense = 'L';
 				int matbeg = 0;
-				double rhs = M;
+				double rhs = instance.E;
 				snprintf(name, NAME_SIZE, "(8) %d %d",i,delta);
 				char* cname = (char*)(&name[0]);
 				CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
