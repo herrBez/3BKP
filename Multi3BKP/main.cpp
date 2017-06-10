@@ -2,7 +2,8 @@
  * @author Mirko Bez
  * @file main.cpp
  * 
- * Usage: ./main <filename.dat>
+ * 
+ * Usage: ./main <filename.dat>@
  */
 #include <iostream>
 #include <fstream>
@@ -36,12 +37,13 @@ char errmsg[BUF_SIZE];
 
 
 /**
- * solve the model write the result in a file and returns the return value of the function
+ * solve the model write the results in a file and returns the objective value
  * @param env the CPLEX environment
  * @param lp the CPLEX problem
- * @param N the number of nodes of the TSP
- * @param mapY a map containing the (CPLEX) index of the y variables of the problem
- * used in order to retrieve the values of the y variables and print them on the screen.
+ * @param instance the object encoding of the problem's instance
+ * @param oFlag an object containing helpful configuration information passed by cli
+ * @param timeout_reached a boolean pointer that is set to true if cplex could not
+ * solve the problem within the given timeout (if it is specified)
  * @return objval the optimal solution
  */
 double solve( CEnv env, Prob lp, Instance3BKP instance, optionFlag oFlag, bool * timeout_reached) {
@@ -94,7 +96,14 @@ double solve( CEnv env, Prob lp, Instance3BKP instance, optionFlag oFlag, bool *
 }
 
 
-
+/**
+ * fetches the variables' values after the solution is found
+ * @param env the CPLEX environment
+ * @param lp the CPLEX problem
+ * @param instance the problem instance
+ * @param map a map containing the CPLEX's indices of the variables
+ * @return a VarVal object that contains the values fetched from CPLEX
+ */
 VarVal fetchVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	
 	int N = instance.N;
@@ -161,11 +170,16 @@ VarVal fetchVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 }
 
 /**
- * Print a human readable output in the file named output.txt
- * @param env
- * @param lp
- * @param instance
- * @param map
+ * Print a human readable output in a file, named filename. This can be also
+ * be represented by the webgl written program
+ * @param env the CPLEX environment
+ * @param lp the CPLEX problem
+ * @param instance the instance of the problem
+ * @param objval the value of the objective value
+ * @param VarVal the values of the fetched variables, computed by the function
+ * fetchVariables
+ * @param filename the name of the file in which to print the output
+ * @param oFlag the configuration of this particular instance
  */
  
 void output(CEnv env, Prob lp, Instance3BKP instance, double objval, VarVal v, char * filename, optionFlag oFlag){
