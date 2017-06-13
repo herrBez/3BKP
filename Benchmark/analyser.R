@@ -8,7 +8,7 @@ analyse <- function(mydata) {
 }
 
 #mydata = read.csv(args[1], header=TRUE, sep=",")
-filenames <- list.files("OneKnapsack", pattern="\\.orig\\.csv$", full.names=TRUE)
+filenames <- list.files("FifteenKnapsacks", pattern="\\.main\\.all\\.csv$", full.names=TRUE)
 
 con <- file("filename.tex", "w")
 cat(
@@ -29,22 +29,28 @@ cat(
 ldf <- lapply(filenames, function(i){
 	mydata<-read.csv(i, header=TRUE, skip=",")
 	if(length(mydata$CPU.Time) > 0){
+		print(length(mydata$Timeout.Reached[mydata$Timeout.Reached == "Yes"]))
+		print(length(mydata$Timeout.Reached['No']))
 		cat(
-			sprintf("\\verb|%s| & %d/7&%.2f&%.4f&%.4f&%.4f&%.4f \\\\ \n", 
+			sprintf("\\verb|%s| & %d / %d & %.2f & %.4f & %.4f & %.4f & %.4f \\\\ \n", 
 					basename(i),
-					length(mydata$User.Time),
+					length(grep('No', mydata$Timeout.Reached)),
+					length(mydata$Timeout.Reached),
 					mean(mydata$CPU.Time)/mean(mydata$User.Time),
-					mean(mydata$User.Time),
-					max(mydata$User.Time),
-					min(mydata$User.Time),
-					(sd(mydata$User.Time)/mean(mydata$User.Time))*100), 
+					mean(mydata$User.Time)/60,
+					max(mydata$User.Time)/60,
+					min(mydata$User.Time)/60,
+					(sd(mydata$User.Time)/mean(mydata$User.Time))*100
+					
+			),
 			file=con
 		)
 	} else {
 		cat(
-			sprintf("\\verb|%s| & %d & %s & %s & %s & %s & %s \\\\ \n", 
+			sprintf("\\verb|%s| & %d & %s & %s & %s & %s & %s & %s  \\\\ \n", 
 					basename(i),
 					0,
+					"NA",
 					"NA",
 					"NA",
 					"NA",
