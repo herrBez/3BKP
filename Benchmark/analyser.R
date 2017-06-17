@@ -10,16 +10,17 @@ analyse <- function(mydata) {
 #mydata = read.csv(args[1], header=TRUE, sep=",")
 filenames <- list.files("FifteenKnapsacks", pattern="\\.main\\.all\\.csv$", full.names=TRUE)
 
-con <- file("filename.tex", "w")
+con <- file(args[1], "w")
 cat(
-	sprintf("%s \n %s \n %s \n %s \n %s\n %s\n %s \n %s \n",
+	sprintf("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
 		"\\documentclass{article}",
 		"\\begin{document}",
-		"\\begin{table}",
+		"\\begin{table}[h!]",
 		"\\begin{center}",
-		"\\begin{tabular}{| c | c | c | c | c | c | c |}",
+		"\\small",
+		"\\begin{tabular}{| c | c | c | c | c | c | c | c | c | c |}",
 		"\\hline",
-		"instance & completed & avg cpu used & average & max & min & CV \\% \\\\",
+		"inst. & done & AUT & CU & ACT & max & min & CV-T & ObjV & CV-O \\\\",
 		"\\hline")
 	,
 	file=con)
@@ -32,24 +33,27 @@ ldf <- lapply(filenames, function(i){
 		print(length(mydata$Timeout.Reached[mydata$Timeout.Reached == "Yes"]))
 		print(length(mydata$Timeout.Reached['No']))
 		cat(
-			sprintf("\\verb|%s| & %d / %d & %.2f & %.4f & %.4f & %.4f & %.4f \\\\ \n", 
-					basename(i),
+			sprintf("\\verb|%s| & %d / %d & %.4f & %.4f & %.4f & %.4f & %.4f & %.4f & %.2f & %.2f\\\\ \n", 
+					strsplit(basename(i), "\\.")[[1]][1],
 					length(grep('No', mydata$Timeout.Reached)),
 					length(mydata$Timeout.Reached),
-					mean(mydata$CPU.Time)/mean(mydata$User.Time),
 					mean(mydata$User.Time)/60,
-					max(mydata$User.Time)/60,
-					min(mydata$User.Time)/60,
-					(sd(mydata$User.Time)/mean(mydata$User.Time))*100
-					
+					mean(mydata$CPU.Time)/mean(mydata$User.Time),
+					mean(mydata$CPU.Time)/60,
+					max(mydata$CPU.Time)/60,
+					min(mydata$CPU.Time)/60,
+					(sd(mydata$CPU.Time)/mean(mydata$CPU.Time))*100,
+					mean(mydata$Objval),
+					(sd(mydata$Objval)/mean(mydata$Objval))*100
 			),
 			file=con
 		)
 	} else {
 		cat(
-			sprintf("\\verb|%s| & %d & %s & %s & %s & %s & %s & %s  \\\\ \n", 
-					basename(i),
+			sprintf("\\verb|%s| & %d & %s & %s & %s & %s & %s & %s & \\\\ \n", 
+					strsplit(basename(i), "\\.")[[1]][1],
 					0,
+					"NA",
 					"NA",
 					"NA",
 					"NA",
@@ -62,7 +66,7 @@ ldf <- lapply(filenames, function(i){
 	}
 })
 
-cat(sprintf("\\hline\n\\end{tabular}\n\\end{center}\n\\end{table}\n\\end{document}"), file = con);
+cat(sprintf("\\hline\n\\end{tabular}\n\\caption{:}\n\\label{table:}\n\\end{center}\n\\end{table}\n\\end{document}"), file = con);
 
 close(con);
 
