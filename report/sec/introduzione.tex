@@ -1,0 +1,37 @@
+\section{Introduzione}
+Lo scopo di questo documento è proporre alcune possibili estensioni per il 
+modello esatto definito in Baldi et al. \cite{Baldi20129802}, 
+che d'ora in poi verrà riferito come \emph{paper originale}.
+
+\begin{problem}[3KP]
+Il problema consiste nel posizionare ortogonalmente un sottoinsieme di 
+oggetti tridimensionali all'interno di uno zaino in modo tale da 
+massimizzare il profitto totale degli oggetti caricati. 
+Gli oggetti posizionati non devono avere sovrapposizioni e possono 
+essere ruotati.
+\end{problem}
+
+\begin{problem}[3BKP]
+Estensione del 3KP in cui il centro di massa dello zaino deve risiedere
+all'interno di un'area specificata dello zaino (vincoli di bilanciamento).
+\end{problem}
+
+Nella Sezione \ref{sec:modello:originale} viene riportato il modello descritto 
+nel paper originale~\cite{Baldi20129802} per rendere i riferimenti al modello
+di partenza più immediati e quindi il documento più leggibile.
+
+Nella Sezione \ref{sec:extension1} verrà analizzata un'estensione del 3KP con 
+più zaini, cui viene associato un costo fisso differente per ciascuno zaino.
+
+Nella Sezione \ref{sec:extension2} viene considerato un problema analogo, 
+ma differente il cui scopo è quello di inserire tutti gli oggetti all'interno 
+degli zaini e cercare di minimizzare le dimensioni e il numero degli stessi. 
+
+All'interno della Sezione \ref{sec:Balancing:Constraint} viene descritto come 
+si potrebbero estendere i vincoli di bilanciamento per più zaini. 
+
+
+Segue una sezione in cui si descrive come compilare il programma e i formati dei
+file di input e di output e per concludere verranno evidenziati alcuni refusi 
+del paper originale riscontrati durante lo sviluppo di questo progetto.
+

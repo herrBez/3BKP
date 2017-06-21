@@ -1,0 +1,39 @@
+\section{Refusi nel paper originale}
+\label{sec:refusi}
+Nello sviluppo di questo lavoro sono stati riscontrati alcuni refusi nel paper 
+di Baldi et al. \cite{Baldi20129802}.
+\begin{itemize}
+	\item Nel vincolo (10) di \cite{Baldi20129802} c'è un errore di stampa che 
+	causa in alcune istanze del problema
+	la sovrapposizione di oggetti all'interno dello zaino:
+	$$
+	\chi_j^\delta + \sum_{r\in R} s_{jr}\rho_{ir} \leq \chi_i^\delta + M(1-b_{ji})
+	$$
+	dovrebbe essere 
+	$$
+	\chi_j^\delta + \sum_{r\in R} s_{jr}\rho_{\mathbf{\color{red}j}r} \leq \chi_i^\delta + M(1-b_{ji})
+	$$
+	Infatti sostituendo la prima equazione con la seconda, tutte le 
+	sovrapposizioni tra gli oggetti scompaiono.
+	
+	\item Il vincolo (8) unito al vincolo (16) di \cite{Baldi20129802}, 
+	fanno sì che, qualora si inserisca nell'insieme $J$ un oggetto che non abbia
+	abbastanza spazio all'interno dello zaino, il modello sia inammissibile.
+	Per ovviare a questo problema si può modificare il vincolo (16) di
+	\cite{Baldi20129802} nel modo seguente:
+	$$
+	\sum_{r \in R} \rho_{ir} = \color{red}\mathbf{t_i}
+	$$
+	
+	
+	Infatti l'oggetto deve avere una rotazione soltanto se viene effettivamente
+	inserito nello zaino.
+	Una soluzione alternativa a questo problema potrebbe consistere nel 
+	controllare che tutti gli oggetti siano più piccoli dello zaino, 
+	prima di istanziare il modello.
+	La prima soluzione è stata preferita alla seconda perché si prestava meglio
+	alle estensioni mostrate in questo documento.
+	\item Il vincolo (12) e (13) di \cite{Baldi20129802} sono ridondanti, 
+	infatti ogni vincolo in (12) ha un corrispettivo in (13). L'unica differenza
+	è che i vincoli vengono elencati in due maniere diverse. 
+\end{itemize}

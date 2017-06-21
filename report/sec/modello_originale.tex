@@ -1,0 +1,86 @@
+\section{Modello Originale}
+\label{sec:modello:originale}
+
+Viene qui riportato il modello originale descritto in Baldi et al. 
+\cite{Baldi20129802}
+con gli aggiustamenti motivati nella sezione sui refusi~\ref{sec:refusi}.
+
+
+
+
+Sia dato:
+\begin{itemize} 
+	\item uno zaino di dimensione $W, H, D$, anche riferite come $S^0, S^1, S^2$.
+	\item un insieme di parallelepipedi $J = \{1, \dots, n\}$\ (gli \emph{oggetti})
+	di profitto $p_j$ e dimensione $w_j, h_j, d_j$.
+\end{itemize}
+
+Si cerca e $J' \subseteq J$ tale che gli oggetti in $J'$ siano contenuti nei 
+limiti dello zaino.
+
+
+\subsection{Modello}
+\begin{itemize}
+	\item $J$ è l'insieme degli oggetti -- di cardinalità $n$ -- cui sono 
+	associati gli indici $i$ e $j$;
+	\item $\Delta$ l'insieme delle dimensioni $\{0,1,2\}$ con l'indice associato
+	$\delta$;
+	\item $R$ è l'insieme delle possibili rotazioni degli oggetti, ha 
+	cardinalità $6$ e indice $r$;
+	\item $s_{ir}^\delta$ dimensione dell'oggetto $i$--simo lungo la dimensione
+	$\delta$ quando l'oggetto è ruotato con la rotazione $r$;
+	\item $S^\delta$ la dimensione dello zaino nella dimensione $\delta$;
+	\item $\chi_{i}^\delta$ la coordinata del punto più in fondo, in basso a 
+	sinistra (il punto di coordinate minime) dell'oggetto $i$ lungo la 
+	dimensione $\delta$ nello zaino;
+	\item 
+	\MutliLineEquation{t_{i}}{Se l'oggetto $i$ è contenuto nello zaino}{Altrimenti}
+	\item 
+	\MutliLineEquation{b_{ij}^\delta}{Se l'oggetto $i$ viene prima dell'oggetto 
+	$j$ lungo la dimensione $\delta$ nello zaino}{Altrimenti}
+	\item \MutliLineEquation{\rho_{ir}}{Se l'oggetto $i$ è ruotato con la 
+	rotazione $r$}{Altrimenti}
+\end{itemize}
+
+
+\subsubsection{Funzione Obiettivo}
+\begin{flalign}
+\text{ max } \left(\sum_{i \in J} p_i \cdot t_{i}\right)
+\end{flalign}
+
+\subsubsection{Vincoli}
+\begin{flalign}
+\label{eq:constraint:volume}
+\sum_{j \in J} w_j d_j h_j t_{j} \leq \prod_{\delta \in \Delta} S^\delta & \\
+%
+\sum_{\delta\in\Delta}(b_{ij}^\delta + b_{ji}^\delta) \geq t_{i} + t_{j} - 1 &&  i < j,\ i \in J,\ j \in J \\
+%
+\sum_{\delta\in\Delta}(b_{ij}^\delta + b_{ji}^\delta) \geq t_{i} + t_{j} - 1 && i < j,\ i \in J,\ j \in J \\
+%
+\label{eq:orig:constraint:coodinateLessThanSkdelta}
+\chi_{i}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{ir} \leq S^\delta && i \in J,\ \delta \in \Delta \\
+%
+\chi_{i}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{ir} \leq \chi_{j}^\delta + M(1 - b_{ij}^\delta) &&  i < j,\ i \in J, j \in J, \delta \in \Delta \\
+%
+\chi_{j}^\delta + \sum_{r \in R} s_{jr}^\delta \rho_{jr} \leq \chi_{i}^\delta + M(1 - b_{ji}^\delta) && i < j,\ i \in J, j \in J, \delta \in \Delta \\
+%
+\chi_{i}^\delta \leq M t_{i} &&  i \in J, \delta \in \Delta \\
+%
+b_{ij}^\delta \leq t_{i} && i \in J, j \in J, \delta \in \Delta \\
+%
+b_{ji}^\delta \leq t_{j} && i \in J, j \in J, \delta \in \Delta \\
+%
+\label{eq:constraint:rho:ir:leq:sumk}
+\sum_{r \in R} \rho_{ir} = 1 && i \in J \\
+%
+\chi_{i}^\delta \geq 0 && i \in J, \delta \in \Delta \\
+%
+t_{i} \in \{0,1\} && i \in J \\
+%
+b_{ij}^\delta \in \{0,1\} && i \in J, j \in J, \delta \in \Delta \\
+%
+\rho_{ir} \in \{0,1\} && i \in J, r \in R \\
+\nonumber
+\end{flalign}
+
+
