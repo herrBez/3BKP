@@ -28,7 +28,7 @@ char OUTPUTFILENAME[128];
 using namespace std;
 
 int status;
-char errmsg[BUF_SIZE];		
+char errmsg[BUF_SIZE];
 
 
 

@@ -14,8 +14,8 @@ CPX_LDFLAGS = -lcplex -lm -pthread
 
 
 
-SOURCES=main.cpp HullProblem.cpp ../Utils/get_option.cpp
-OBJECTS=main.o HullProblem.o ../Utils/get_option.o
+SOURCES=main.cpp HullProblem.cpp SlaveProblem.cpp ../Utils/get_option.cpp
+OBJECTS=main.o HullProblem.o SlaveProblem.o ../Utils/get_option.o
 EXECUTABLE=main
 
 

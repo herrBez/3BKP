@@ -4,6 +4,7 @@
  * 
  */
 #include "MasterProblem.h"
+
 using namespace std;
 
 /**
@@ -301,11 +302,11 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 				coeff[index] = -1.0;
 				index++;
 				idVar[index] = map.T[k][i];
-				coeff[index] = +M;
+				coeff[index] = +instance.E;
 				index++;
 				char sense = 'L';
 				int matbeg = 0;
-				double rhs = M;
+				double rhs = instance.E;
 				snprintf(name, NAME_SIZE, "(8) %d %d",i,delta);
 				char* cname = (char*)(&name[0]);
 				CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
@@ -582,7 +583,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 				number_of_constraint++;
 			}
 	}
-	
+	if(!oFlag.benchmark)
 	printf("Number of constraints (not considering the variable bounds): %d\n", number_of_constraint);
 }
 
@@ -619,4 +620,127 @@ mapVar setupLP(CEnv env, Prob lp, Instance3BKP instance, optionFlag oFlag)
 	}
 	
 	return map;
+}
+
+void output(CEnv env, Prob lp, Instance3BKP instance, double objval, VarVal v, char * filename, optionFlag oFlag){
+	int N = instance.N;
+	int K = instance.K;
+	
+	
+	
+	ofstream outfile(filename);
+	if(!outfile.good()) {
+		cerr << filename << endl;
+		throw std::runtime_error("Cannot open the file ");
+	}
+	outfile << "#Valore della funzione obiettivo " << objval << endl; 
+	outfile << "#Vengono inclusi solo gli oggetti messi nello zaino" << endl;
+	for(int k = 0; k < K; k++){
+		if(v.z[k] == 1) {
+			outfile << "#Dimensione max. del " << k << "-mo Zaino " << instance.S[k][0] << " " << instance.S[k][1] <<" "<< instance.S[k][2] << endl;
+		}
+	} 
+	
+	for(int k = 0; k < K; k++){
+		if(v.z[k] == 0)
+			continue;
+		outfile << "#Knapsack " << k << "-mo" << endl;
+		outfile << v.sigma[k][0] << " " << v.sigma[k][1] << " " << v.sigma[k][2] << endl;
+		if(oFlag.extended){
+			outfile << "L " << instance.L[k][0] << " " << instance.L[k][1] << " " << instance.L[k][2] << endl;
+			outfile << "U " << instance.U[k][0] << " " << instance.U[k][1] << " " << instance.U[k][2] << endl;
+		}
+	
+		for(int i = 0; i < N; i++){
+			if(v.t[k][i] == 0)
+				continue;
+			//Print only inserted objects 
+			outfile << i << "\t";
+			
+			for(int delta = 0; delta < 3; delta++){
+				outfile << v.chi[k][i][delta];
+				outfile << " ";
+			}
+			outfile << "\t";
+			for(int delta = 0; delta < 3; delta++){
+				outfile << instance.s[i][v.rotation[i][delta]] << " ";
+			}
+			
+			outfile << endl;
+		}
+			
+	}
+	
+	outfile.close();
+}
+VarVal fetchVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
+	
+	int N = instance.N;
+	int K = instance.K;
+	
+	VarVal variable_values(K, N, 6);
+	
+	{
+		vector<double> tmp(K);
+		int begin = map.Z[0];
+		int end = map.Z[K-1];
+		CHECKED_CPX_CALL (CPXgetx, env, lp, &tmp[0], begin, end);
+		std::transform(tmp.begin(), tmp.end(), variable_values.z.begin(), [](double val){ return val < 0.5? 0:1; });
+	}
+	
+	
+	for(int k = 0; k < K; k++){
+		int begin = map.Sigma[k][0];
+		int end = map.Sigma[k][2];
+		CHECKED_CPX_CALL( CPXgetx, env, lp, &variable_values.sigma[k][0], begin, end);
+	}
+	
+	
+	for(int k = 0; k < K; k++){
+		vector<double> tmp(N);
+		int begin = map.T[k][0];
+		int end = map.T[k][N - 1];
+		CHECKED_CPX_CALL( CPXgetx, env, lp, &tmp[0], begin, end);
+		std::transform(tmp.begin(), tmp.end(), variable_values.t[k].begin(), [](double val){ return val < 0.5? 0:1; });
+	}
+	
+	for(int k = 0; k < K; k++){
+		for(int i = 0; i < N; i++){
+			int begin = map.Chi[k][i][0];
+			int end = map.Chi[k][i][2];
+			CHECKED_CPX_CALL( CPXgetx, env, lp, &variable_values.chi[k][i][0], begin, end);
+		}
+	}
+	
+	for(int k = 0; k < K; k++){
+		for(int i = 0; i < N; i++){
+			for(int j = 0; j < N; j++){
+				vector<double> tmp(3);
+				int begin = map.B[k][i][j][0];
+				int end = map.B[k][i][j][2];
+				CHECKED_CPX_CALL( CPXgetx, env, lp, &tmp[0], begin, end);
+				std::transform(tmp.begin(), tmp.end(), variable_values.b[k][i][j].begin(), [](double val){ return val < 0.5? 0:1; });
+			}
+		}
+	}
+	
+	for(int i = 0; i < N; i++){
+		vector<double> tmp(6);
+		int begin = map.Rho[i][0];
+		int end = map.Rho[i][5];
+		CHECKED_CPX_CALL( CPXgetx, env, lp, &tmp[0], begin, end);
+		std::transform(tmp.begin(), tmp.end(), variable_values.rho[i].begin(), [](double val){ return val < 0.5? 0:1; });
+	}
+	
+	for(int i = 0; i < N; i++){
+		for(int r = 0; r < 6; r++){
+			if(variable_values.rho[i][r] >= 0.9) { //Taking into account round errors due to the double representation
+				for(int delta = 0; delta < 3; delta++){
+					variable_values.rotation[i][delta] = instance.R[r][delta];
+				}
+				break;
+			}
+		}
+	}
+	return variable_values;
 }

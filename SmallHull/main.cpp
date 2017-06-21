@@ -1,6 +1,6 @@
-/*!
+/**
  * @author Mirko Bez
- * @file hull_main.cpp
+ * @file main.cpp
  * 
  * Usage: ./main <filename.dat>
  */
@@ -15,8 +15,8 @@
 #include "../Utils/Instance3BKP.h"
 #include <assert.h>     /* assert */
 #include "MasterProblem.h"
+#include "SlaveProblem.h"
 #include <algorithm>
-
 
 
 
@@ -26,37 +26,51 @@ char OUTPUTFILENAME[128];
 using namespace std;
 
 int status;
-char errmsg[BUF_SIZE];		
-
-
-
-
-
+char errmsg[BUF_SIZE];
 
 
 
 /**
- * solve the model write the result in a file and returns the return value of the function
+ * solve the model write the results in a file and returns the objective value
  * @param env the CPLEX environment
  * @param lp the CPLEX problem
- * @param N the number of nodes of the TSP
- * @param mapY a map containing the (CPLEX) index of the y variables of the problem
- * used in order to retrieve the values of the y variables and print them on the screen.
+ * @param instance the object encoding of the problem's instance
+ * @param oFlag an object containing helpful configuration information passed by cli
+ * @param timeout_reached a boolean pointer that is set to true if cplex could not
+ * solve the problem within the given timeout (if it is specified)
  * @return objval the optimal solution
  */
-double solve( CEnv env, Prob lp, Instance3BKP instance, optionFlag oFlag) {
+double solve( CEnv env, Prob lp, Instance3BKP instance, optionFlag oFlag, bool * timeout_reached) {
 	clock_t t1,t2;
-    t1 = clock();
-    struct timeval  tv1, tv2;
-    gettimeofday(&tv1, NULL);
+	t1 = clock();
+	struct timeval  tv1, tv2;
+	gettimeofday(&tv1, NULL);
 	CHECKED_CPX_CALL( CPXmipopt, env, lp );
 	t2 = clock();
-    gettimeofday(&tv2, NULL);
+	gettimeofday(&tv2, NULL);
+	
+	int status = CPXgetstat(env, lp);
+	switch(status){
+		case CPXMIP_OPTIMAL: /* Optimal solution found */
+			break;
+		case CPXMIP_TIME_LIM_FEAS: /* Time limit exceeded, integer solution exists */
+			*timeout_reached = true;
+			break;
+		case CPXMIP_TIME_LIM_INFEAS: /* Time limit exceeded */
+			*timeout_reached = true;
+		default: break;
+	}
+	if(status == CPXMIP_TIME_LIM_FEAS){
+		cerr << "TIMEOUT REACHED\n" << endl;
+	}
+	
+	
 	double objval = 0.0;
 	CHECKED_CPX_CALL( CPXgetobjval, env, lp, &objval );
 	
 	double user_time = (double)(tv2.tv_sec+tv2.tv_usec*1e-6 - (tv1.tv_sec+tv1.tv_usec*1e-6));
 	double cpu_time = (double)(t2-t1) / CLOCKS_PER_SEC;
+	
 	
 	if(oFlag.output_required){	
 		CHECKED_CPX_CALL( CPXsolwrite, env, lp, "/tmp/Model.sol");
@@ -70,259 +84,12 @@ double solve( CEnv env, Prob lp, Instance3BKP instance, optionFlag oFlag) {
 		}
 		cout << "Objval: " << objval << endl;
 	} else {
-		printf("%.4lf, %.4lf\n", user_time, cpu_time);
-	}
-	
-	
-	
+		printf("%.4lf, %.4lf, %lf\n", user_time, cpu_time, objval);
+	}	
 	return objval;
 }
 
 
-
-VarVal fetchVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
-	
-	int N = instance.N;
-	int K = instance.K;
-	
-	VarVal variable_values(K, N, 6);
-	
-	{
-		vector<double> tmp(K);
-		int begin = map.Z[0];
-		int end = map.Z[K-1];
-		CHECKED_CPX_CALL (CPXgetx, env, lp, &tmp[0], begin, end);
-		std::transform(tmp.begin(), tmp.end(), variable_values.z.begin(), [](double val){ return val < 0.5? 0:1; });
-	}
-	
-	
-	for(int k = 0; k < K; k++){
-		int begin = map.Sigma[k][0];
-		int end = map.Sigma[k][2];
-		CHECKED_CPX_CALL( CPXgetx, env, lp, &variable_values.sigma[k][0], begin, end);
-	}
-	
-	
-	for(int k = 0; k < K; k++){
-		vector<double> tmp(N);
-		int begin = map.T[k][0];
-		int end = map.T[k][N - 1];
-		CHECKED_CPX_CALL( CPXgetx, env, lp, &tmp[0], begin, end);
-		std::transform(tmp.begin(), tmp.end(), variable_values.t[k].begin(), [](double val){ return val < 0.5? 0:1; });
-	}
-	
-	for(int k = 0; k < K; k++){
-		for(int i = 0; i < N; i++){
-			int begin = map.Chi[k][i][0];
-			int end = map.Chi[k][i][2];
-			CHECKED_CPX_CALL( CPXgetx, env, lp, &variable_values.chi[k][i][0], begin, end);
-		}
-	}
-	
-	for(int k = 0; k < K; k++){
-		for(int i = 0; i < N; i++){
-			for(int j = 0; j < N; j++){
-				vector<double> tmp(3);
-				int begin = map.B[k][i][j][0];
-				int end = map.B[k][i][j][2];
-				CHECKED_CPX_CALL( CPXgetx, env, lp, &tmp[0], begin, end);
-				std::transform(tmp.begin(), tmp.end(), variable_values.b[k][i][j].begin(), [](double val){ return val < 0.5? 0:1; });
-			}
-		}
-	}
-	
-	for(int i = 0; i < N; i++){
-		vector<double> tmp(6);
-		int begin = map.Rho[i][0];
-		int end = map.Rho[i][5];
-		CHECKED_CPX_CALL( CPXgetx, env, lp, &tmp[0], begin, end);
-		std::transform(tmp.begin(), tmp.end(), variable_values.rho[i].begin(), [](double val){ return val < 0.5? 0:1; });
-	}
-	
-	for(int i = 0; i < N; i++){
-		for(int r = 0; r < 6; r++){
-			if(variable_values.rho[i][r] >= 0.9) { //Taking into account round errors due to the double representation
-				for(int delta = 0; delta < 3; delta++){
-					variable_values.rotation[i][delta] = instance.R[r][delta];
-				}
-				break;
-			}
-		}
-	}
-	return variable_values;
-}
-
-/**
- * Print a human readable output in the file named output.txt
- * @param env
- * @param lp
- * @param instance
- * @param map
- */
- 
-void output(CEnv env, Prob lp, Instance3BKP instance, double objval, VarVal v, char * filename, optionFlag oFlag){
-	int N = instance.N;
-	int K = instance.K;
-	
-	
-	
-	ofstream outfile(filename);
-	if(!outfile.good()) {
-		cerr << filename << endl;
-		throw std::runtime_error("Cannot open the file ");
-	}
-	outfile << "#Valore della funzione obiettivo " << objval << endl; 
-	outfile << "#Vengono inclusi solo gli oggetti messi nello zaino" << endl;
-	for(int k = 0; k < K; k++){
-		if(v.z[k] == 1) {
-			outfile << "#Dimensione max. del " << k << "-mo Zaino " << instance.S[k][0] << " " << instance.S[k][1] <<" "<< instance.S[k][2] << endl;
-		}
-	} 
-	
-	for(int k = 0; k < K; k++){
-		if(v.z[k] == 0)
-			continue;
-		outfile << "#Knapsack " << k << "-mo" << endl;
-		outfile << v.sigma[k][0] << " " << v.sigma[k][1] << " " << v.sigma[k][2] << endl;
-		if(oFlag.extended){
-			outfile << "L " << instance.L[k][0] << " " << instance.L[k][1] << " " << instance.L[k][2] << endl;
-			outfile << "U " << instance.U[k][0] << " " << instance.U[k][1] << " " << instance.U[k][2] << endl;
-		}
-	
-		for(int i = 0; i < N; i++){
-			if(v.t[k][i] == 0)
-				continue;
-			//Print only inserted objects 
-			outfile << i << "\t";
-			
-			for(int delta = 0; delta < 3; delta++){
-				outfile << v.chi[k][i][delta];
-				outfile << " ";
-			}
-			outfile << "\t";
-			for(int delta = 0; delta < 3; delta++){
-				outfile << instance.s[i][v.rotation[i][delta]] << " ";
-			}
-			
-			outfile << endl;
-		}
-			
-	}
-	
-	outfile.close();
-}
-
-/**
- * setup slave problem
- * @param env
- * @param lp 
- * @param instance an instance of 3KP
- * @param map contains the index position of the variables in the problem
- * @param fetched_variables contains the values of the variables of the solution of the master problem 
- */
-void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetched_variables, optionFlag oFlag){
-	int N = instance.N;
-	int K = instance.K;
-	//fix z variables with the known values
-	for(int k = 0; k < K; k++){
-		char bound = 'B'; //Set upper and lower bound
-		double value = fetched_variables.z[k];
-		CHECKED_CPX_CALL(CPXchgbds, env, lp, 1, &map.Z[k], &bound, &value);
-	}
-	//fix t variables with the known values
-	for(int k = 0; k < K; k++){
-		for(int i = 0; i < N; i++){
-			char bound = 'B';
-			double value = fetched_variables.t[k][i];
-			CHECKED_CPX_CALL(CPXchgbds, env, lp, 1, &map.T[k][i], &bound, &value);
-		}
-	}
-	//fix b variables that are not used
-	for(int k = 0; k < K; k++){
-		
-			for(int i = 0; i < N; i++){
-				if(fetched_variables.t[k][i] == 0){
-				for(int j = 0; j < N; j++){
-					for(int delta = 0; delta < 3; delta++){
-					char bound = 'B';
-					double value = 0.0;
-					CHECKED_CPX_CALL(CPXchgbds, env, lp, 1, &map.B[k][i][j][delta], &bound, &value);
-					}
-				}
-			
-			}	
-		}
-	}
-	
-	//fix sigma variables
-	for(int k = 0; k < K; k++){
-		for(int delta = 0; delta < 3; delta++){
-			char bound = 'B';
-			double value = fetched_variables.sigma[k][delta];
-			CHECKED_CPX_CALL(CPXchgbds, env, lp, 1, &map.Sigma[k][delta], &bound, &value);
-		}
-	}
-	
-	
-	
-	
-	//fix rho variabes with known values
-	for(int i = 0; i < N; i++){
-		for(int r = 0; r < 6; r++){
-			char bound = 'B';
-			double value = fetched_variables.rho[i][r];
-			CHECKED_CPX_CALL(CPXchgbds, env, lp, 1, &map.Rho[i][r], &bound, &value);
-		}
-	}
-
-		
-	//fix chi variables that are not used (s.t. t[k][i] == 0)
-	for(int k = 0; k < K; k++){
-		for(int i = 0; i < N; i++){
-			if(fetched_variables.t[k][i] == 0){
-				char bound[3] = {'B', 'B', 'B'};
-				double value[3] = {0.0, 0.0,0.0};
-				CHECKED_CPX_CALL(CPXchgbds, env, lp, 3, &map.Chi[k][i][0], &bound[0], &value[0]);
-			}
-		}
-	}
-	
-	/* Change objective function */
-	
-	//Change objective coefficient of variabe z_k
-	for(int k = 0; k < K; k++){
-		double coeff = 0.0;
-		CHECKED_CPX_CALL(CPXprechgobj, env, lp, 1, &map.Z[k], &coeff);
-	}
-	
-	//Change objective coefficient of variabe t_k
-	for(int k = 0; k < K; k++){
-		for(int i = 0; i < N; i++){
-			double coeff = 0.0;
-			CHECKED_CPX_CALL(CPXprechgobj, env, lp, 1, &map.T[k][i], &coeff);
-		}
-	}
-	//Change objective coefficients of variable chi_ki only if t_ki
-	 for(int k = 0; k < K; k++){
-		for(int i = 0; i < N; i++){
-			for(int delta = 0; delta < 3; delta++){
-				double coeff = 0.0;
-				if(oFlag.optimize[delta] && fetched_variables.t[k][i] == 1) //Optimize only with respect to objects that are included
-					coeff = 1.0;
-				
-				CHECKED_CPX_CALL(CPXprechgobj, env, lp, 1, &map.Chi[k][i][delta], &coeff);
-			}
-		}
-	}
-	
-	/* Set problem to minimum */
-	CHECKED_CPX_CALL( CPXchgobjsen, env, lp, CPX_MIN); 
-	
-	CPXchgprobname (env, lp, "slave problem");
-	
-	
-	
-}	
 
 /**
  * the main function
@@ -332,7 +99,8 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
  */
 int main (int argc, char *argv[])
 {
-	bool exc_arised = false;	
+	bool exc_arised = false;
+	bool timeout_reached[] = {false, false};
 	try { 
 
 		optionFlag oFlag = get_option(argc, argv);	
@@ -344,11 +112,12 @@ int main (int argc, char *argv[])
 		
 		/* Set up timeout */
 		CHECKED_CPX_CALL(CPXsetintparam, env, CPX_PARAM_CLOCKTYPE, 1); //Use CPU as timer
-		CHECKED_CPX_CALL(CPXsetdblparam, env,  CPX_PARAM_TILIM, oFlag.timeout);
-		CHECKED_CPX_CALL(CPXsetintparam, env,  CPX_PARAM_THREADS, oFlag.threads);
-
+		CHECKED_CPX_CALL(CPXsetdblparam, env, CPX_PARAM_TILIM, oFlag.timeout);
+		
+		CHECKED_CPX_CALL(CPXsetintparam, env, CPX_PARAM_THREADS, oFlag.threads);
+		
 		// find the solution
-		double objvalMP = solve(env, lp, instance, oFlag);
+		double objvalMP = solve(env, lp, instance, oFlag, &timeout_reached[0]);
 		
 		if(!oFlag.benchmark)
 			printf("Solved Main Problem\n");
@@ -388,7 +157,6 @@ int main (int argc, char *argv[])
 			
 			// Setup Slave Problem
 			setupSP(env, lp, instance, map, fetched_variables, oFlag);
-			
 			if(!oFlag.benchmark)
 				printf("Set up problem Successfully\n");
 			
@@ -396,9 +164,8 @@ int main (int argc, char *argv[])
 			CHECKED_CPX_CALL( CPXwriteprob, env, lp, "/tmp/Model2.lp", NULL ); 
 			CHECKED_CPX_CALL(CPXchgprobtype, env, lp, CPXPROB_MILP);
 			
-			
 			// Solve Slave Problem
-			double objvalSP = solve(env, lp, instance, oFlag); 
+			double objvalSP = solve(env, lp, instance, oFlag, &timeout_reached[1]); 
 			
 			
 			
@@ -439,5 +206,8 @@ int main (int argc, char *argv[])
 	if(exc_arised){
 		return EXIT_FAILURE;
 	} 
+	if(timeout_reached[0]){
+		return 124;
+	}
 	return EXIT_SUCCESS;
 }

@@ -3,10 +3,10 @@
 iteration_per_instance=5
 max_line=$(($iteration_per_instance+1))
 output_directory=FiveKnapsacks/
-program=../Multi3BKP/main
-program_type=multi.all.E
+program=../SmallHull/main
+program_type=small.all
 small_pause=1
-regex=10_1.dat
+regex=*.dat
 timeout=6300
 
 mkdir $output_directory
