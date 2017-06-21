@@ -37,19 +37,51 @@ circa il parallelismo che riusciva a raggiungere CPLEX nei primi file.
 \end{itemize}
 
 I risultati dei benchmark grezzi possono essere trovati nella cartella 
-\path{Benchmark}. Qui vengono riportati delle elaborazioni.
+\path{Benchmark}. Qui vengono riportati delle elaborazioni sotto forma tabellare.
+Il significato delle varie colonne è riportato nella Tabella \ref{table:description}
+
 Purtroppo per le istanze in cui si è raggiunto il timeout non si hanno dati
 sulla soluzione ottima e quindi non si possono 
-fare stima sul livello di accuratezza delle soluzioni incombenti. Sarebbe
+fare stime sul livello di accuratezza delle soluzioni incombenti. Sarebbe
 interessante misurare la distanza tra la soluzione ottima
 e quelle incombenti, ma per motivi di tempo non sono riuscito a calcolarle.
-Viene quindi solo riportata la standard deviation dei valori
-delle soluzioni. Naturalmente per i problemi in cui la soluzione ottima è
-stata trovata la deviazione è $0$.
+Viene quindi solo riportata il coefficiente di variazione per gli
+objective values. Naturalmente 
+per i problemi risolti sempre con successo questo coefficiente è pari a $0$.
 
+\subsection{Descrizione della tabella}
+In ogni tabella sono presenti 10 colonne.
+\begin{table}
+\centering
+\small
+\begin{tabular}{| l| l |}
+\hline
+Abbreviazione & Descrizione \\
+\hline
+inst. & Nome dell'istanza \\
+compl. & Numero di esecuzioni completate con successo prima del timeout\\
+AUT & Average user time in minuti \\
+ACT & Average computer time in minuti\\
+CU  & CPU usage: numero di cpu usate in media per eseguire l'istanza. \\
+	& ottenuta come $AUT/ACT$\\
+max & Max cpu time \\
+min & Min cpu time \\
+CV-T & coefficiente di variazione per il cpu-time \\
+ObjV & media del valore della funzione obiettivo. Nel caso di soluzioni ottime corrisponde\\
+	& corrisponde al risultato della soluzione ottima.\\
+CV-O & coefficiente di variazioni per i valori della funzione obiettivo. In caso \\
+& di solo soluzioni ottime questo valore è $0$. \\
+\hline
+\end{tabular}
+\caption{Descizione dei significati delle colonne usate per riportare i dati
+di benchmark.}
+\label{table:description}
+\end{table}
 
+\subsection{5 Zaini}
 
-\subsection{15 Zaini}
+Le analisi per le istanze con $5$ zaini vengono riportate nelle tabelle
+\ref{table:multi:5} e \ref{table:hull:5}.
 
 \begin{table}[h!]
 \begin{center}
@@ -57,6 +89,52 @@ stata trovata la deviazione è $0$.
 \begin{tabular}{| c | c | c | c | c | c | c | c | c | c |}
 \hline
 inst. & done & AUT & CU & ACT & max & min & CV-T & ObjV & CV-O \\
+\hline
+\verb|10_1| & 5 / 5 & 0.0258 & 5.0139 & 0.1295 & 0.1309 & 0.1269 & 1.1987 & 751.00 & 0.00\\ 
+\verb|10_2| & 5 / 5 & 0.0243 & 5.0885 & 0.1235 & 0.1273 & 0.1198 & 2.1670 & 405.00 & 0.00\\ 
+\verb|10_3| & 5 / 5 & 0.0101 & 3.4377 & 0.0348 & 0.0353 & 0.0340 & 1.5021 & 2097.00 & 0.00\\ 
+\verb|10_4| & 5 / 5 & 0.0026 & 1.9404 & 0.0051 & 0.0065 & 0.0037 & 19.4727 & 1110.00 & 0.00\\ 
+\verb|10_5| & 5 / 5 & 0.0143 & 4.4032 & 0.0632 & 0.0650 & 0.0621 & 1.8000 & 1038.00 & 0.00\\ 
+\verb|20_1| & 0 / 5 & 14.4942 & 7.3164 & 106.0454 & 106.0757 & 106.0293 & 0.0172 & 1384.00 & 0.00\\ 
+\verb|20_2| & 5 / 5 & 4.5096 & 6.3234 & 28.5159 & 28.8547 & 28.2609 & 0.7570 & 1928.00 & 0.00\\ 
+\verb|20_3| & 0 / 5 & 14.3237 & 7.3976 & 105.9612 & 105.9938 & 105.9425 & 0.0182 & 1615.00 & 0.00\\ 
+\verb|20_4| & 0 / 5 & 14.2652 & 7.4228 & 105.8871 & 105.9240 & 105.8327 & 0.0317 & 1749.00 & 0.00\\ 
+\verb|20_5| & 0 / 5 & 14.3670 & 7.3718 & 105.9113 & 105.9264 & 105.9022 & 0.0100 & 1214.00 & 2.33\\ 
+\verb|30_1| & 0 / 5 & 14.9684 & 7.0659 & 105.7655 & 105.8104 & 105.7266 & 0.0324 & 2742.00 & 0.00\\ 
+\verb|30_2| & 0 / 5 & 15.3183 & 6.9060 & 105.7878 & 105.8425 & 105.7005 & 0.0534 & 3586.00 & 0.00\\ 
+\verb|30_3| & 0 / 5 & 14.6727 & 7.2435 & 106.2811 & 106.3591 & 106.1745 & 0.0733 & 2936.20 & 1.62\\ 
+\verb|30_4| & 0 / 5 & 14.8508 & 7.1367 & 105.9864 & 106.0274 & 105.9317 & 0.0333 & 2334.00 & 0.00\\ 
+\verb|30_5| & 0 / 5 & 15.3005 & 6.9274 & 105.9925 & 106.0134 & 105.9551 & 0.0211 & 3033.00 & 0.00\\ 
+\verb|40_1| & 0 / 5 & 15.4012 & 6.8799 & 105.9582 & 106.0244 & 105.8685 & 0.0583 & 2981.00 & 0.00\\ 
+\verb|40_2| & 0 / 5 & 15.8970 & 6.6490 & 105.6989 & 105.7507 & 105.6621 & 0.0361 & 2896.80 & 2.60\\ 
+\verb|40_3| & 0 / 5 & 16.7509 & 6.3392 & 106.1880 & 106.2455 & 106.0961 & 0.0546 & 3925.00 & 0.00\\ 
+\verb|40_4| & 0 / 5 & 16.7558 & 6.2921 & 105.4287 & 105.4462 & 105.4010 & 0.0175 & 3287.40 & 2.07\\ 
+\verb|40_5| & 0 / 5 & 15.9545 & 6.6432 & 105.9890 & 106.0273 & 105.9418 & 0.0289 & 3067.00 & 0.00\\ 
+\hline
+\end{tabular}
+\caption{$K = 5$ --- Multi3BKP}
+\label{table:multi:5}
+\end{center}
+\end{table}
+
+\subsection{10 Zaini}
+Le analisi per le istanze con $10$ zaini vengono riportate nelle tabelle
+\ref{table:multi:10} e \ref{table:hull:10}.
+
+
+
+\subsection{15 Zaini}
+
+Le analisi per le istanze con $15$ zaini vengono riportate nelle tabelle
+\ref{table:multi:15} e \ref{table:hull:15}.
+
+
+\begin{table}[h!]
+\begin{center}
+\small
+\begin{tabular}{| c | c | c | c | c | c | c | c | c | c |}
+\hline
+Inst. & Compl. & AUT & CU & ACT & max & min & CV-T & ObjV & CV-O \\
 \hline
 \verb|10_1| & 5 / 5 & 0.0274 & 3.3608 & 0.0922 & 0.0989 & 0.0884 & 4.3444 & 1370.00 & 0.00\\ 
 \verb|10_2| & 5 / 5 & 0.0103 & 2.4119 & 0.0247 & 0.0290 & 0.0225 & 10.3083 & 1668.00 & 0.00\\ 
@@ -84,3 +162,34 @@ inst. & done & AUT & CU & ACT & max & min & CV-T & ObjV & CV-O \\
 \label{table:multi:15}
 \end{center}
 \end{table}
+
+
+\subsection{Risultati}
+Generalmente il programma Multi3BKP risulta essere molto più veloce sulle 
+stesse istanze rispetto allo Small3BKP, anche perchè il secondo programma 
+è considerevolmente più complicato. 
+
+\paragraph{Multi3BKP}
+Questo problema risulta risolvibile per tutte le istanze con $10$ oggetti prese
+in esame. 
+
+
+
+
+
+
+
+\subsection{Problema Accessorio}
+Questa Sezione ha il solo scopo di fornire dei dati per supportare l'affermazione
+fatta nella Sezione \ref{sec:multi:problemaAcessorio}, ovvero che c'è una 
+differenza  considerevole di tempo necessario e qualità della soluzione se 
+vengono fissate 
+tutte le variabili (eccetto le $\chi$) o se si evita di fissare le variabili
+$b$.
+
+Per motivi di tempo questo test è stato fatto \emph{solo} per le istanze che
+hanno completato tutte e $5$ le esecuzioni con successo entro i termini del
+timeout.
+
+
+
