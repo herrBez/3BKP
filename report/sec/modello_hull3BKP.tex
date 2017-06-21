@@ -1,0 +1,187 @@
+\section{Problema alternativo}
+\label{sec:extension2}
+Un problema alternativo che è  stato analizzato è quello di considerare le 
+dimensioni degli zaini come delle variabili, con un upper bound fissato 
+($S_k^0, S_k^1, S_k^2$), in cui lo scopo è quello di trovare le dimensioni 
+minime che gli zaini devono avere, affinché possano contenere tutti gli oggetti.
+
+\subsection{Modello}
+Il modello differisce di poco dal modello fornito nella
+Sezione \ref{sec:modello:Multi3BKP}, quindi vengono elencate soltanto le 
+differenze:
+\begin{itemize}
+	\item $S_k^\delta$ definisce l'upper bound della lunghezza dello zaino $k$ 
+	lungo la dimensione $\delta$.
+	
+	\item $\sigma_k^\delta$ è una variabile che codifica l'estensione dello 
+	zaino $k$ lungo la dimensione $\delta$. È limitato superiormente dal valore
+	$S_k^\delta$ fornito in input.
+	Qualora si volesse trovare le dimensioni di un unico zaino che racchiuda 
+	tutti gli oggetti $J$ è sufficiente	mettere in input uno zaino solo e 
+	fissare gli upper bound a valori molto alti. 
+	
+	\item Al posto della variabile $\rho_{ir}$ qui viene definita una variabile
+	che itera anche tra gli zaini: $\rho_{kir}$. 
+	Se si mantiene la $\rho$ su due dimensioni e si utilizza il vincolo 
+	(\ref{eq:constraint:rho:ir:leq:sumk}) si creano dei vincoli che fanno sì 
+	che tutti gli oggetti debbano essere più piccoli di ogni zaino,
+	come spiegato nella sezione \ref{sec:extension2:Note}.
+\end{itemize}
+\subsubsection{Funzione obiettivo}
+Lo scopo è quello di minimizzare il volume degli zaini restando nei limiti 
+$S_k^\delta$. Siccome il modello deve restare lineare non è possibile calcolare
+il volume degli zaini, per questo motivo si utilizza come euristica per il 
+calcolo del volume la somma delle lunghezze degli spigoli $\sigma_k^\delta$:
+\begin{equation}
+\text{ min } \sum_{k \in K} \sum_{\delta \in \Delta} \sigma_k^\delta
+\end{equation}
+Siccome è desiderabile, a parità di somma delle dimensione dei vari zaini,
+diminuire il numero di zaini inclusi nella soluzione è stata preferita la 
+seguente funzione obiettivo:
+\begin{equation}
+\text{ min } \sum_{k \in K} \sum_{\delta \in \Delta} \sigma_k^\delta 
++ \sum_{k \in K} z_k
+\end{equation}
+\subsubsection{Vincoli}
+
+\begin{flalign}
+\sum_{\delta\in\Delta}(b_{kij}^\delta + b_{kji}^\delta) \geq t_{ki} + t_{kj} - 1
+&& i < j,\ k \in K,\ i \in J,\ j \in J \\
+%
+\label{eq:rho:kir:leq:sigmakdelta}
+\chi_{ki}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{kir} \leq \sigma_k^\delta \cdot + M \ (1-t_{ki}) && k \in K,\ i \in J,\ \delta \in \Delta \\
+%
+\label{eq:rho:kir:leq:precedenceA}
+\chi_{ki}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{kir} \leq \chi_{kj}^\delta + M(1 - b_{kij}^\delta) && i < j,\ k \in K, i \in J, j \in J, \delta \in \Delta \\
+%
+\label{eq:rho:kir:leq:precedenceB}
+\chi_{kj}^\delta + \sum_{r \in R} s_{jr}^\delta \rho_{kjr} \leq \chi_{ki}^\delta + M(1 - b_{kji}^\delta) && i < j,\ k \in K, i \in J, j \in J, \delta \in \Delta \\
+%
+\chi_{ki}^\delta \leq M t_{ki} && k \in K, i \in J && \in \Delta \\
+%
+b_{kij}^\delta \leq t_{ki} && k \in K, i \in J, j \in J, \delta \in \Delta \\
+%
+b_{kji}^\delta \leq t_{kj} && k \in K, i \in J, j \in J, \delta \in \Delta \\
+%
+\label{eq:rho:kir:sumofallrotation:tki}
+\sum_{r \in R} \rho_{kir} = t_{ki} && k \in K, i \in J \\
+%
+\label{2:constraint:multi:tkzk}
+t_{kj} \leq z_k && k \in K, j \in J \\
+%
+\label{2:constraint:multi:onlyInOneKnapsack}
+\sum_{k \in K} t_{kj} = 1 && j \in J \\
+\nonumber
+%
+\label{sigma_kdelta:leq:Skdelta}
+\sigma_k^\delta \leq S_k^\delta z_k && \forall k \in K, \forall \delta \in \Delta \\
+%
+\chi_{ki}^\delta \geq 0 && k \in K, i \in J, \delta \in \Delta \\
+%
+t_{ki} \in \{0,1\} && k \in K, i \in J \\
+%
+b_{kij}^\delta \in \{0,1\} && k \in K, i \in J, j \in J, \delta \in \delta \\
+%
+\rho_{kir} \in \{0,1\} && k \in K, i \in J, r \in R \\
+%
+\label{2:zk:in:0:1}
+z_k \in \{0,1\} && k \in K \\
+%
+\label{sigma_kdelta:geq:0}
+\sigma_k^\delta \geq 0 && k\in K, \delta \in \Delta \\
+\nonumber
+\end{flalign}
+
+
+\subsubsection{Note}
+\label{sec:extension2:Note}
+Vengono qui elencate brevemente le differenze con il modello descritto nella 
+Sezione \ref{sec:extension1} e spiegate le motivazioni delle modifiche.
+\begin{itemize}
+\item Avendo esteso $\rho$ su tre dimensioni tutti i vincoli 
+((\ref{eq:rho:kir:leq:sigmakdelta}), (\ref{eq:rho:kir:leq:precedenceA}), 
+(\ref{eq:rho:kir:leq:precedenceB}), (\ref{eq:rho:kir:sumofallrotation:tki})) che
+coinvolgono questa variabile devono essere modificati tenendo in considerazione
+anche l'indice $k$.
+
+\item Siccome il volume degli zaini in questo modello è dato dalla 
+moltiplicazione di variabili, il vincolo
+(\ref{eq:constraint:volume}) non può più essere considerato. 
+Ma poiché è ridondante rispetto ai vincoli 
+\ref{eq:constraint:coodinateLessThanSkdelta}
+può essere tralasciato senza intaccare la validità del modello.
+Infatti nel paper originale il vincolo (\ref{eq:constraint:volume}) viene 
+considerato esclusivamente per questioni numeriche.
+
+Al posto del vincolo (\ref{eq:constraint:coodinateLessThanSkdelta}) viene ora 
+considerato il vincolo 
+(\ref{eq:rho:kir:leq:sigmakdelta}) che coinvolge la variabile $\sigma_k^\delta$
+invece del parametro $S_k^\delta$.
+
+\item Il vincolo numero (\ref{constraint:multi:onlyInOneKnapsack}) deve essere 
+modificato in modo tale che \emph{tutti} gli oggetti siano contenuti in uno 
+zaino nella soluzione, dando forma al vincolo 
+(\ref{2:constraint:multi:onlyInOneKnapsack}).
+
+\item Il vincolo (\ref{eq:constraint:rho:ir:leq:sumk}) è stato sostituito dal
+nuovo vincolo (\ref{eq:rho:kir:sumofallrotation:tki}). Qualora si tenesse il
+vincolo (\ref{eq:constraint:rho:ir:leq:sumk}) si otterrebbe che qualsiasi zaino
+ dovrebbe essere più grande di tutti i singoli oggetti, per via  del vincolo
+ (\ref{2:constraint:multi:onlyInOneKnapsack}).
+
+\item Inoltre, come già accennato, vanno aggiunti i bound per le variabili 
+$\sigma_k^\delta$:
+
+\begin{equation}
+\sigma_k^\delta \in [ 0, S_k^\delta ]
+\end{equation}
+
+che vengono codificati nei due vincoli
+(\ref{sigma_kdelta:leq:Skdelta}) e (\ref{sigma_kdelta:geq:0}).
+\end{itemize}
+\subsection{Dimensione del problema}
+
+La dimensione viene qui definita come differenza rispetto a quella calcolata in
+\ref{sec:orig:dimensioneDelProblema}.
+
+Siccome si aggiungono le variabili $\sigma_k^\delta$ e le variabili $\rho_{kir}$
+al posto delle variabili $\rho_{ir}$ il numero di variabili aumenta di:
+\begin{itemize}
+	\item $|K|\cdot|\Delta|$ unità per $\sigma_k^\delta$
+	
+	\item $6(|K|-1)\cdot |J|$ per $\rho_{kir}$
+\end{itemize} 
+
+Portando ad un numero approssimato usando l'assunzione $|K| < |J|$:
+$$
+3|J|^3 + 10|J|^2 + 4|J| 
+$$
+
+
+I vincoli decrescono di $|K|$ perché rimuoviamo il vincolo
+(\ref{eq:constraint:volume}). E aumentano di $2 \cdot |K|\cdot|\Delta|$ per via
+della definizione dei domini delle variabili $\sigma_k^\delta$ 
+(i vincoli (\ref{sigma_kdelta:leq:Skdelta}) e (\ref{sigma_kdelta:geq:0})) e 
+di $(|K|-1) |J|$ per via dei vincoli (\ref{eq:rho:kir:sumofallrotation:tki}).
+
+In totale
+$$
+\frac{19}{2} |J|^3 + \frac{21}{2} |J|^2 + 10|J|
+$$
+
+
+Visto che le differenze avvengono solo al livello di grado $1$ e $2$ la
+dimensione asintotica delle variabili e dei vincoli è la stessa, tuttavia il
+secondo problema richiede molto più tempo per essere risolto soprattutto al
+crescere di $K$ visto che deve determinare il valore di un numero di variabili
+sensibilmente maggiore.
+
+
+\subsection{Problema Accessorio}
+
+Il problema accessorio è esattamente lo stesso di quello di capitolo 
+\ref{sec:orig:problemaAcessorio} ma bisogna fissare anche le variabili
+$\sigma_k^\delta$ e $\rho_{kir}$.
+
+
+

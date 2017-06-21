@@ -1,0 +1,223 @@
+\section{Estensione del 3KP con più zaini}
+\label{sec:extension1}
+
+Siano dati:
+\begin{itemize} 
+	
+	\item un insieme di parallelepipedi $K = \{1, \dots, m \}$\ 
+	(gli \emph{zaini}) le loro dimensioni $W_k, H_k, D_k$ e il loro costo 
+	associato $f_k$ (modella quanto costa usare lo zaino $k$);
+	\item un insieme di parallelepipedi $J = \{1, \dots, n\}$\ 
+	(gli \emph{oggetti}) di profitto $p_j$ e dimensione $w_j, h_j, d_j$.
+\end{itemize}
+
+Si cercano $K' \subseteq K$ e $J' \subseteq J$ tali che gli oggetti in $J'$ 
+siano contenuti nei limiti degli zaini $K'$ e il profitto sia massimo.
+
+
+\textbf{N.B.} Qui viene analizzato un modello senza i vincoli di 
+bilanciamento.
+Il loro adattamento è stato considerato nella sezione 
+\ref{sec:Balancing:Constraint}.
+
+
+\subsection{Modello}
+\label{sec:modello:multi3BKP}
+\begin{itemize}
+	\item $J$ è l'insieme degli oggetti -- di cardinalità $n$ -- cui sono 
+	associati gli indici $i$ e $j$;
+	\item $K$ è l'insieme di possibili zaini, cui è associato l'indice $k$;
+	\item $\Delta$ l'insieme delle dimensioni $\{0,1,2\}$ con l'indice associato
+	$\delta$;
+	\item $R$ è l'insieme delle possibili rotazioni degli oggetti, ha 
+	cardinalità $6$ e indice $r$;
+	\item $s_{ir}^\delta$ dimensione dell'oggetto $i$--simo lungo la dimensione
+	$\delta$ quando l'oggetto è ruotato con la rotazione $r$;
+	\item $S_{k}^\delta$ la dimensione del $k$--simo zaino nella dimensione 
+	$\delta$;
+	\item $\chi_{ki}^\delta$ la coordinata del punto più in fondo, in basso a 
+	sinistra  (il punto di coordinate minime) dell'oggetto $i$ lungo la 
+	dimensione $\delta$ nello zaino $k$;
+	\item \MutliLineEquation{t_{ki}}{Se l'oggetto $i$ è contenuto nello 
+	zaino $k$}{Altrimenti}
+	\item \MutliLineEquation{b_{kij}^\delta}{Se l'oggetto $i$ viene prima 
+	dell'oggetto $j$ lungo la dimensione $\delta$ nello zaino $k$}{Altrimenti}
+	\item \MutliLineEquation{\rho_{ir}}{Se l'oggetto $i$ è ruotato con la 
+	rotazione $r$}{Altrimenti}
+	\item \MutliLineEquation{z_k}{Se lo zaino $k$--simo viene 
+	utilizzato}{Altrimenti}
+	
+\end{itemize}
+
+
+
+\subsubsection{Funzione Obiettivo}
+\begin{equation}
+\text{ max }\left(\sum_{k \in K} \sum_{i \in J} p_i \cdot t_{ki}\right) - 
+\left(\sum_{k \in K} f_k \cdot z_k\right)
+\end{equation}
+
+
+\subsubsection{Vincoli}
+\begin{flalign}
+\label{eq:constraint:volume}
+\sum_{j \in J} w_j d_j h_j t_{kj} \leq W_kD_kH_k && \forall k \in K \\
+%
+\sum_{\delta\in\Delta}(b_{kij}^\delta + b_{kji}^\delta) \geq t_{ki} + t_{kj} - 1 && i < j,\ k \in K,\ i \in J,\ j \in J \\
+%
+\label{eq:constraint:coodinateLessThanSkdelta}
+\chi_{ki}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{ir} \leq S_k^\delta \cdot t_{ki} + M (1 - t_{ki}) && k \in K,\ i \in J,\ \delta \in \Delta \\
+%
+\chi_{ki}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{ir} \leq \chi_{kj}^\delta + M(1 - b_{kij}^\delta) && i < j,\ k \in K, i \in J, j \in J, \delta \in \Delta \\
+%
+\chi_{kj}^\delta + \sum_{r \in R} s_{jr}^\delta \rho_{jr} \leq \chi_{ki}^\delta + M(1 - b_{kji}^\delta) && i < j,\ k \in K, i \in J, j \in J, \delta \in \Delta \\
+% 
+\chi_{ki}^\delta \leq M t_{ki} && k \in K, i \in J, \delta \in \Delta \\
+%
+\label{constraint:bkij:leq:tki}
+b_{kij}^\delta \leq t_{ki} && k \in K, i \in J, j \in J, \delta \in \Delta \\
+%
+\label{constraint:bkji:leq:tki}
+b_{kji}^\delta \leq t_{kj} && k \in K, i \in J, j \in J, \delta \in \Delta \\
+%
+\label{eq:constraint:rho:ir:leq:sumk}
+\sum_{r \in R} \rho_{ir} = \sum_{k \in K} t_{ki} && i \in J \\
+%
+\label{constraint:multi:tkzk}
+t_{kj} \leq z_k && k \in K, j \in J \\
+%
+\label{constraint:multi:onlyInOneKnapsack}
+\sum_{k \in K} t_{kj} \leq 1 && j \in J \\
+%
+\chi_{ki}^\delta \geq 0 && k \in K, i \in J, \delta \in \Delta \\ 
+%
+t_{ki} \in \{0,1\} && k \in K, i \in J \\
+%
+b_{kij}^\delta \in \{0,1\} && k \in K, i \in J, j \in J, \delta \in \Delta \\
+%
+\rho_{ir} \in \{0,1\} && i \in J, r \in R \\
+%
+\label{zk:in:0:1}
+z_k \in \{0,1\} && k \in K \\
+\nonumber
+\end{flalign}
+
+\subsubsection{Note}
+\begin{itemize}
+\item Tutti i vincoli a parte (\ref{constraint:multi:tkzk}), 
+(\ref{constraint:multi:onlyInOneKnapsack}) e (\ref{zk:in:0:1}) sono stati 
+ottenuti adattando i vincoli del modello di partenza.
+\item Il vincolo (\ref{constraint:multi:tkzk}) fa sì che un oggetto possa essere
+ inserito nel $k$--simo zaino soltanto se lo zaino viene effettivamente 
+ utilizzato nella soluzione.
+\item Il vincolo (\ref{constraint:multi:onlyInOneKnapsack}) fa sì che un oggetto
+possa essere inserito al più in uno zaino. 
+\item Il vincolo (9) è ridondante rispetto ad (8), infatti ogni vincolo di tipo
+(9) ha un corrispettivo di tipo (8).
+\item Per il vincolo (7) si può utilizzare invece di un generico $M$, un 
+parametro $E$ così definito:
+$$
+E = max(S_k^\delta : k \in K, \delta \in \Delta) + 1
+$$ 
+\end{itemize}
+
+
+\subsection{Dimensioni del problema}
+\label{sec:orig:dimensioneDelProblema}
+Assumendo verosimilmente che 
+\begin{itemize}
+	\item $|K| < |J|$
+\end{itemize}  
+dalla Tabella \ref{table:no:variables}
+si ottiene che il numero di variabili è minore di $3|J|^3 + 4|J|^2 + 7|J|$, 
+quindi nell'ordine di $O(|J|^3)$.
+
+
+
+\begin{table}[h!]
+	\center
+	\begin{tabular}{|l|l|}
+		\hline
+		Variabili & \# Variabili \\
+		\hline
+		& \\
+		$z_k$ & $|K|$ \\
+		$\rho_{ir}$ & $|J| \cdot 6$\\
+		$t_{ki}$ & $|J| \cdot |K|$ \\
+		$\chi_{ki}^\delta$ & $|J| \cdot |K| \cdot | \Delta |$\\
+		$b_{kij}^\delta$ & $|J| \cdot |J| \cdot |K| \cdot |\Delta|$\\ 
+		& \\
+		\hline
+		& $3|J||J||K| + 4|J||K|+6|J|+ |K|$ \\
+		\hline
+	\end{tabular}
+	\caption{Numero di variabili del problema.}
+	\label{table:no:variables}
+\end{table}
+
+
+Nella Tabella \ref{table:no:constraints} sono riportati il numero di vincoli 
+per ogni tipo di vincolo. 
+Assumendo, come per le variabili che $|K|$ sia minore di $|J|$, il numero di 
+vincoli può essere sovrapprossimato nel modo seguente:
+$$
+\frac{19}{2}|J|^3 + \frac{15}{2}|J|^2 + 10|J|
+$$
+che è sempre nell'ordine $O(|J|^3)$.
+
+
+\begin{table}[h!]
+	\center
+\begin{tabular}{|l|l|}
+	\hline
+	Vincoli & \# Vincoli\\
+	\hline
+	(2) & $|K|$ \\
+	(3) & $|K| |J| (|J|-1)/2$ \\
+	(4) & $3\cdot |K| |J| $ \\
+	(5) & $3\cdot |K| |J| (|J|-1)/2$\\
+	(6) & $3\cdot |K| |J| (|J|-1)/2$ \\
+	(7) & $3\cdot |K| |J|$ \\
+	(8) & $3\cdot |K| |J| |J|$\\
+	(9) - È ridondante & 0 \\
+	(10)& $|J|$ \\
+	(11)& $|K| |J|$ \\
+	(12)& $|J|$ \\
+	\hline
+	Totale    & $3\cdot|K||J||J| + 7\cdot|K||J|(|J|-1)/2 + 7|K||J|+ 2|J| + |K|$ \\
+	(senza definizione dei domini) & \\
+	\hline
+	Dominio & \\
+	\hline 
+	(13)& $3 \cdot |K| |J|$ \\
+	(14)& $|K| |J|$ \\
+	(15)& $3 \cdot |K| |J| |J|$ \\
+	(16)& $6 |J|$ \\
+	(17)& $|K|$ \\
+	\hline
+	Totale & $6\cdot|K||J||J| + 7\cdot|K||J|(|J|-1)/2 + 11|K||J|+ 8|J| + 2|K|$ \\
+	\hline
+\end{tabular}
+	\caption{Numero di vincoli per ogni tipo di vincolo.}
+	\label{table:no:constraints}
+\end{table}
+
+\subsection{Problema Accessorio}
+\label{sec:orig:problemaAcessorio}
+Una volta risolto il problema, potrebbe essere desiderabile cercare di ridurre 
+i valori delle coordinate
+$\chi$ il più possibile.
+
+Il modello rimane lo stesso ma cambia la funzione obiettivo
+\begin{equation}
+\text{ min } \sum_{k\in k}\sum_{i \in J}\sum_{\delta \in \Delta'} \chi_{ki}^\delta
+\end{equation}
+dove $\Delta' \subseteq \Delta$ e $\Delta' \neq \varnothing$.
+
+Inoltre si fissano tutte le variabili $z_k, \rho_{ir}, t_{ki}$ e tutte le 
+variabili $b_{kij}^\delta$ con $z_k = 0$, ma non quelle con $z_k = 1$, perché 
+$b_{kij}^\delta$ definisce delle precedenze molto forti tra oggetti -- molte 
+volte non necessarie in alcune direzioni -- che potrebbero limitare 
+l'ottimizzazione delle variabili $\chi$, per questo è stato preferito non 
+fissarle.
+

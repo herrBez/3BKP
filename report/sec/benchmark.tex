@@ -1,0 +1,86 @@
+\section{Performance}
+Per testare le performance del modello proposto in Baldi et. 
+al~\cite{Baldi20129802} e le estensioni fornite
+in questo documento sono state generate varie istanze casuali.
+Per motivi di tempo non sono stati considerati i Balancing Constraints. 
+
+Con uno script python \path{instance_generator.py} sono state create varie
+istanze casuali cinque per ogni 
+combinazione di $k = \{1,5,10,15\}$ e $j = \{10,20,30,40\}$. 
+
+Il computer usato per le simulazioni ha 8GB di RAM (DDR3) un processore 
+Intel(R) Core(TM) i7-3610QM CPU @ 2.30GHz del 2012~\cite{cpu}.
+Il sistema operativo usato per le simulazione è openSUSE 13.2 (Harlequin) con
+il kernel linux 3.16.7-24-desktop.
+
+Per permettere delle analisi agevoli con \verb|R| è stata aggiunta un'opzione di
+\verb|--benchmark| all'interno dei vari programmi. 
+Questa opzione formatta l'output per contenere in una riga le seguenti 
+informazioni: User Time, CPU Time, Objective Value, Timeout Reached (Yes/No).
+
+Per rendere automatica l'esecuzione dei vari programmi è stato scritto uno 
+script in bash \path{benchmark.sh}. 
+All'inizio del file possono essere specificati i seguenti parametri:
+\begin{itemize}
+\item il programma da usare, 
+\item il numero di esecuzioni per istanza, in questo documento sono stati usati
+5 test per motivi di tempo,
+\item la cartella dove trovare le istanze, 
+\item una regex per i file da eseguire  (per esempio \verb|10*.dat| per eseguire
+ tutti i file che cominciano con 10), 
+\item secondi di pausa dopo l'esecuzione di un programma 
+(utile per non fare surriscaldare il computer).
+\item suffisso da dare ai file \verb|.csv| generati dal programma
+\item timeout. Qui è stato usato come timeout 6300 secondi di cpu. Questo valore
+è stato ottenuto moltiplicando 15 minuti per 7, che sembrava essere
+circa il parallelismo che riusciva a raggiungere CPLEX nei primi file.
+\end{itemize}
+
+I risultati dei benchmark grezzi possono essere trovati nella cartella 
+\path{Benchmark}. Qui vengono riportati delle elaborazioni.
+Purtroppo per le istanze in cui si è raggiunto il timeout non si hanno dati
+sulla soluzione ottima e quindi non si possono 
+fare stima sul livello di accuratezza delle soluzioni incombenti. Sarebbe
+interessante misurare la distanza tra la soluzione ottima
+e quelle incombenti, ma per motivi di tempo non sono riuscito a calcolarle.
+Viene quindi solo riportata la standard deviation dei valori
+delle soluzioni. Naturalmente per i problemi in cui la soluzione ottima è
+stata trovata la deviazione è $0$.
+
+
+
+\subsection{15 Zaini}
+
+\begin{table}[h!]
+\begin{center}
+\small
+\begin{tabular}{| c | c | c | c | c | c | c | c | c | c |}
+\hline
+inst. & done & AUT & CU & ACT & max & min & CV-T & ObjV & CV-O \\
+\hline
+\verb|10_1| & 5 / 5 & 0.0274 & 3.3608 & 0.0922 & 0.0989 & 0.0884 & 4.3444 & 1370.00 & 0.00\\ 
+\verb|10_2| & 5 / 5 & 0.0103 & 2.4119 & 0.0247 & 0.0290 & 0.0225 & 10.3083 & 1668.00 & 0.00\\ 
+\verb|10_3| & 5 / 5 & 0.0196 & 3.7409 & 0.0735 & 0.0759 & 0.0705 & 2.6602 & 1104.00 & 0.00\\ 
+\verb|10_4| & 5 / 5 & 0.1513 & 5.4620 & 0.8264 & 0.8308 & 0.8216 & 0.4606 & 1226.00 & 0.00\\ 
+\verb|10_5| & 5 / 5 & 0.0177 & 3.2744 & 0.0581 & 0.0606 & 0.0549 & 4.3044 & 1512.00 & 0.00\\ 
+\verb|20_1| & 0 / 5 & 16.0912 & 6.9548 & 111.9108 & 121.0174 & 105.8202 & 7.4255 & 2454.00 & 0.00\\ 
+\verb|20_2| & 0 / 5 & 16.5143 & 6.3963 & 105.6305 & 105.6581 & 105.6203 & 0.0149 & 2144.00 & 0.00\\ 
+\verb|20_3| & 0 / 5 & 15.0028 & 7.0641 & 105.9810 & 106.1126 & 105.9059 & 0.0773 & 3001.00 & 0.00\\ 
+\verb|20_4| & 0 / 5 & 15.1309 & 7.0066 & 106.0155 & 106.0362 & 105.9940 & 0.0158 & 1469.00 & 0.00\\ 
+\verb|20_5| & 0 / 5 & 15.3664 & 6.8822 & 105.7544 & 105.7779 & 105.7350 & 0.0177 & 1606.00 & 0.00\\ 
+\verb|30_1| & 0 / 5 & 16.6060 & 6.6281 & 110.0666 & 117.1187 & 105.3622 & 5.8486 & 2174.80 & 0.33\\ 
+\verb|30_2| & 0 / 5 & 17.2941 & 6.1007 & 105.5053 & 105.5180 & 105.4947 & 0.0085 & 2667.60 & 2.55\\ 
+\verb|30_3| & 0 / 5 & 16.6564 & 6.3292 & 105.4216 & 105.4249 & 105.4193 & 0.0022 & 2264.00 & 0.00\\ 
+\verb|30_4| & 0 / 5 & 17.8652 & 6.5670 & 117.3200 & 117.3902 & 117.2509 & 0.0443 & 2265.00 & 0.00\\ 
+\verb|30_5| & 0 / 5 & 20.0436 & 5.8523 & 117.3005 & 117.3528 & 117.2390 & 0.0377 & 2806.20 & 0.84\\ 
+\verb|40_1| & 0 / 5 & 22.4948 & 5.2039 & 117.0611 & 117.0770 & 117.0522 & 0.0086 & 3339.00 & 2.48\\ 
+\verb|40_2| & 0 / 5 & 21.0422 & 5.5732 & 117.2715 & 117.2845 & 117.2535 & 0.0099 & 3461.20 & 0.47\\ 
+\verb|40_3| & 0 / 5 & 22.5891 & 5.1755 & 116.9096 & 116.9824 & 116.8894 & 0.0348 & 2706.80 & 0.48\\ 
+\verb|40_4| & 0 / 5 & 20.2110 & 5.7857 & 116.9348 & 117.0042 & 116.9164 & 0.0332 & 3736.00 & 0.00\\ 
+\verb|40_5| & 0 / 5 & 19.9309 & 5.8681 & 116.9571 & 117.0181 & 116.9200 & 0.0392 & 2994.00 & 0.00\\ 
+\hline
+\end{tabular}
+\caption{$K = 15$ --- Multi3BKP}
+\label{table:multi:15}
+\end{center}
+\end{table}

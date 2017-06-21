@@ -1,0 +1,86 @@
+\section{Come eseguire il programma}
+\subsection{Compilazione}
+La cartella \verb|Multi3BKP| contiene l'implementazione del primo modello, 
+mentre \verb|Hull3BKP| contiene l'implementazione del problema alternativo.
+Per compilare è sufficiente utilizzare il \verb|Makefile| contenuto nella 
+rispettiva cartella.
+
+
+\subsection{File di Input}
+Per comodità entrambi i programmi utilizzano lo stesso file di input, anche se 
+non tutti i parametri vengono utilizzati in tutti e due i programmi.
+\begin{itemize}
+	\item $K$, il numero di zaini
+	\item Seguono $K$ righe contenente nella riga $k$ i dati per lo zaino $k$ 
+	intervallati da uno spazio:
+	\begin{itemize}
+		\item $S_k^0$
+		\item $S_k^1$
+		\item $S_k^2$
+		\item $f_k$
+	\end{itemize} 
+	Se il problema è esteso (con i \emph{balancing constraints}) si 
+	aggiungono anche:
+	\begin{itemize}
+		\item $L_k^0$
+		\item $L_k^1$
+		\item $L_k^2$
+		\item $U_k^0$
+		\item $U_k^1$
+		\item $U_k^2$
+	\end{itemize}
+	\item $N$, il numero di oggetti ($|J|$)
+	\begin{itemize}
+		\item $s_i^1$
+		\item $s_i^2$
+		\item $s_i^3$
+		\item $m_i$
+		\item $p_i$
+	\end{itemize}
+\end{itemize}
+
+\subsection{File di output}
+In questa sezione siano $K' \subseteq K$ l'insieme di zaini selezionati, 
+$J^k$ gli oggetti che sono stati inseriti nel $k$--simo zaino e sia $r'$ la 
+rotazione selezionata per l'oggetto $i$.
+
+
+Il programma genera un file di output così costituito:
+\begin{itemize}
+	\item Una serie di righe di commento che includono anche il valore ottimo 
+	trovato
+	\item $|K'|$ blocchi così formati:
+		\begin{itemize}
+			\item \verb|# Knapsack k-mo|
+			\item $S_k^\delta$ o $\sigma_k^\delta$ a seconda se il programma è 
+			stato generato con \verb|main| o \verb|main_hull|
+			\item Seguono $|J^k|$ righe contenenti le seguenti informazioni 
+			sugli oggetti inseriti nello zaino $k$:
+			\begin{itemize}
+				\item $i$, l'indice dell'oggetto
+				\item $\chi_{ki}^0$
+				\item $\chi_{ki}^1$
+				\item $\chi_{ki}^2$
+				\item $s_{ir'}^0$
+				\item $s_{ir'}^1$
+				\item $s_{ir'}^2$
+			\end{itemize}
+		\end{itemize}
+\end{itemize}
+
+
+
+
+
+
+\subsection{Visualizzazione}
+Per visualizzare il file di output ed agevolare le fasi di verifica e 
+validazione del modello è stato implementato un programma che rappresenta gli 
+zaini e gli oggetti selezionati nello spazio, utilizzando la libreria grafica 
+\verb|webgl|\footnote{\url{https://www.khronos.org/webgl/}}.
+
+\subsection{Documentazione}
+La documentazione del codice può essere generata utilizzando il programma 
+\verb|doxygen|\footnote{\url{https://github.com/doxygen/doxygen}} 
+all'interno delle rispettive cartelle.
+

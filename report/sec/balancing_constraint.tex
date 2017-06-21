@@ -1,0 +1,28 @@
+\section{Balancing Constraints}
+\label{sec:Balancing:Constraint}
+È stata anche considerata la possibilità di estendere i balancing constraint 
+del paper originale:
+\begin{equation}
+\sum_{i \in J} m_i \chi_{i}^\delta + \sum_{i \in J}\sum_{r \in R} m_i \gamma_{ir}^\delta \rho_{ir} \geq L^\delta \sum_{i \in J} m_i t_i \quad\quad \delta \in \Delta
+\end{equation}
+\begin{equation}
+\sum_{i \in J} m_i \chi_{i}^\delta + \sum_{i \in J}\sum_{r \in R} m_i \gamma_{ir}^\delta \rho_{ir} \leq U^\delta \sum_{i \in J} m_i t_i \quad\quad \delta \in \Delta
+\end{equation}
+dove 
+\begin{itemize}
+	\item $\gamma_{ir}^\delta$ è la coordinata del centro di massa dell'oggetto 
+	$i$ nella rotazione $r$ nella dimensione $\delta$.
+	\item $L^\delta$ è il lower bound 
+	\item $U^\delta$ è l'upper bound
+\end{itemize}
+
+per il modello con più zaini:
+\begin{equation}
+\sum_{i \in J} m_i \chi_{ki}^\delta + \sum_{i \in J}\sum_{r \in R} m_i \gamma_{ir}^\delta \rho_{ir} \geq L_k^\delta \sum_{i \in J} m_i t_{ki} \quad\quad k \in K, \delta \in \Delta
+\end{equation}
+\begin{equation}
+\sum_{i \in J} m_i \chi_{ki}^\delta + \sum_{i \in J}\sum_{r \in R} m_i \gamma_{ir}^\delta \rho_{ir} \leq U_k^\delta \sum_{i \in J} m_i t_{ki} \quad\quad k \in K, \delta \in \Delta
+\end{equation}
+
+In questo caso vengono aggiunti $2 \cdot (|K| \cdot 3)$ vincoli a quelli del 
+modello di partenza.
