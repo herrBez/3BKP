@@ -7,8 +7,21 @@ analyse <- function(mydata) {
 	return(mean(mydata$CPU.Time));
 }
 
+if(length(args) < 2){
+	stop("Rscript <name.R> <output_file> <directory> <regex>")
+}
+
+directory <- args[2]
+
+regex <- args[3] #".main\\.all\\.csv$"
+
+cat(sprintf("%s\n%s\n",
+			regex,
+			"\\.multi\\.all\\.E\\.csv$"
+	)
+)
 #mydata = read.csv(args[1], header=TRUE, sep=",")
-filenames <- list.files("FifteenKnapsacks", pattern="\\.main\\.all\\.csv$", full.names=TRUE)
+filenames <- list.files(directory, pattern=regex, full.names=TRUE)
 
 con <- file(args[1], "w")
 cat(
@@ -49,6 +62,7 @@ ldf <- lapply(filenames, function(i){
 			file=con
 		)
 	} else {
+		
 		cat(
 			sprintf("\\verb|%s| & %d & %s & %s & %s & %s & %s & %s & \\\\ \n", 
 					strsplit(basename(i), "\\.")[[1]][1],
