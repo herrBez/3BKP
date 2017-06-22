@@ -49,22 +49,22 @@ seguente funzione obiettivo:
 && i < j,\ k \in K,\ i \in J,\ j \in J \\
 %
 \label{eq:rho:kir:leq:sigmakdelta}
-\chi_{ki}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{kir} \leq \sigma_k^\delta \cdot + M \ (1-t_{ki}) && k \in K,\ i \in J,\ \delta \in \Delta \\
+\chi_{ki}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{ir} \leq \sigma_k^\delta + M \ (1-t_{ki}) && k \in K,\ i \in J,\ \delta \in \Delta \\
 %
 \label{eq:rho:kir:leq:precedenceA}
-\chi_{ki}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{kir} \leq \chi_{kj}^\delta + M(1 - b_{kij}^\delta) && i < j,\ k \in K, i \in J, j \in J, \delta \in \Delta \\
+\chi_{ki}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{ir} \leq \chi_{kj}^\delta + M(1 - b_{kij}^\delta) && i < j,\ k \in K, i \in J, j \in J, \delta \in \Delta \\
 %
 \label{eq:rho:kir:leq:precedenceB}
-\chi_{kj}^\delta + \sum_{r \in R} s_{jr}^\delta \rho_{kjr} \leq \chi_{ki}^\delta + M(1 - b_{kji}^\delta) && i < j,\ k \in K, i \in J, j \in J, \delta \in \Delta \\
+\chi_{kj}^\delta + \sum_{r \in R} s_{jr}^\delta \rho_{jr} \leq \chi_{ki}^\delta + M(1 - b_{kji}^\delta) && i < j,\ k \in K, i \in J, j \in J, \delta \in \Delta \\
 %
-\chi_{ki}^\delta \leq M t_{ki} && k \in K, i \in J && \in \Delta \\
+\chi_{ki}^\delta \leq M t_{ki} && k \in K, i \in J, \delta \in \Delta \\
 %
 b_{kij}^\delta \leq t_{ki} && k \in K, i \in J, j \in J, \delta \in \Delta \\
 %
 b_{kji}^\delta \leq t_{kj} && k \in K, i \in J, j \in J, \delta \in \Delta \\
 %
 \label{eq:rho:kir:sumofallrotation:tki}
-\sum_{r \in R} \rho_{kir} = t_{ki} && k \in K, i \in J \\
+\sum_{r \in R} \rho_{ir} = t_{ki} && k \in K, i \in J \\
 %
 \label{2:constraint:multi:tkzk}
 t_{kj} \leq z_k && k \in K, j \in J \\
@@ -82,7 +82,7 @@ t_{ki} \in \{0,1\} && k \in K, i \in J \\
 %
 b_{kij}^\delta \in \{0,1\} && k \in K, i \in J, j \in J, \delta \in \delta \\
 %
-\rho_{kir} \in \{0,1\} && k \in K, i \in J, r \in R \\
+\rho_{ir} \in \{0,1\} && k \in K, i \in J, r \in R \\
 %
 \label{2:zk:in:0:1}
 z_k \in \{0,1\} && k \in K \\
