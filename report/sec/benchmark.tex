@@ -219,9 +219,28 @@ vengono fissate
 tutte le variabili (eccetto le $\chi$) o se si evita di fissare le variabili
 $b$.
 
-Per motivi di tempo questo test è stato fatto \emph{solo} per le istanze che
-hanno completato tutte e $5$ le esecuzioni con successo entro i termini del
-timeout.
+Per motivi di tempo questo test è stato fatto \emph{solo} per poche istanze.
+I risultati si possono trovare nella Tabella \ref{table:accessorio:res}.
+
+I pochi dati forniti mostrano chiaramente che fissando le variabili $b$ del problema
+il tempo richiesto per risolverlo cresce notevolmente. Ma al contempo la qualità
+delle soluzioni cresce considerevolmente.
 
 
+\begin{table}[h!]
+\begin{center}
+\small
+\begin{tabular}{| c | c | c | c | c | c | c | c | c | }
+\hline
+inst.			& SOV	& OF				& ONF 				& O-Impr. 	& ACT F 	& ACT NF 		& Diff \\
+\hline
+\verb|5_10_1|	& 3144  	& 2956	(-5.98\%) 	& 2127 	(-32.34\%)	& -28.04\%	 			& 0.00542 	&  0. 0.07414 	& +92\% \\ 
+\verb|5_10_2|	& 3999		& 3700	(-7.47\%)	& 1404	(-64.89\%)	& -62.05\%				& 0.00594	& 0.06318 		& +90.7\%\\
+\verb|5_10_3|	& 7835		& 7467	(-4.70\%)	& 3225	(-58.83\%)	& -56.80\%				& 0.00526	& 1.835 		& +98.5\% \\
 
+\hline
+\end{tabular}
+\caption{Risultati per il problema accessorio}
+\label{table:accessorio:res}
+\end{center}
+\end{table}
