@@ -129,7 +129,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map, opt
 				double obj = 0.0;
 				double lb = 0.0;
 				double ub = CPX_INFBOUND;
-				snprintf(name, NAME_SIZE, "chi %d %d %d", i, k, delta);
+				snprintf(name, NAME_SIZE, "chi %d %d %d", k, i, delta);
 				char * xname = (char*)(&name[0]);
 				CHECKED_CPX_CALL( CPXnewcols, env, lp, 1, &obj, &lb, &ub, &xtype, &xname );
 				map.Chi[k][i][delta] = current_var_position++;
