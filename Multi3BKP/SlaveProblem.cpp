@@ -28,16 +28,15 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
 	}
 	//fix b variables that are not used
 	for(int k = 0; k < K; k++){
-				for(int i = 0; i < N; i++){
-								if(fetched_variables.t[k][i] == 0){
-
-					for(int j = 0; j < N; j++){
-						for(int delta = 0; delta < 3; delta++){
-						char bound = 'B';
-						double value = fetched_variables.b[k][i][j][delta];
-						CHECKED_CPX_CALL(CPXchgbds, env, lp, 1, &map.B[k][i][j][delta], &bound, &value);
-						}
+		for(int i = 0; i < N; i++){
+			if(fetched_variables.t[k][i] == 0){
+				for(int j = 0; j < N; j++){
+					for(int delta = 0; delta < 3; delta++){
+					char bound = 'B';
+					double value = fetched_variables.b[k][i][j][delta];
+					CHECKED_CPX_CALL(CPXchgbds, env, lp, 1, &map.B[k][i][j][delta], &bound, &value);
 					}
+				}
 			}
 		}
 	}
