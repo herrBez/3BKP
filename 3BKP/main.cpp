@@ -579,7 +579,7 @@ double solve( CEnv env, Prob lp, Instance3BKP instance, optionFlag oFlag, bool *
 		}
 		cout << "Objval: " << objval << endl;
 	} else {
-		printf("%.4lf, %.4lf\n", user_time, cpu_time);
+		printf("%.4lf, %.4lf, %lf\n", user_time, cpu_time, objval);
 	}	
 	return objval;
 }
