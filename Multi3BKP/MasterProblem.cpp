@@ -410,6 +410,37 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 			}
 		}
 	}
+	
+	//Add this constraint for the accessory problem
+	
+	for(int k = 0; k < K; k++){
+		for(int i = 0; i < N; i++){
+			for(int j = 0;  j < N; j++){
+				for(int delta = 0; delta < 3; delta++){
+					vector <int> idVar(2);
+					vector <double> coef(2);
+					idVar[0] = map.B[k][i][j][delta];
+					coef[0] = 1.0;
+					idVar[1] = map.Z[k];
+					coef[1] = -1.0;
+					char sense = 'L';
+					int matbeg = 0;
+					double rhs = 0;
+					//snprintf(name, NAME_SIZE, "(12) %d %d %d", i, j, delta);
+					//char * cname = (char*) (&name[0]);
+					CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coef[0], 0, NULL);
+				}
+			}
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 	//Constraint (12): b_{kij}^\delta <= t_i ==> b_{ij}^\delta - t_i = 0
 	
 	for(int k = 0; k < K; k++){
