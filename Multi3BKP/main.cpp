@@ -17,6 +17,7 @@
 #include <assert.h>     /* assert */
 #include "utils.h"
 #include "MasterProblem.h"
+#include "SlaveProblem.h"
 #include <algorithm>
 
 
@@ -46,7 +47,7 @@ char errmsg[BUF_SIZE];
  * solve the problem within the given timeout (if it is specified)
  * @return objval the optimal solution
  */
-double solve( CEnv env, Prob lp, Instance3BKP instance, optionFlag oFlag, bool * timeout_reached) {
+double solve( CEnv env, Prob lp, Instance3BKP instance, optionFlag oFlag, bool * timeout_reached, bool master) {
 	clock_t t1,t2;
 	t1 = clock();
 	struct timeval  tv1, tv2;
@@ -78,8 +79,11 @@ double solve( CEnv env, Prob lp, Instance3BKP instance, optionFlag oFlag, bool *
 	double cpu_time = (double)(t2-t1) / CLOCKS_PER_SEC;
 	
 	
-	if(oFlag.output_required){	
-		CHECKED_CPX_CALL( CPXsolwrite, env, lp, "/tmp/Model.sol");
+	if(oFlag.output_required){
+		if(master)
+			CHECKED_CPX_CALL( CPXsolwrite, env, lp, "/tmp/Model_master.sol");
+		else
+			CHECKED_CPX_CALL( CPXsolwrite, env, lp, "/tmp/Model_slave.sol");
 	}
 	if(!oFlag.benchmark){
 		printf("User time:\t %.4lf seconds ~ %.6lf minutes\n", user_time, (user_time/60));
@@ -158,7 +162,7 @@ VarVal fetchVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	
 	for(int i = 0; i < N; i++){
 		for(int r = 0; r < 6; r++){
-			if(variable_values.rho[i][r] >= 0.9) { //Taking into account round errors due to the double representation
+			if(variable_values.rho[i][r] >= 0.5) { //Taking into account round errors due to the double representation
 				for(int delta = 0; delta < 3; delta++){
 					variable_values.rotation[i][delta] = instance.R[r][delta];
 				}
@@ -235,108 +239,6 @@ void output(CEnv env, Prob lp, Instance3BKP instance, double objval, VarVal v, c
 	outfile.close();
 }
 
-/**
- * setup slave problem
- * @param env
- * @param lp 
- * @param instance an instance of 3KP
- * @param map contains the index position of the variables in the problem
- * @param fetched_variables contains the values of the variables of the solution of the master problem 
- */
-void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetched_variables, optionFlag oFlag){
-	int N = instance.N;
-	int K = instance.K;
-	//fix z variables with the known values
-	for(int k = 0; k < K; k++){
-		char bound = 'B'; //Set upper and lower bound
-		double value = fetched_variables.z[k];
-		CHECKED_CPX_CALL(CPXchgbds, env, lp, 1, &map.Z[k], &bound, &value);
-	}
-	//fix t variables with the known values
-	for(int k = 0; k < K; k++){
-		for(int i = 0; i < N; i++){
-			char bound = 'B';
-			double value = fetched_variables.t[k][i];
-			CHECKED_CPX_CALL(CPXchgbds, env, lp, 1, &map.T[k][i], &bound, &value);
-		}
-	}
-	//fix b variables that are not used
-	for(int k = 0; k < K; k++){
-		
-			for(int i = 0; i < N; i++){
-				if(fetched_variables.t[k][i] == 0){
-				for(int j = 0; j < N; j++){
-					for(int delta = 0; delta < 3; delta++){
-					char bound = 'B';
-					double value = 0.0;
-					CHECKED_CPX_CALL(CPXchgbds, env, lp, 1, &map.B[k][i][j][delta], &bound, &value);
-					}
-				}
-			
-			}	
-		}
-	}
-	
-	
-	
-	
-	
-	//fix rho variabes with known values
-	for(int i = 0; i < N; i++){
-		for(int r = 0; r < 6; r++){
-			char bound = 'B';
-			double value = fetched_variables.rho[i][r];
-			CHECKED_CPX_CALL(CPXchgbds, env, lp, 1, &map.Rho[i][r], &bound, &value);
-		}
-	}
-	
-	//fix chi variables that are not used (s.t. t[k][i] == 0)
-	for(int k = 0; k < K; k++){
-		for(int i = 0; i < N; i++){
-			if(fetched_variables.t[k][i] == 0){
-				char bound[3] = {'B', 'B', 'B'};
-				double value[3] = {0.0, 0.0,0.0};
-				CHECKED_CPX_CALL(CPXchgbds, env, lp, 3, &map.Chi[k][i][0], &bound[0], &value[0]);
-			}
-		}
-	}
-	
-	/* Change objective function */
-	
-	//Change objective coefficient of variabe z_k
-	for(int k = 0; k < K; k++){
-		double coeff = 0.0;
-		CHECKED_CPX_CALL(CPXprechgobj, env, lp, 1, &map.Z[k], &coeff);
-	}
-	
-	//Change objective coefficient of variabe t_k
-	for(int k = 0; k < K; k++){
-		for(int i = 0; i < N; i++){
-			double coeff = 0.0;
-			CHECKED_CPX_CALL(CPXprechgobj, env, lp, 1, &map.T[k][i], &coeff);
-		}
-	}
-	//Change objective coefficients of variable chi_ki only if t_ki
-	 for(int k = 0; k < K; k++){
-		for(int i = 0; i < N; i++){
-			for(int delta = 0; delta < 3; delta++){
-				double coeff = 0.0;
-				if(oFlag.optimize[delta] && fetched_variables.t[k][i] == 1) //Optimize only with respect to objects that are included
-					coeff = 1.0;
-				
-				CHECKED_CPX_CALL(CPXprechgobj, env, lp, 1, &map.Chi[k][i][delta], &coeff);
-			}
-		}
-	}
-	
-	/* Set problem to minimum */
-	CHECKED_CPX_CALL( CPXchgobjsen, env, lp, CPX_MIN); 
-	
-	CPXchgprobname (env, lp, "slave problem");
-	
-	
-	
-}	
 
 /**
  * the main function
@@ -364,7 +266,7 @@ int main (int argc, char *argv[])
 		CHECKED_CPX_CALL(CPXsetintparam, env, CPX_PARAM_THREADS, oFlag.threads);
 		
 		// find the solution
-		double objvalMP = solve(env, lp, instance, oFlag, &timeout_reached[0]);
+		double objvalMP = solve(env, lp, instance, oFlag, &timeout_reached[0], true);
 		
 		if(!oFlag.benchmark)
 			printf("Solved Main Problem\n");
@@ -412,7 +314,7 @@ int main (int argc, char *argv[])
 			CHECKED_CPX_CALL(CPXchgprobtype, env, lp, CPXPROB_MILP);
 			
 			// Solve Slave Problem
-			double objvalSP = solve(env, lp, instance, oFlag, &timeout_reached[1]); 
+			double objvalSP = solve(env, lp, instance, oFlag, &timeout_reached[1], false); 
 			
 			
 			
