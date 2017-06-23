@@ -515,23 +515,6 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 	}
 	
 	/* */
-	for(int j = 0; j < N; j++){
-		vector < int > idVar(K);
-		vector < double > coeff(K);
-		for(int k = 0; k < K; k++){
-			idVar[k] = map.T[k][j];
-			coeff[k] = 1.0;
-		}
-		double rhs = 1.0;
-		char sense = 'L';
-		int matbeg = 0;
-		
-		snprintf(name, NAME_SIZE, "Multi (2) %d ", j);
-		char * cname = (char*) (&name[0]);
-		CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
-		number_of_constraint++;
-	}
-	/* */
 	for(int k = 0; k < K; k++){
 		for(int delta = 0; delta < 3; delta++){
 			vector< int > idVar(2);
