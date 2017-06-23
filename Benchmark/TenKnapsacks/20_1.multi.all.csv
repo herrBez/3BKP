@@ -1,4 +1,4 @@
-User.Time, CPU.Time
+User.Time, CPU.Time, Objval, Timeout.Reached
 902.9516, 5939.0744, 2086.000000, No
 925.6667, 6064.0130, 2086.000000, No
 914.5385, 6006.6277, 2086.000000, No
