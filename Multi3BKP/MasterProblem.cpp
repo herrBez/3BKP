@@ -435,7 +435,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 	}
 	
 	
-	//Constraint (13): b_{ji}^\delta <= t_j ==> b_{ji}^\delta - t_j = 0
+	/*Constraint (13): b_{ji}^\delta <= t_j ==> b_{ji}^\delta - t_j = 0
 	for(int k = 0; k < K; k++){
 		for(int i = 0; i < N; i++){
 			for(int j = 0;  j < N; j++){
@@ -456,7 +456,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 				}
 			}
 		}
-	}
+	}*/
 	
 	
 	/* Constraint (16) */
