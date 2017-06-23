@@ -76,19 +76,21 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
 		}
 	}
 	
+	
+	
 	/* Change objective function */
 	
 	//Change objective coefficient of variabe z_k
 	for(int k = 0; k < K; k++){
 		double coeff = 0.0;
-		CHECKED_CPX_CALL(CPXprechgobj, env, lp, 1, &map.Z[k], &coeff);
+		CHECKED_CPX_CALL(CPXchgobj, env, lp, 1, &map.Z[k], &coeff);
 	}
 	
 	//Change objective coefficient of variabe t_k
 	for(int k = 0; k < K; k++){
 		for(int i = 0; i < N; i++){
 			double coeff = 0.0;
-			CHECKED_CPX_CALL(CPXprechgobj, env, lp, 1, &map.T[k][i], &coeff);
+			CHECKED_CPX_CALL(CPXchgobj, env, lp, 1, &map.T[k][i], &coeff);
 		}
 	}
 	//Change objective coefficients of variable chi_ki only if t_ki
@@ -99,9 +101,16 @@ void setupSP(CEnv env, Prob lp, Instance3BKP instance, mapVar map, VarVal fetche
 				if(oFlag.optimize[delta] && fetched_variables.t[k][i] == 1) //Optimize only with respect to objects that are included
 					coeff = 1.0;
 				
-				CHECKED_CPX_CALL(CPXprechgobj, env, lp, 1, &map.Chi[k][i][delta], &coeff);
+				CHECKED_CPX_CALL(CPXchgobj, env, lp, 1, &map.Chi[k][i][delta], &coeff);
 			}
 		}
+	}
+	//Change objective coefficients of variables sigma_k
+	for(int k = 0; k < K; k++){
+			for(int delta = 0; delta < 3; delta++){
+				double coeff = 0.0;
+				CHECKED_CPX_CALL(CPXchgobj, env, lp, 1, &map.Sigma[k][delta], &coeff);
+			}
 	}
 	
 	/* Set problem to minimum */
