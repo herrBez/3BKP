@@ -1,0 +1,50 @@
+%{
+	/****************
+	 * @brief The aim of this file is to scan a 3BKP/Multi3BKP/SmallHull instance
+	 * and multiply for a factor each dimension (and cost) of the knapsack(s).
+	 * Usage: <main.c> factor < input_instance > output_instance
+	 * @file
+	 * @author Mirko Bez
+	 */
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <stdbool.h>
+	
+	double factor = 1.2;
+	bool start = true;
+	bool isKnapsack = false;
+
+%}
+
+NUM	[0-9]+
+
+%%
+^{NUM}$	{	if(start){
+				isKnapsack=true;
+				start = false;
+			} else {
+				isKnapsack=false;
+			}
+			printf("%s", yytext);
+		}
+
+{NUM}	{
+			if(isKnapsack){
+				printf("%.2lf", (strtol(yytext, NULL, 0)*factor));
+			} else {
+				printf("%s", yytext);
+			}
+		}
+%%
+
+int main(int argc, char * argv[]){
+	if(argc >= 2){
+		factor = strtod(argv[1], NULL);
+	}
+	yylex();
+	return EXIT_SUCCESS;
+}
+
+
+
+
