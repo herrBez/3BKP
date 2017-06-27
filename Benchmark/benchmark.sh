@@ -2,13 +2,13 @@
 
 iteration_per_instance=5
 max_line=$(($iteration_per_instance+1))
-output_directory=TenKnapsacks/
-program=../Multi3BKP/main
-program_type=multi.all
-small_pause=30
-regex=*.dat
+program=../SmallHull/main 
+program_type=small.all
+small_pause=40
+regex=15_*_bigger.dat
 timeout=6300
 
+for output_directory in OneKnapsack FifteenKnapsacks FiveKnapsacks TenKnapsacks; do
 mkdir $output_directory
 for filename in ../MultiInstance/$output_directory/$regex; do
 	
@@ -55,4 +55,5 @@ for filename in ../MultiInstance/$output_directory/$regex; do
 			echo "Sleep $small_pause seconds to cool down processor"
 			sleep $small_pause;
 		done;
+done;
 done;
