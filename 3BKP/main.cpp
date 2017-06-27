@@ -99,9 +99,6 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 		for(int delta = 0; delta < 3; delta++){
 			char xtype = 'C';
 			double obj = 0.0;
-		//	if(optimize[delta]) //If we want to optimize this dimension
-			//	obj = -1.0;
-			
 			double lb = 0.0;
 			double ub = CPX_INFBOUND;
 			snprintf(name, NAME_SIZE, "chi %d %d", i, delta);
@@ -118,7 +115,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map){
 	 */ 
 	for(int j = 0; j < N; j++){
 			char xtype = 'B';
-			double obj = instance.M * (instance.profit[j]/instance.pMin);
+			double obj = instance.profit[j];
 			double lb = 0.0;
 			double ub = 1.0;
 			sprintf(name, "t_%d", j);
@@ -626,9 +623,9 @@ void output(CEnv env, Prob lp, Instance3BKP instance, mapVar map, optionFlag oFl
 			}
 		}
 	}
-	/*
 	
-	sprintf(OUTPUTFILENAME, "output%s_%s", extended?"_extended":"", FILENAME);
+	
+	sprintf(OUTPUTFILENAME, "/tmp/output%s", oFlag.extended?"_extended":"");
 	ofstream outfile(OUTPUTFILENAME);
 	if(!outfile.good()) {
 		cerr << OUTPUTFILENAME << endl;
@@ -639,7 +636,7 @@ void output(CEnv env, Prob lp, Instance3BKP instance, mapVar map, optionFlag oFl
 	outfile << "#Dimensione Zaino " << instance.S[0] << " " << instance.S[1] <<" "<< instance.S[2] << endl; 
 	outfile << "#La prima riga indica le dimensioni dello zaino" << endl;
 	outfile << "#Formato: i pos_i_x pos_i_y pos_i_z rot_dim_i_x rot_dim_i_y rot_dim_i_z" << endl;
-	if(extended)
+	if(oFlag.extended)
 		outfile << "#Le ultime due righe contengono i valori dei lower bounds ed upper bounds" << endl;
 	
 	outfile << instance.S[0] << " " << instance.S[1] << " " << instance.S[2] << endl;
@@ -661,7 +658,7 @@ void output(CEnv env, Prob lp, Instance3BKP instance, mapVar map, optionFlag oFl
 		outfile << endl;
 		
 	}
-	if(extended){
+	if(!oFlag.benchmark && oFlag.extended){
 		outfile << "L " << instance.L[0] << " " << instance.L[1] << " " << instance.L[2] << endl;
 		outfile << "U " << instance.U[0] << " " << instance.U[1] << " " << instance.U[2] << endl;
 	}
@@ -672,8 +669,9 @@ void output(CEnv env, Prob lp, Instance3BKP instance, mapVar map, optionFlag oFl
 		if(t[i] > 0.9)
 			orig_obj += instance.profit[i];
 	}
-	cout << " The original objective function value is " << orig_obj << endl;*/
-}	
+	if(!oFlag.benchmark)
+		cout << "The original objective function value is " << orig_obj << endl;
+}
 
 
 
