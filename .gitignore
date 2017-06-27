@@ -268,3 +268,15 @@ TSWLatexianTemp*
 filename.tex
 
 
+
+# History files
+.Rhistory
+.Rapp.history
+
+# Session Data files
+.RData
+
+
+# Ignore Flex intermediate file lex.yy.c
+lex.yy.c
+
