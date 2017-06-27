@@ -1,5 +1,1 @@
-User.Time, CPU.Time, Objval, Timeout.Reached, No
-, No
-, No
-, No
-, No
+User.Time, CPU.Time, Objval, Timeout.Reached
