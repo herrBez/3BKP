@@ -1,4 +1,4 @@
-User.Time, CPU.Time
+User.Time, CPU.Time, Objval, Timeout.Reached
 867.7434, 6338.4157, 8739.000000, Yes
 873.1557, 6339.7374, 8739.000000, Yes
 871.3401, 6339.1504, 8739.000000, Yes

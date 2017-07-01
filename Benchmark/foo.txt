@@ -1,0 +1,17 @@
+\documentclass{scrartcl}
+\begin{document}
+\begin{table}[h!]
+\begin{center}
+\small
+\begin{tabular}{| c | c | c | c | c | c | c | c | c | c |}
+\hline
+inst. & done & AUT & CU & ACT & max & min & CV-T & ObjV & CV-O \\
+\hline
+\verb|20_3_bigger| & 0 / 5 & 17.6407 & 5.9946 & 105.7488 & 105.7683 & 105.7162 & 0.0192 & 5639.40 & 0.23\\ 
+\hline
+\end{tabular}
+\caption{:}
+\label{table:}
+\end{center}
+\end{table}
+\end{document}

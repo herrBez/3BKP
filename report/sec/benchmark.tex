@@ -1,12 +1,13 @@
 \section{Performance}
+\label{sec:benchmark}
 Per testare le performance del modello proposto in Baldi et. 
 al~\cite{Baldi20129802} e le estensioni fornite
 in questo documento sono state generate varie istanze casuali.
 Per motivi di tempo non sono stati considerati i Balancing Constraints. 
 
-Con uno script python \path{instance_generator.py} sono state create varie
-istanze casuali cinque per ogni 
-combinazione di $k = \{1,5,10,15\}$ e $j = \{10,20,30,40\}$. 
+Con uno script python \path{instance_generator.py}, sono state create varie
+istanze casuali: cinque per ogni 
+combinazione di $k = \{1,5,10,15\}$ e $j = \{10,15,20,30,40\}$. 
 
 Il computer usato per le simulazioni ha 8GB di RAM (DDR3) un processore 
 Intel(R) Core(TM) i7-3610QM CPU @ 2.30GHz del 2012~\cite{cpu}.
@@ -33,7 +34,7 @@ All'inizio del file possono essere specificati i seguenti parametri:
 \item suffisso da dare ai file \verb|.csv| generati dal programma
 \item timeout. Qui è stato usato come timeout 6300 secondi di cpu. Questo valore
 è stato ottenuto moltiplicando 15 minuti per 7, che sembrava essere
-circa il parallelismo che riusciva a raggiungere CPLEX nei primi file.
+circa il parallelismo che riusciva a raggiungere CPLEX nei primi esempi eseguiti.
 \end{itemize}
 
 I risultati dei benchmark grezzi possono essere trovati nella cartella 
@@ -42,15 +43,11 @@ Il significato delle varie colonne è riportato nella Tabella \ref{table:descrip
 
 Purtroppo per le istanze in cui si è raggiunto il timeout non si hanno dati
 sulla soluzione ottima e quindi non si possono 
-fare stime sul livello di accuratezza delle soluzioni incombenti. Sarebbe
-interessante misurare la distanza tra la soluzione ottima
-e quelle incombenti, ma per motivi di tempo non sono riuscito a calcolarle.
-Viene quindi solo riportata il coefficiente di variazione per gli
+fare stime sul livello di accuratezza delle soluzioni incombenti.
+Viene quindi solo riportato il coefficiente di variazione per gli
 objective values. Naturalmente 
 per i problemi risolti sempre con successo questo coefficiente è pari a $0$.
 
-\subsection{Descrizione della tabella}
-In ogni tabella sono presenti 10 colonne.
 \begin{table}
 \centering
 \small
@@ -59,7 +56,7 @@ In ogni tabella sono presenti 10 colonne.
 Abbreviazione & Descrizione \\
 \hline
 inst. & Nome dell'istanza \\
-compl. & Numero di esecuzioni completate con successo prima del timeout\\
+done & Numero di esecuzioni completate con successo prima del timeout\\
 AUT & Average user time in minuti \\
 ACT & Average computer time in minuti\\
 CU  & CPU usage: numero di cpu usate in media per eseguire l'istanza. \\
@@ -67,7 +64,7 @@ CU  & CPU usage: numero di cpu usate in media per eseguire l'istanza. \\
 max & Max cpu time \\
 min & Min cpu time \\
 CV-T & coefficiente di variazione per il cpu-time \\
-ObjV & media del valore della funzione obiettivo. Nel caso di soluzioni ottime corrisponde\\
+ObjV & media del valore della funzione obiettivo. Nel caso di soluzioni ottime \\
 	& corrisponde al risultato della soluzione ottima.\\
 CV-O & coefficiente di variazioni per i valori della funzione obiettivo. In caso \\
 & di solo soluzioni ottime questo valore è $0$. \\
@@ -77,124 +74,7 @@ CV-O & coefficiente di variazioni per i valori della funzione obiettivo. In caso
 di benchmark.}
 \label{table:description}
 \end{table}
-
-\subsection{5 Zaini}
-
-Le analisi per le istanze con $5$ zaini vengono riportate nelle tabelle
-\ref{table:multi:5} e \ref{table:hull:5}.
-
-\begin{table}[h!]
-\begin{center}
-\small
-\begin{tabular}{| c | c | c | c | c | c | c | c | c | c |}
-\hline
-inst. & done & AUT & CU & ACT & max & min & CV-T & ObjV & CV-O \\
-\hline
-\verb|10_1| & 5 / 5 & 0.0258 & 5.0139 & 0.1295 & 0.1309 & 0.1269 & 1.1987 & 751.00 & 0.00\\ 
-\verb|10_2| & 5 / 5 & 0.0243 & 5.0885 & 0.1235 & 0.1273 & 0.1198 & 2.1670 & 405.00 & 0.00\\ 
-\verb|10_3| & 5 / 5 & 0.0101 & 3.4377 & 0.0348 & 0.0353 & 0.0340 & 1.5021 & 2097.00 & 0.00\\ 
-\verb|10_4| & 5 / 5 & 0.0026 & 1.9404 & 0.0051 & 0.0065 & 0.0037 & 19.4727 & 1110.00 & 0.00\\ 
-\verb|10_5| & 5 / 5 & 0.0143 & 4.4032 & 0.0632 & 0.0650 & 0.0621 & 1.8000 & 1038.00 & 0.00\\ 
-\verb|20_1| & 0 / 5 & 14.4942 & 7.3164 & 106.0454 & 106.0757 & 106.0293 & 0.0172 & 1384.00 & 0.00\\ 
-\verb|20_2| & 5 / 5 & 4.5096 & 6.3234 & 28.5159 & 28.8547 & 28.2609 & 0.7570 & 1928.00 & 0.00\\ 
-\verb|20_3| & 0 / 5 & 14.3237 & 7.3976 & 105.9612 & 105.9938 & 105.9425 & 0.0182 & 1615.00 & 0.00\\ 
-\verb|20_4| & 0 / 5 & 14.2652 & 7.4228 & 105.8871 & 105.9240 & 105.8327 & 0.0317 & 1749.00 & 0.00\\ 
-\verb|20_5| & 0 / 5 & 14.3670 & 7.3718 & 105.9113 & 105.9264 & 105.9022 & 0.0100 & 1214.00 & 2.33\\ 
-\verb|30_1| & 0 / 5 & 14.9684 & 7.0659 & 105.7655 & 105.8104 & 105.7266 & 0.0324 & 2742.00 & 0.00\\ 
-\verb|30_2| & 0 / 5 & 15.3183 & 6.9060 & 105.7878 & 105.8425 & 105.7005 & 0.0534 & 3586.00 & 0.00\\ 
-\verb|30_3| & 0 / 5 & 14.6727 & 7.2435 & 106.2811 & 106.3591 & 106.1745 & 0.0733 & 2936.20 & 1.62\\ 
-\verb|30_4| & 0 / 5 & 14.8508 & 7.1367 & 105.9864 & 106.0274 & 105.9317 & 0.0333 & 2334.00 & 0.00\\ 
-\verb|30_5| & 0 / 5 & 15.3005 & 6.9274 & 105.9925 & 106.0134 & 105.9551 & 0.0211 & 3033.00 & 0.00\\ 
-\verb|40_1| & 0 / 5 & 15.4012 & 6.8799 & 105.9582 & 106.0244 & 105.8685 & 0.0583 & 2981.00 & 0.00\\ 
-\verb|40_2| & 0 / 5 & 15.8970 & 6.6490 & 105.6989 & 105.7507 & 105.6621 & 0.0361 & 2896.80 & 2.60\\ 
-\verb|40_3| & 0 / 5 & 16.7509 & 6.3392 & 106.1880 & 106.2455 & 106.0961 & 0.0546 & 3925.00 & 0.00\\ 
-\verb|40_4| & 0 / 5 & 16.7558 & 6.2921 & 105.4287 & 105.4462 & 105.4010 & 0.0175 & 3287.40 & 2.07\\ 
-\verb|40_5| & 0 / 5 & 15.9545 & 6.6432 & 105.9890 & 106.0273 & 105.9418 & 0.0289 & 3067.00 & 0.00\\ 
-\hline
-\end{tabular}
-\caption{$K = 5$ --- Multi3BKP}
-\label{table:multi:5}
-\end{center}
-\end{table}
-
-\subsection{10 Zaini}
-Le analisi per le istanze con $10$ zaini vengono riportate nelle tabelle
-\ref{table:multi:10} e \ref{table:hull:10}.
-
-\begin{table}[h!]
-\begin{center}
-\small
-\begin{tabular}{| c | c | c | c | c | c | c | c | c | c |}
-\hline
-inst. & done & AUT & CU & ACT & max & min & CV-T & ObjV & CV-O \\
-\hline
-\verb|10_1| & 5 / 5 & 0.0336 & 4.6955 & 0.1577 & 0.1595 & 0.1565 & 0.7058 & 1024.00 & 0.00\\ 
-\verb|10_2| & 5 / 5 & 0.0739 & 4.9343 & 0.3644 & 0.3781 & 0.3584 & 2.1855 & 608.00 & 0.00\\ 
-\verb|10_3| & 5 / 5 & 0.0208 & 4.0499 & 0.0841 & 0.0857 & 0.0821 & 1.5976 & 900.00 & 0.00\\ 
-\verb|10_4| & 5 / 5 & 0.0053 & 2.0631 & 0.0109 & 0.0115 & 0.0104 & 3.6076 & 1387.00 & 0.00\\ 
-\verb|10_5| & 5 / 5 & 0.0871 & 5.3035 & 0.4620 & 0.4738 & 0.4549 & 1.5970 & 1044.00 & 0.00\\ 
-\verb|20_1| & 5 / 5 & 15.2880 & 6.5556 & 100.2216 & 101.1052 & 98.9846 & 0.8900 & 2086.00 & 0.00\\ 
-\verb|20_2| & 0 / 5 & 14.4320 & 7.3250 & 105.7138 & 105.7269 & 105.7065 & 0.0074 & 1718.20 & 0.68\\ 
-\verb|20_3| & 0 / 5 & 14.6367 & 7.2252 & 105.7527 & 105.7803 & 105.7349 & 0.0162 & 1606.00 & 3.66\\ 
-\verb|20_4| & 5 / 5 & 4.0921 & 6.8390 & 27.9855 & 28.5023 & 27.5481 & 1.3095 & 3519.00 & 0.00\\ 
-\verb|20_5| & 0 / 5 & 15.1233 & 7.0087 & 105.9948 & 106.0309 & 105.9698 & 0.0217 & 2558.00 & 0.00\\ 
-\verb|30_1| & 0 / 5 & 15.2810 & 6.8983 & 105.4118 & 105.4296 & 105.3920 & 0.0127 & 2979.40 & 0.71\\ 
-\verb|30_2| & 0 / 5 & 19.5789 & 5.4006 & 105.7384 & 105.7649 & 105.7115 & 0.0234 & 3326.00 & 0.00\\ 
-\verb|30_3| & 0 / 5 & 15.2605 & 6.9414 & 105.9295 & 105.9673 & 105.8958 & 0.0280 & 2445.00 & 0.00\\ 
-\verb|30_4| & 0 / 5 & 15.7287 & 6.7182 & 105.6680 & 105.6990 & 105.6374 & 0.0241 & 2926.20 & 4.41\\ 
-\verb|30_5| & 0 / 5 & 18.4636 & 5.7235 & 105.6757 & 105.8217 & 105.5719 & 0.1060 & 2814.00 & 0.00\\ 
-\verb|40_1| & 0 / 5 & 18.8507 & 5.6029 & 105.6188 & 105.6868 & 105.4996 & 0.0751 & 3436.80 & 9.55\\ 
-\verb|40_2| & 0 / 5 & 20.2018 & 5.2268 & 105.5910 & 105.6247 & 105.5130 & 0.0426 & 2524.00 & 0.00\\ 
-\verb|40_3| & 0 / 5 & 17.8017 & 5.9284 & 105.5352 & 105.5859 & 105.4521 & 0.0471 & 4213.00 & 0.00\\ 
-\verb|40_4| & 0 / 5 & 19.7702 & 5.3351 & 105.4765 & 105.5484 & 105.3628 & 0.0756 & 3091.00 & 0.00\\ 
-\verb|40_5| & 0 / 5 & 17.1303 & 6.1639 & 105.5893 & 105.6372 & 105.4978 & 0.0525 & 3271.00 & 0.00\\ 
-\hline
-\end{tabular}
-\caption{$K = 10$ --- Multi3BKP}
-\label{table:multi:10}
-\end{center}
-\end{table}
-
-\subsection{15 Zaini}
-
-Le analisi per le istanze con $15$ zaini vengono riportate nelle tabelle
-\ref{table:multi:15} e \ref{table:hull:15}.
-
-
-\begin{table}[h!]
-\begin{center}
-\small
-\begin{tabular}{| c | c | c | c | c | c | c | c | c | c |}
-\hline
-Inst. & Compl. & AUT & CU & ACT & max & min & CV-T & ObjV & CV-O \\
-\hline
-\verb|10_1| & 5 / 5 & 0.0274 & 3.3608 & 0.0922 & 0.0989 & 0.0884 & 4.3444 & 1370.00 & 0.00\\ 
-\verb|10_2| & 5 / 5 & 0.0103 & 2.4119 & 0.0247 & 0.0290 & 0.0225 & 10.3083 & 1668.00 & 0.00\\ 
-\verb|10_3| & 5 / 5 & 0.0196 & 3.7409 & 0.0735 & 0.0759 & 0.0705 & 2.6602 & 1104.00 & 0.00\\ 
-\verb|10_4| & 5 / 5 & 0.1513 & 5.4620 & 0.8264 & 0.8308 & 0.8216 & 0.4606 & 1226.00 & 0.00\\ 
-\verb|10_5| & 5 / 5 & 0.0177 & 3.2744 & 0.0581 & 0.0606 & 0.0549 & 4.3044 & 1512.00 & 0.00\\ 
-\verb|20_1| & 0 / 5 & 16.0912 & 6.9548 & 111.9108 & 121.0174 & 105.8202 & 7.4255 & 2454.00 & 0.00\\ 
-\verb|20_2| & 0 / 5 & 16.5143 & 6.3963 & 105.6305 & 105.6581 & 105.6203 & 0.0149 & 2144.00 & 0.00\\ 
-\verb|20_3| & 0 / 5 & 15.0028 & 7.0641 & 105.9810 & 106.1126 & 105.9059 & 0.0773 & 3001.00 & 0.00\\ 
-\verb|20_4| & 0 / 5 & 15.1309 & 7.0066 & 106.0155 & 106.0362 & 105.9940 & 0.0158 & 1469.00 & 0.00\\ 
-\verb|20_5| & 0 / 5 & 15.3664 & 6.8822 & 105.7544 & 105.7779 & 105.7350 & 0.0177 & 1606.00 & 0.00\\ 
-\verb|30_1| & 0 / 5 & 16.6060 & 6.6281 & 110.0666 & 117.1187 & 105.3622 & 5.8486 & 2174.80 & 0.33\\ 
-\verb|30_2| & 0 / 5 & 17.2941 & 6.1007 & 105.5053 & 105.5180 & 105.4947 & 0.0085 & 2667.60 & 2.55\\ 
-\verb|30_3| & 0 / 5 & 16.6564 & 6.3292 & 105.4216 & 105.4249 & 105.4193 & 0.0022 & 2264.00 & 0.00\\ 
-\verb|30_4| & 0 / 5 & 17.8652 & 6.5670 & 117.3200 & 117.3902 & 117.2509 & 0.0443 & 2265.00 & 0.00\\ 
-\verb|30_5| & 0 / 5 & 20.0436 & 5.8523 & 117.3005 & 117.3528 & 117.2390 & 0.0377 & 2806.20 & 0.84\\ 
-\verb|40_1| & 0 / 5 & 22.4948 & 5.2039 & 117.0611 & 117.0770 & 117.0522 & 0.0086 & 3339.00 & 2.48\\ 
-\verb|40_2| & 0 / 5 & 21.0422 & 5.5732 & 117.2715 & 117.2845 & 117.2535 & 0.0099 & 3461.20 & 0.47\\ 
-\verb|40_3| & 0 / 5 & 22.5891 & 5.1755 & 116.9096 & 116.9824 & 116.8894 & 0.0348 & 2706.80 & 0.48\\ 
-\verb|40_4| & 0 / 5 & 20.2110 & 5.7857 & 116.9348 & 117.0042 & 116.9164 & 0.0332 & 3736.00 & 0.00\\ 
-\verb|40_5| & 0 / 5 & 19.9309 & 5.8681 & 116.9571 & 117.0181 & 116.9200 & 0.0392 & 2994.00 & 0.00\\ 
-\hline
-\end{tabular}
-\caption{$K = 15$ --- Multi3BKP}
-\label{table:multi:15}
-\end{center}
-\end{table}
-
+I risultati possono essere consultati nell'appendice \ref{sec:appendix}.
 
 \subsection{Risultati}
 Generalmente il programma Multi3BKP risulta essere molto più veloce sulle 
@@ -212,6 +92,7 @@ in esame.
 
 
 \subsection{Problema Accessorio}
+\label{sec:benchmark:accessorio}
 Questa Sezione ha il solo scopo di fornire dei dati per supportare l'affermazione
 fatta nella Sezione \ref{sec:multi:problemaAcessorio}, ovvero che c'è una 
 differenza  considerevole di tempo necessario e qualità della soluzione se 
@@ -225,6 +106,19 @@ I risultati si possono trovare nella Tabella \ref{table:accessorio:res}.
 I pochi dati forniti mostrano chiaramente che fissando le variabili $b$ del problema
 il tempo richiesto per risolverlo cresce notevolmente. Ma al contempo la qualità
 delle soluzioni cresce considerevolmente.
+
+Per motivi di spazio nella Tabella \ref{table:accessorio:res} il problema con
+le variabile \emph{fissate} è stato abbreviato con F, mentre quello con le
+variabili \emph{non fissate} è stato abbreviato con NF.
+SOV indica lo start objective
+value, ovvero il valore di partenza della somma delle $\chi$ prima di risolvere
+il problema accessorio.
+Di seguito vengono riportati l'objective value di F e l'objective value di NF 
+O-Impr indica la percentuale di miglioramento nell'objective value risolvendo
+il problema NF invece che F. 
+ACT F e ACT NF indicano l'average CPU time del problema per il problema F
+e il problema NF. Infine Diff indica quanto tempo
+in più (in percentuale) ci ha messo NF rispetto a F.
 
 
 \begin{table}[h!]
@@ -240,7 +134,7 @@ inst.			& SOV	& OF				& ONF 				& O-Impr. 	& ACT F 	& ACT NF 		& Diff \\
 
 \hline
 \end{tabular}
-\caption{Risultati per il problema accessorio}
+\caption{Risultati per il problema accessorio.}
 \label{table:accessorio:res}
 \end{center}
 \end{table}

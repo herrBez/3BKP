@@ -15,18 +15,14 @@ directory <- args[2]
 
 regex <- args[3] #".main\\.all\\.csv$"
 
-cat(sprintf("%s\n%s\n",
-			regex,
-			"\\.multi\\.all\\.E\\.csv$"
-	)
-)
+
 #mydata = read.csv(args[1], header=TRUE, sep=",")
 filenames <- list.files(directory, pattern=regex, full.names=TRUE)
 
 con <- file(args[1], "w")
 cat(
 	sprintf("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
-		"\\documentclass{article}",
+		"\\documentclass{scrartcl}",
 		"\\begin{document}",
 		"\\begin{table}[h!]",
 		"\\begin{center}",
@@ -41,6 +37,7 @@ cat(
 	
 
 ldf <- lapply(filenames, function(i){
+	print(cat("READ", i, "\n"));
 	mydata<-read.csv(i, header=TRUE, skip=",")
 	if(length(mydata$CPU.Time) > 0){
 		print(length(mydata$Timeout.Reached[mydata$Timeout.Reached == "Yes"]))

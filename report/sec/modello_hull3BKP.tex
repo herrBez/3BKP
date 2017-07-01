@@ -7,7 +7,7 @@ minime che gli zaini devono avere, affinché possano contenere tutti gli oggetti
 
 \subsection{Modello}
 Il modello differisce di poco dal modello fornito nella
-Sezione \ref{sec:modello:Multi3BKP}, quindi vengono elencate soltanto le 
+Sezione \ref{sec:modello:multi3BKP}, quindi vengono elencate soltanto le 
 differenze:
 \begin{itemize}
 	\item $S_k^\delta$ definisce l'upper bound della lunghezza dello zaino $k$ 
@@ -20,12 +20,12 @@ differenze:
 	tutti gli oggetti $J$ è sufficiente	mettere in input uno zaino solo e 
 	fissare gli upper bound a valori molto alti. 
 	
-	\item Al posto della variabile $\rho_{ir}$ qui viene definita una variabile
-	che itera anche tra gli zaini: $\rho_{kir}$. 
-	Se si mantiene la $\rho$ su due dimensioni e si utilizza il vincolo 
-	(\ref{eq:constraint:rho:ir:leq:sumk}) si creano dei vincoli che fanno sì 
-	che tutti gli oggetti debbano essere più piccoli di ogni zaino,
-	come spiegato nella sezione \ref{sec:extension2:Note}.
+%	\item Al posto della variabile $\rho_{ir}$ qui viene definita una variabile
+%	che itera anche tra gli zaini: $\rho_{kir}$. 
+%	Se si mantiene la $\rho$ su due dimensioni e si utilizza il vincolo 
+%	(\ref{eq:constraint:rho:ir:leq:sumk}) si creano dei vincoli che fanno sì 
+%	che tutti gli oggetti debbano essere più piccoli di ogni zaino,
+%	come spiegato nella sezione \ref{sec:extension2:Note}.
 \end{itemize}
 \subsubsection{Funzione obiettivo}
 Lo scopo è quello di minimizzare il volume degli zaini restando nei limiti 
@@ -40,8 +40,10 @@ diminuire il numero di zaini inclusi nella soluzione è stata preferita la
 seguente funzione obiettivo:
 \begin{equation}
 \text{ min } \sum_{k \in K} \sum_{\delta \in \Delta} \sigma_k^\delta 
-+ \sum_{k \in K} z_k
++ \sum_{k \in K} E^3 z_k
 \end{equation}
+dove $E = max(S_k^\delta : k \in K, \delta \in \Delta) + 1$.
+
 \subsubsection{Vincoli}
 
 \begin{flalign}
@@ -71,7 +73,6 @@ t_{kj} \leq z_k && k \in K, j \in J \\
 %
 \label{2:constraint:multi:onlyInOneKnapsack}
 \sum_{k \in K} t_{kj} = 1 && j \in J \\
-\nonumber
 %
 \label{sigma_kdelta:leq:Skdelta}
 \sigma_k^\delta \leq S_k^\delta z_k && \forall k \in K, \forall \delta \in \Delta \\
@@ -98,11 +99,6 @@ z_k \in \{0,1\} && k \in K \\
 Vengono qui elencate brevemente le differenze con il modello descritto nella 
 Sezione \ref{sec:extension1} e spiegate le motivazioni delle modifiche.
 \begin{itemize}
-\item Avendo esteso $\rho$ su tre dimensioni tutti i vincoli 
-((\ref{eq:rho:kir:leq:sigmakdelta}), (\ref{eq:rho:kir:leq:precedenceA}), 
-(\ref{eq:rho:kir:leq:precedenceB}), (\ref{eq:rho:kir:sumofallrotation:tki})) che
-coinvolgono questa variabile devono essere modificati tenendo in considerazione
-anche l'indice $k$.
 
 \item Siccome il volume degli zaini in questo modello è dato dalla 
 moltiplicazione di variabili, il vincolo
@@ -144,44 +140,44 @@ che vengono codificati nei due vincoli
 La dimensione viene qui definita come differenza rispetto a quella calcolata in
 \ref{sec:orig:dimensioneDelProblema}.
 
-Siccome si aggiungono le variabili $\sigma_k^\delta$ e le variabili $\rho_{kir}$
-al posto delle variabili $\rho_{ir}$ il numero di variabili aumenta di:
-\begin{itemize}
-	\item $|K|\cdot|\Delta|$ unità per $\sigma_k^\delta$
-	
-	\item $6(|K|-1)\cdot |J|$ per $\rho_{kir}$
-\end{itemize} 
+Siccome si aggiungono le variabili $\sigma_k^\delta$, 
+il numero di variabili aumenta di:
+$$
+|K|\cdot|\Delta| \text{ unità per } \sigma_k^\delta
+$$
 
 Portando ad un numero approssimato usando l'assunzione $|K| < |J|$:
 $$
-3|J|^3 + 10|J|^2 + 4|J| 
+3|J|^3 + 4|J|^2 + 10|J|
 $$
 
 
 I vincoli decrescono di $|K|$ perché rimuoviamo il vincolo
 (\ref{eq:constraint:volume}). E aumentano di $2 \cdot |K|\cdot|\Delta|$ per via
-della definizione dei domini delle variabili $\sigma_k^\delta$ 
-(i vincoli (\ref{sigma_kdelta:leq:Skdelta}) e (\ref{sigma_kdelta:geq:0})) e 
-di $(|K|-1) |J|$ per via dei vincoli (\ref{eq:rho:kir:sumofallrotation:tki}).
+della definizione del dominio delle variabili $\sigma_k^\delta$
+(i vincoli (\ref{sigma_kdelta:leq:Skdelta}) e (\ref{sigma_kdelta:geq:0})).
 
 In totale
 $$
-\frac{19}{2} |J|^3 + \frac{21}{2} |J|^2 + 10|J|
+\frac{19}{2}|J|^3 + \frac{15}{2}|J|^2 + 16|J|
 $$
 
 
-Visto che le differenze avvengono solo al livello di grado $1$ e $2$ la
-dimensione asintotica delle variabili e dei vincoli è la stessa, tuttavia il
+Visto che le differenze avvengono solo al livello di grado $1$, la
+dimensione asintotica delle variabili e dei vincoli è la stessa.
+\huge Add breve riferimento ai risultati\normalsize
+, tuttavia il
 secondo problema richiede molto più tempo per essere risolto soprattutto al
 crescere di $K$ visto che deve determinare il valore di un numero di variabili
-sensibilmente maggiore.
+maggiore. Dati concreti a supporto di questa affermazioni sono forniti nella 
+Sezione~\ref{sec:benchmark}.
 
 
 \subsection{Problema Accessorio}
 
 Il problema accessorio è esattamente lo stesso di quello di capitolo 
-\ref{sec:orig:problemaAcessorio} ma bisogna fissare anche le variabili
-$\sigma_k^\delta$ e $\rho_{kir}$.
+\ref{sec:multi:problemaAcessorio} ma bisogna fissare anche le variabili
+$\sigma_k^\delta$.
 
 
 

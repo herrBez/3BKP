@@ -1,14 +1,15 @@
 \section{Come eseguire il programma}
 \subsection{Compilazione}
-La cartella \verb|Multi3BKP| contiene l'implementazione del primo modello, 
-mentre \verb|Hull3BKP| contiene l'implementazione del problema alternativo.
+La cartella \verb|3BKP| contiene un'implementazione del modello del paper originale.
+\verb|Multi3BKP| contiene l'implementazione della prima estensione, 
+mentre \verb|Hull3BKP| contiene l'implementazione della seconda estensione.
 Per compilare è sufficiente utilizzare il \verb|Makefile| contenuto nella 
 rispettiva cartella.
 
 
 \subsection{File di Input}
-Per comodità entrambi i programmi utilizzano lo stesso file di input, anche se 
-non tutti i parametri vengono utilizzati in tutti e due i programmi.
+Per comodità tutti e tre i programmi utilizzano lo stesso file di input, anche se 
+non tutti i parametri vengono utilizzati in tutti i programmi.
 \begin{itemize}
 	\item $K$, il numero di zaini
 	\item Seguono $K$ righe contenente nella riga $k$ i dati per lo zaino $k$ 
@@ -77,10 +78,10 @@ Il programma genera un file di output così costituito:
 Per visualizzare il file di output ed agevolare le fasi di verifica e 
 validazione del modello è stato implementato un programma che rappresenta gli 
 zaini e gli oggetti selezionati nello spazio, utilizzando la libreria grafica 
-\verb|webgl|\footnote{\url{https://www.khronos.org/webgl/}}.
+\verb|WebGL| (\url{https://www.khronos.org/webgl/}).
 
 \subsection{Documentazione}
 La documentazione del codice può essere generata utilizzando il programma 
-\verb|doxygen|\footnote{\url{https://github.com/doxygen/doxygen}} 
+\verb|doxygen| (\url{https://github.com/doxygen/doxygen})
 all'interno delle rispettive cartelle.
 

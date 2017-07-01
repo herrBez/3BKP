@@ -2,12 +2,18 @@
 \label{sec:Balancing:Constraint}
 È stata anche considerata la possibilità di estendere i balancing constraint 
 del paper originale:
+\newcounter{tmp}
+\setcounter{tmp}{\value{equation}}
+\setcounter{equation}{13}
 \begin{equation}
+\label{eq:orig:balancing1}
 \sum_{i \in J} m_i \chi_{i}^\delta + \sum_{i \in J}\sum_{r \in R} m_i \gamma_{ir}^\delta \rho_{ir} \geq L^\delta \sum_{i \in J} m_i t_i \quad\quad \delta \in \Delta
 \end{equation}
 \begin{equation}
+\label{eq:orig:balancing2}
 \sum_{i \in J} m_i \chi_{i}^\delta + \sum_{i \in J}\sum_{r \in R} m_i \gamma_{ir}^\delta \rho_{ir} \leq U^\delta \sum_{i \in J} m_i t_i \quad\quad \delta \in \Delta
 \end{equation}
+\setcounter{equation}{\value{tmp}}
 dove 
 \begin{itemize}
 	\item $\gamma_{ir}^\delta$ è la coordinata del centro di massa dell'oggetto 

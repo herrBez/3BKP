@@ -3,7 +3,7 @@
 Nello sviluppo di questo lavoro sono stati riscontrati alcuni refusi nel paper 
 di Baldi et al. \cite{Baldi20129802}.
 \begin{itemize}
-	\item Nel vincolo (10) di \cite{Baldi20129802} c'è un errore di stampa che 
+	\item Nel vincolo (\ref{eq:orig:error:10}) di \cite{Baldi20129802} c'è un errore di stampa che 
 	causa in alcune istanze del problema
 	la sovrapposizione di oggetti all'interno dello zaino:
 	$$
@@ -16,11 +16,14 @@ di Baldi et al. \cite{Baldi20129802}.
 	Infatti sostituendo la prima equazione con la seconda, tutte le 
 	sovrapposizioni tra gli oggetti scompaiono.
 	
-	\item Il vincolo (8) unito al vincolo (16) di \cite{Baldi20129802}, 
+	\item Il vincolo (\ref{eq:orig:chi+s_ir:leq:SdeltaK}) unito al vincolo 
+	(\ref{eq:orig:constraint:rho:ir:leq:sumk})
+	di \cite{Baldi20129802}, 
 	fanno sì che, qualora si inserisca nell'insieme $J$ un oggetto che non abbia
 	abbastanza spazio all'interno dello zaino, il modello sia inammissibile.
-	Per ovviare a questo problema si può modificare il vincolo (16) di
-	\cite{Baldi20129802} nel modo seguente:
+	Per ovviare a questo problema si può modificare il vincolo 
+	(\ref{eq:orig:constraint:rho:ir:leq:sumk}) 
+	di \cite{Baldi20129802} nel modo seguente:
 	$$
 	\sum_{r \in R} \rho_{ir} = \color{red}\mathbf{t_i}
 	$$
@@ -33,7 +36,10 @@ di Baldi et al. \cite{Baldi20129802}.
 	prima di istanziare il modello.
 	La prima soluzione è stata preferita alla seconda perché si prestava meglio
 	alle estensioni mostrate in questo documento.
-	\item Il vincolo (12) e (13) di \cite{Baldi20129802} sono ridondanti, 
-	infatti ogni vincolo in (12) ha un corrispettivo in (13). L'unica differenza
+	\item Il vincolo (\ref{eq:orig:constraint:bij:leq:ti}) e 
+	(\ref{eq:orig:constraint:bji:leq:tj}) di \cite{Baldi20129802} sono ridondanti, 
+	infatti ogni vincolo in (\ref{eq:orig:constraint:bij:leq:ti}) ha un 
+	corrispettivo in (\ref{eq:orig:constraint:bji:leq:tj}). L'unica differenza
 	è che i vincoli vengono elencati in due maniere diverse. 
 \end{itemize}
+

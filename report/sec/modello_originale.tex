@@ -3,7 +3,9 @@
 
 Viene qui riportato il modello originale descritto in Baldi et al. 
 \cite{Baldi20129802}
-con gli aggiustamenti motivati nella sezione sui refusi~\ref{sec:refusi}.
+con gli aggiustamenti motivati nella Sezione~\ref{sec:refusi}.
+Per ora vengono ignorati i modelli di bilanciamento che verranno discussi
+nella Sezione \ref{sec:Balancing:Constraint}.
 
 
 
@@ -23,7 +25,7 @@ limiti dello zaino.
 \begin{itemize}
 	\item $J$ è l'insieme degli oggetti -- di cardinalità $n$ -- cui sono 
 	associati gli indici $i$ e $j$;
-	\item $\Delta$ l'insieme delle dimensioni $\{0,1,2\}$ con l'indice associato
+	\item $\Delta$ è l'insieme delle dimensioni $\{0,1,2\}$ con l'indice associato
 	$\delta$;
 	\item $R$ è l'insieme delle possibili rotazioni degli oggetti, ha 
 	cardinalità $6$ e indice $r$;
@@ -55,20 +57,25 @@ limiti dello zaino.
 %
 \sum_{\delta\in\Delta}(b_{ij}^\delta + b_{ji}^\delta) \geq t_{i} + t_{j} - 1 &&  i < j,\ i \in J,\ j \in J \\
 %
-\label{eq:orig:constraint:coodinateLessThanSkdelta}
+\label{eq:orig:chi+s_ir:leq:SdeltaK}
 \chi_{i}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{ir} \leq S^\delta && i \in J,\ \delta \in \Delta \\
 %
 \chi_{i}^\delta + \sum_{r \in R} s_{ir}^\delta \rho_{ir} \leq \chi_{j}^\delta + M(1 - b_{ij}^\delta) &&  i < j,\ i \in J, j \in J, \delta \in \Delta \\
 %
+\label{eq:orig:error:10}
 \chi_{j}^\delta + \sum_{r \in R} s_{jr}^\delta \rho_{jr} \leq \chi_{i}^\delta + M(1 - b_{ji}^\delta) && i < j,\ i \in J, j \in J, \delta \in \Delta \\
 %
 \chi_{i}^\delta \leq M t_{i} &&  i \in J, \delta \in \Delta \\
 %
+\label{eq:orig:constraint:bij:leq:ti}
 b_{ij}^\delta \leq t_{i} && i \in J, j \in J, \delta \in \Delta \\
 %
+\label{eq:orig:constraint:bji:leq:tj}
 b_{ji}^\delta \leq t_{j} && i \in J, j \in J, \delta \in \Delta \\
 %
-\label{eq:constraint:rho:ir:leq:sumk}
+\setcounter{equation}{15}
+%
+\label{eq:orig:constraint:rho:ir:leq:sumk}
 \sum_{r \in R} \rho_{ir} = 1 && i \in J \\
 %
 \chi_{i}^\delta \geq 0 && i \in J, \delta \in \Delta \\
@@ -81,4 +88,15 @@ b_{ij}^\delta \in \{0,1\} && i \in J, j \in J, \delta \in \Delta \\
 \nonumber
 \end{flalign}
 
+\subsection{Nota}
+\begin{itemize}
+\item Per rendere la lettura di questo documento più facile e i riferimenti al 
+modello
+del paper originario più semplici (soprattutto nella sezione \ref{sec:refusi}),
+si è preferito usare la stessa numerazione di Baldi et al.~\cite{Baldi20129802}.
+\item I vincoli \ref{eq:orig:balancing1} e \ref{eq:orig:balancing2}
+ ovvero i vincoli di bilanciamento, vengono qui 
+ignorati deliberatamente. Verranno brevemente discussi
+nella sezione~\ref{sec:Balancing:Constraint}.
 
+\end{itemize}

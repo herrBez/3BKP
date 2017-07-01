@@ -2,13 +2,14 @@
 
 iteration_per_instance=5
 max_line=$(($iteration_per_instance+1))
-program=../SmallHull/main 
-program_type=small.all
-small_pause=40
-regex=15_*_bigger.dat
+program=../3BKP/main 
+program_type=orig.all
+small_pause=10
+regex=15_?.dat
 timeout=6300
 
-for output_directory in OneKnapsack FifteenKnapsacks FiveKnapsacks TenKnapsacks; do
+for output_directory in OneKnapsack FifteenKnapsacks FiveKnapsacks TenKnapsacks 
+do
 mkdir $output_directory
 for filename in ../MultiInstance/$output_directory/$regex; do
 	
