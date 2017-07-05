@@ -109,7 +109,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map, opt
 	 */
 	 for(int k = 0; k < K; k++){
 		char xtype = 'B';
-		double obj = instance.E*instance.E*instance.E;
+		double obj = instance.E+instance.E+instance.E;
 		double lb = 0.0;
 		double ub = 1.0;
 		sprintf(name, "z %d", k);

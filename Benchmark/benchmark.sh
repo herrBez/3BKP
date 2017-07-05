@@ -2,10 +2,10 @@
 
 iteration_per_instance=5
 max_line=$(($iteration_per_instance+1))
-program=../3BKP/main 
-program_type=orig.all
+program=../SmallHull/main 
+program_type=small.all.def
 small_pause=10
-regex=15_?.dat
+regex=*big*.dat
 timeout=6300
 
 for output_directory in OneKnapsack FifteenKnapsacks FiveKnapsacks TenKnapsacks 
