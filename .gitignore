@@ -280,3 +280,5 @@ filename.tex
 # Ignore Flex intermediate file lex.yy.c
 lex.yy.c
 
+# 
+!Benchmark/*.tex
