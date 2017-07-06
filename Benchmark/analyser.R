@@ -39,6 +39,7 @@ cat(
 ldf <- lapply(filenames, function(i){
 	print(cat("READ", i, "\n"));
 	mydata<-read.csv(i, header=TRUE, skip=",")
+	mydata<-na.omit(mydata)
 	if(length(mydata$CPU.Time) > 0){
 		print(length(mydata$Timeout.Reached[mydata$Timeout.Reached == "Yes"]))
 		print(length(mydata$Timeout.Reached['No']))
