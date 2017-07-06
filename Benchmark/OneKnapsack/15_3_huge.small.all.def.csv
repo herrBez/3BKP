@@ -1,6 +1,6 @@
-User.Time, CPU.Time, Objval, Timeout.Reached
-infeasible
-
-
-
-
+User.Time, CPU.Time, Objval, Timeout.Reachedinfeasible
+910.7031, 6343.7283, 184092.000000, Yes
+923.0437, 6343.0694, 184050.000000, Yes
+915.2728, 6342.7461, 184077.000000, Yes
+917.4447, 6342.7363, 184054.000000, Yes
+911.3793, 6342.8314, 184053.000000, Yes
