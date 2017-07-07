@@ -32,3 +32,11 @@ per il modello con più zaini:
 
 In questo caso vengono aggiunti $2 \cdot (|K| \cdot 3)$ vincoli a quelli del 
 modello di partenza.
+
+Nel problema alternativo, cosí come è definito, i balancing constraints non 
+sono stati considerati, perchè i parametri $L$ e $U$ dovrebbero essere a loro
+volta delle variabili (dipendenti dalle variabili $\sigma_{k}^{\delta}$) e quindi
+il modello diverrebbe \emph{non} lineare e, visto che le dimensioni dello zaino
+non sono prevedibili a priori il significato (concreto) di questi vincoli verrebbe meno:
+perchè sono stati considerati per permettere un carico bilanciato dei pesi all'interno
+di parametri $U$ e $L$ fissati.

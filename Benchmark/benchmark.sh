@@ -5,7 +5,7 @@ max_line=$(($iteration_per_instance+1))
 program=../Multi3BKP/main 
 program_type=multi.all
 small_pause=1
-regex=*_?.dat
+regex=10_2_r.dat
 timeout=6300
 
 for output_directory in OneKnapsack #FifteenKnapsacks FiveKnapsacks TenKnapsacks 

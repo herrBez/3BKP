@@ -77,16 +77,32 @@ di benchmark.}
 
 
 \subsection{Breve Commento sui risultati}
-Il programma per il problema \emph{3BKP} risulta richiedere tempi di esecuzioni
-sostanzialemente equivalenti a \emph{Multi3BKP} sulle istanze con un solo 
-zaino, come mostrato nelle tabelle~\ref{table:3BKP} e \ref{table:multi:1}.
+
+
+
+\paragraph{3BKP}
+Il programma \emph{3BKP} risulta risolvibile entro i limiti stabiliti ($6300$ secondi di cpu)
+per le istanze fino a 20 elementi compresi. L'istanza \verb|30_3| risulta
+essere risolta in poco tempo. Probabilmente questa anomalia è dovuta alla
+scelta casuale delle istanze.
 
 \paragraph{Multi3BKP}
 In generale il programma \emph{Multi3BKP} non riesce a risolvere nel timeout
-stabilito nessuna istanza con $40$ elementi, mentre riesce a risolvere sporadiche
-istanze con $30$ elementi in tempi molto stretti. Queste anomalie sono dovute
-con ogni probabilità alla generazione casuale delle istanze.
-Tutte le istanze con $10$ elementi sono state risolte entro il secondo.
+stabilito nessuna istanza con $40$ e $30$ elementi (c'è solo la stessa eccezione
+di \emph{3BKP}). 
+In generale si possono notare numerose istanze in cui l'objective value in tutte
+e $5$ le istanze è uguale ma è stato raggiunto il timeout. Alcune di queste
+soluzioni probabilmente sono soluzioni ottime.
+
+
+\paragraph{SmallHull}
+Poche istanze di questo programma sono state portate a termine tutte e $5$
+l'esecuzioni entro il timeout. Inoltre si possono notare alcune istanze che
+sono state stoppate da CPLEX (probabilmente per avere richiesto troppa memoria),
+o meglio dal Kernel Linux.
+
+
+
 
 
 
