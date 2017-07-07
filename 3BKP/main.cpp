@@ -177,7 +177,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	int N = instance.N;
 	int R = 6; //Cardinality of the set R
 	//int DELTA = 3; //Cardinality of the set \Delta
-	int M = 1e20; //Used in constraint 9-10 
+	double M = 1e20; //Used in constraint 9-10 
 	
 	//Constraint (6): sum_{j \in J} w_j*d_j*h_j*t_j <= WDH
 	{
