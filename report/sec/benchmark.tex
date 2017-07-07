@@ -31,15 +31,23 @@ All'inizio del file possono essere specificati i seguenti parametri:
  tutti i file che cominciano con 10), 
 \item secondi di pausa dopo l'esecuzione di un programma,
 \item suffisso da dare ai file \verb|.csv| generati dal programma
-\item timeout: qui è stato usato come timeout $6300$ secondi di cpu. Questo valore
+\item il timeout dopo il quale stoppare l'esecuzione.
+Per questi test è stato usato come timeout $6300$ secondi di CPU. Questo valore
 è stato ottenuto moltiplicando $15$ minuti per $7$, che sembrava essere
 circa il parallelismo che riusciva a raggiungere CPLEX nei primi esempi eseguiti.
+È stato preferito il tempo di CPU a quello utente perchè è meno dipendente dalle
+politiche di scheduling del sistema operativo sottostante.
+Visto che per settare il timeout è stata usata una funzione interna a CPLEX, il timeout
+effettivo non è sempre lo stesso, come dimostrano le tabelle dell'Appendice \ref{sec:results}.
+Il tempo di CPU è stato comunque riportato nelle istanze in cui il timeout era 
+stato raggiunto per valutare il livello di parallelismo 
+raggiunto da CPLEX.
 \end{itemize}
 
 I risultati dei benchmark grezzi possono essere trovati nella cartella 
 \path{Benchmark}. Nell'appendice  \ref{sec:results} vengono riportati delle
 elaborazioni sotto forma tabellare.
-Il significato delle varie colonne è riportato nella Tabella \ref{table:description}
+Il significato delle varie colonne è riportato nella Tabella \ref{table:description}.
 
 Purtroppo per le istanze in cui si è raggiunto il timeout non si hanno dati
 sulla soluzione ottima e quindi non si possono 
@@ -58,12 +66,12 @@ Abbreviazione & Descrizione \\
 inst. & Nome dell'istanza \\
 done & Numero di esecuzioni completate con successo prima del timeout\\
 AUT & Average user time in minuti \\
-ACT & Average computer time in minuti\\
-CU  & CPU usage: numero di cpu usate in media per eseguire l'istanza. \\
-	& ottenuta come $AUT/ACT$\\
-max & Max cpu time \\
-min & Min cpu time \\
-CV-T & coefficiente di variazione per il cpu-time \\
+ACT & Average CPU time in minuti\\
+CU  & CPU usage: numero di cpu usate in media per eseguire l'istanza: \\
+	& è ottenuto come $AUT/ACT$\\
+max & Max CPU time \\
+min & Min CPU time \\
+CV-T & coefficiente di variazione per il tempo di CPU \\
 ObjV & media del valore della funzione obiettivo. Nel caso di soluzioni ottime \\
 	& corrisponde al risultato della soluzione ottima.\\
 CV-O & coefficiente di variazioni per i valori della funzione obiettivo. In caso \\
@@ -87,27 +95,33 @@ essere risolta in poco tempo. Probabilmente questa anomalia è dovuta alla
 scelta casuale delle istanze.
 
 \paragraph{Multi3BKP}
-In generale il programma \emph{Multi3BKP} non riesce a risolvere nel timeout
+In generale il programma \path{Multi3BKP} non riesce a risolvere nel timeout
 stabilito nessuna istanza con $40$ e $30$ elementi (c'è solo la stessa eccezione
-di \emph{3BKP}). 
+di \path{3BKP}). 
 In generale si possono notare numerose istanze in cui l'objective value in tutte
 e $5$ le istanze è uguale ma è stato raggiunto il timeout. Alcune di queste
 soluzioni probabilmente sono soluzioni ottime.
 
 
 \paragraph{SmallHull}
-Poche istanze di questo programma sono state portate a termine tutte e $5$
-l'esecuzioni entro il timeout. Inoltre si possono notare alcune istanze che
-sono state stoppate da CPLEX (probabilmente per avere richiesto troppa memoria),
-o meglio dal Kernel Linux.
+Tutte le istanze con $20$ elementi non state portate a termine entro ai limiti
+stabiliti, mentre le istanze con $15$ elementi risultano risolvibili fino a
+$K = 5$. 
+Superato $K = 1$ perfino alcune istanze con $10$ elementi non risultano più risultano
+più risolvibili nei tempi stabiliti.
 
+Nelle Tabelle \ref{table:hull:10} e \ref{table:hull:15} si possono notare
+anche due istanze che hanno portato  il kernel a stoppare il processo CPLEX,
+per avere richiesto troppa memoria. 
 
+\paragraph{Stabilità di CPLEX}
+CPLEX risulta avere delle performance molto stabili come mostrano le colonne
+CV-T e CV-O delle tabelle dell'Appendice \ref{sec:results}.
 
-
-
-
-
-
+\paragraph{Altre considerazioni}
+Molte istanze, nonostante non siano state portate effettivamente a termine nei
+limiti stabiliti, hanno objective values con deviazioni standard uguali a $0$.
+Non è escluso che parte di esse possa essere una soluzione ottima.
 
 
 
@@ -149,7 +163,7 @@ in più (in percentuale) ci ha messo NF rispetto a F.
 \hline
 inst.			& SOV	& OF				& ONF 				& O-Impr. 	& ACT F 	& ACT NF 		& Diff \\
 \hline
-\verb|5_10_1|	& 3144  	& 2956	(-5.98\%) 	& 2127 	(-32.34\%)	& -28.04\%	 			& 0.00542 	&  0. 0.07414 	& +92\% \\ 
+\verb|5_10_1|	& 3144  	& 2956	(-5.98\%) 	& 2127 	(-32.34\%)	& -28.04\%	 			& 0.00542 	& 0.07414 	& +92\% \\ 
 \verb|5_10_2|	& 3999		& 3700	(-7.47\%)	& 1404	(-64.89\%)	& -62.05\%				& 0.00594	& 0.06318 		& +90.7\%\\
 \verb|5_10_3|	& 7835		& 7467	(-4.70\%)	& 3225	(-58.83\%)	& -56.80\%				& 0.00526	& 1.835 		& +98.5\% \\
 

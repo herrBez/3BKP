@@ -21,12 +21,7 @@ differenze:
 	tutti gli oggetti $J$ è sufficiente	mettere in input uno zaino solo e 
 	fissare gli upper bound a valori molto alti. 
 	
-%	\item Al posto della variabile $\rho_{ir}$ qui viene definita una variabile
-%	che itera anche tra gli zaini: $\rho_{kir}$. 
-%	Se si mantiene la $\rho$ su due dimensioni e si utilizza il vincolo 
-%	(\ref{eq:constraint:rho:ir:leq:sumk}) si creano dei vincoli che fanno sì 
-%	che tutti gli oggetti debbano essere più piccoli di ogni zaino,
-%	come spiegato nella sezione \ref{sec:extension2:Note}.
+
 \end{itemize}
 \subsubsection{Funzione obiettivo}
 Lo scopo è quello di minimizzare il volume degli zaini restando nei limiti 
@@ -41,7 +36,7 @@ diminuire il numero di zaini inclusi nella soluzione è stata preferita la
 seguente funzione obiettivo:
 \begin{equation}
 \text{ min } \sum_{k \in K} \sum_{\delta \in \Delta} \sigma_k^\delta 
-+ \sum_{k \in K} (E + E + E) z_k
++ \sum_{k \in K} |\Delta| E z_k 
 \end{equation}
 dove $E = max(S_k^\delta : k \in K, \delta \in \Delta) + 1$.
 
@@ -67,7 +62,7 @@ b_{kij}^\delta \leq t_{ki} && k \in K, i \in J, j \in J, \delta \in \Delta \\
 b_{kji}^\delta \leq t_{kj} && k \in K, i \in J, j \in J, \delta \in \Delta \\
 %
 \label{eq:rho:kir:sumofallrotation:tki}
-\sum_{r \in R} \rho_{ir} = t_{ki} && k \in K, i \in J \\
+\sum_{r \in R} \rho_{ir} = 1 && i \in J \\
 %
 \label{2:constraint:multi:tkzk}
 t_{kj} \leq z_k && k \in K, j \in J \\
@@ -120,11 +115,11 @@ modificato in modo tale che \emph{tutti} gli oggetti siano contenuti in uno
 zaino nella soluzione, dando forma al vincolo 
 (\ref{2:constraint:multi:onlyInOneKnapsack}).
 
-\item Il vincolo (\ref{eq:constraint:rho:ir:leq:sumk}) è stato sostituito dal
-nuovo vincolo (\ref{eq:rho:kir:sumofallrotation:tki}). Qualora si tenesse il
-vincolo (\ref{eq:constraint:rho:ir:leq:sumk}) si otterrebbe che qualsiasi zaino
- dovrebbe essere più grande di tutti i singoli oggetti, per via  del vincolo
- (\ref{2:constraint:multi:onlyInOneKnapsack}).
+\item Il vincolo (\ref{eq:rho:kir:sumofallrotation:tki}) deriva dall'unione
+del vincolo del modello precedente  (\ref{eq:constraint:rho:ir:leq:sumk}) e dal 
+nuovo vincolo (\ref{2:constraint:multi:onlyInOneKnapsack}).
+
+
 
 \item Inoltre, come già accennato, vanno aggiunti i bound per le variabili 
 $\sigma_k^\delta$:

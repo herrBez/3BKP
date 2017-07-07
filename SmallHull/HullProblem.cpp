@@ -283,7 +283,6 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 	}
 		
 	/* (8) */
-	//TODO add M(1 - t_ki)
 	for(int k = 0; k < K; k++){
 		for(int i = 0; i < N; i++){
 			for(int delta = 0; delta < 3; delta++){
@@ -471,18 +470,18 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 	
 	/* Constraint (16) */
 	for(int i = 0; i < N; i++){
-		vector < int > idVar(R + K);
-		vector < double > coeff(R + K);
+		vector < int > idVar(R); //+K
+		vector < double > coeff(R);//+K
 		
 		for(int r = 0; r < R; r++){
 			idVar[r] = map.Rho[i][r];
 			coeff[r] = 1.0;
 		}
-		for(int k = 0; k < K; k++){
+		/*for(int k = 0; k < K; k++){
 			idVar[R+k] = map.T[k][i];
 			coeff[R+k] = -1.0;
-		}
-		double rhs = 0.0;
+		}*/
+		double rhs = 1.0; //0
 		char sense = 'E';
 		int matbeg = 0;
 		
