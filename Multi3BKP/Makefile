@@ -3,11 +3,11 @@ CPPFLAGS = -Wall -Werror -O2
 
 
 
-CPX_INCDIR  = /opt/CPLEX_Studio/cplex/cplex/include
-CPX_LIBDIR  = /opt/CPLEX_Studio/cplex/cplex/lib/x86-64_linux/static_pic
+#CPX_INCDIR  = /opt/CPLEX_Studio/cplex/cplex/include
+#CPX_LIBDIR  = /opt/CPLEX_Studio/cplex/cplex/lib/x86-64_linux/static_pic
 
-#CPX_INCDIR = /opt/CPLEX_Studio/cplex/include 
-#CPX_LIBDIR = /opt/CPLEX_Studio/cplex/lib/x86-64_linux/static_pic
+CPX_INCDIR = /opt/CPLEX_Studio/cplex/include 
+CPX_LIBDIR = /opt/CPLEX_Studio/cplex/lib/x86-64_linux/static_pic
 
 CPX_LDFLAGS = -lcplex -lm -pthread
 
