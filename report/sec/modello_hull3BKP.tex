@@ -6,6 +6,7 @@ dimensioni degli zaini come delle variabili, con un upper bound fissato
 minime che gli zaini devono avere, affinché possano contenere tutti gli oggetti.
 
 \subsection{Modello}
+\label{sec:modello:hull}
 Il modello differisce di poco dal modello fornito nella
 Sezione \ref{sec:modello:multi3BKP}, quindi vengono elencate soltanto le 
 differenze:
@@ -40,7 +41,7 @@ diminuire il numero di zaini inclusi nella soluzione è stata preferita la
 seguente funzione obiettivo:
 \begin{equation}
 \text{ min } \sum_{k \in K} \sum_{\delta \in \Delta} \sigma_k^\delta 
-+ \sum_{k \in K} E^3 z_k
++ \sum_{k \in K} (E + E + E) z_k
 \end{equation}
 dove $E = max(S_k^\delta : k \in K, \delta \in \Delta) + 1$.
 
@@ -104,7 +105,7 @@ Sezione \ref{sec:extension1} e spiegate le motivazioni delle modifiche.
 moltiplicazione di variabili, il vincolo
 (\ref{eq:constraint:volume}) non può più essere considerato. 
 Ma poiché è ridondante rispetto ai vincoli 
-\ref{eq:constraint:coodinateLessThanSkdelta}
+(\ref{eq:constraint:coodinateLessThanSkdelta})
 può essere tralasciato senza intaccare la validità del modello.
 Infatti nel paper originale il vincolo (\ref{eq:constraint:volume}) viene 
 considerato esclusivamente per questioni numeriche.

@@ -24,21 +24,21 @@ script in bash \path{benchmark.sh}.
 All'inizio del file possono essere specificati i seguenti parametri:
 \begin{itemize}
 \item il programma da usare, 
-\item il numero di esecuzioni per istanza, in questo documento sono stati usati
+\item il numero di esecuzioni per istanza: in questo documento sono stati usati
 5 test per motivi di tempo,
 \item la cartella dove trovare le istanze, 
 \item una regex per i file da eseguire  (per esempio \verb|10*.dat| per eseguire
  tutti i file che cominciano con 10), 
-\item secondi di pausa dopo l'esecuzione di un programma 
-(utile per non fare surriscaldare il computer).
+\item secondi di pausa dopo l'esecuzione di un programma,
 \item suffisso da dare ai file \verb|.csv| generati dal programma
-\item timeout. Qui è stato usato come timeout 6300 secondi di cpu. Questo valore
-è stato ottenuto moltiplicando 15 minuti per 7, che sembrava essere
+\item timeout: qui è stato usato come timeout $6300$ secondi di cpu. Questo valore
+è stato ottenuto moltiplicando $15$ minuti per $7$, che sembrava essere
 circa il parallelismo che riusciva a raggiungere CPLEX nei primi esempi eseguiti.
 \end{itemize}
 
 I risultati dei benchmark grezzi possono essere trovati nella cartella 
-\path{Benchmark}. Qui vengono riportati delle elaborazioni sotto forma tabellare.
+\path{Benchmark}. Nell'appendice  \ref{sec:results} vengono riportati delle
+elaborazioni sotto forma tabellare.
 Il significato delle varie colonne è riportato nella Tabella \ref{table:description}
 
 Purtroppo per le istanze in cui si è raggiunto il timeout non si hanno dati
@@ -74,16 +74,21 @@ CV-O & coefficiente di variazioni per i valori della funzione obiettivo. In caso
 di benchmark.}
 \label{table:description}
 \end{table}
-I risultati possono essere consultati nell'appendice \ref{sec:appendix}.
 
-\subsection{Risultati}
-Generalmente il programma Multi3BKP risulta essere molto più veloce sulle 
-stesse istanze rispetto allo Small3BKP, anche perchè il secondo programma 
-è considerevolmente più complicato. 
+
+\subsection{Breve Commento sui risultati}
+Il programma per il problema \emph{3BKP} risulta richiedere tempi di esecuzioni
+sostanzialemente equivalenti a \emph{Multi3BKP} sulle istanze con un solo 
+zaino, come mostrato nelle tabelle~\ref{table:3BKP} e \ref{table:multi:1}.
 
 \paragraph{Multi3BKP}
-Questo problema risulta risolvibile per tutte le istanze con $10$ oggetti prese
-in esame. 
+In generale il programma \emph{Multi3BKP} non riesce a risolvere nel timeout
+stabilito nessuna istanza con $40$ elementi, mentre riesce a risolvere sporadiche
+istanze con $30$ elementi in tempi molto stretti. Queste anomalie sono dovute
+con ogni probabilità alla generazione casuale delle istanze.
+Tutte le istanze con $10$ elementi sono state risolte entro il secondo.
+
+
 
 
 

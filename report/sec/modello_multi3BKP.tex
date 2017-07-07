@@ -115,23 +115,23 @@ ottenuti adattando i vincoli del modello di partenza.
  utilizzato nella soluzione.
 \item Il vincolo (\ref{constraint:multi:onlyInOneKnapsack}) fa sì che un oggetto
 possa essere inserito al più in uno zaino. 
-\item Il vincolo \ref{constraint:bkji:leq:tki} è ridondante rispetto ad 
-\ref{constraint:bkij:leq:tki}, infatti ogni vincolo di tipo
-\ref{constraint:bkji:leq:tki} ha un corrispettivo di tipo 
-\ref{constraint:bkij:leq:tki}.
+\item Il vincolo (\ref{constraint:bkji:leq:tki}) è ridondante rispetto a 
+(\ref{constraint:bkij:leq:tki}), infatti ogni vincolo di tipo
+(\ref{constraint:bkji:leq:tki}) ha un corrispettivo di tipo 
+(\ref{constraint:bkij:leq:tki}).
 \item Al posto di un generico $M$ si potrebbe usare un 
 parametro $E$ così definito:
 $$
 E = max(S_k^\delta : k \in K, \delta \in \Delta) + 1
 $$ 
 \item Nelle versioni precedenti di questo documento era stata fornita una
-versione sbagliata del vincolo \ref{eq:constraint:coodinateLessThanSkdelta}.
+versione sbagliata del vincolo (\ref{eq:constraint:coodinateLessThanSkdelta}).
 
-Questa faceva sì che ogni oggetto che sarebbe stato inserito in uno zaino 
+Questa faceva sì che, ogni oggetto inserito in uno zaino, 
 dovesse essere contenuto nei limiti di \emph{tutti} gli zaini, perfino
 quelli che non venivano utilizzati nella soluzione.
-Questa nuova versione fa sì che gli oggetti siano soggetti a vincoli
-del tipo \ref{eq:constraint:coodinateLessThanSkdelta} \emph{solo}
+Questa nuova versione fa in modo che gli oggetti siano sottoposti a vincoli
+del tipo (\ref{eq:constraint:coodinateLessThanSkdelta}) \emph{solo}
 se l'oggetto è effetivamente contenuto nello zaino $k$, ovvero se 
 $t_{ki}$ è uguale a 1.
 
@@ -234,10 +234,10 @@ Inoltre si fissano tutte le variabili $z_k, \rho_{ir}, t_{ki}$ e tutte le
 variabili $b_{kij}^\delta$ con $z_k = 0$, ma non quelle con $z_k = 1$, perché 
 $b_{kij}^\delta$ definisce delle precedenze molto forti tra oggetti -- molte 
 volte non necessarie in alcune direzioni -- che potrebbero limitare 
-l'ottimizzazione delle variabili $\chi$, per questo è stato preferito non 
+l'ottimizzazione delle variabili $\chi$: per questo è stato preferito non 
 fissarle.
 
 Una breve discussione sulle performance di qualità della soluzione e tempo
-necessario per risolvere il problema settando o meno le variabili $b$ è fornita
+necessario per risolvere il problema fissando o meno le variabili $b$ è fornita
 alla Sezione \ref{sec:benchmark:accessorio}.
 
