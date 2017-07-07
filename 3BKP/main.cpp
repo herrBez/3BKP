@@ -177,7 +177,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	int N = instance.N;
 	int R = 6; //Cardinality of the set R
 	//int DELTA = 3; //Cardinality of the set \Delta
-	int M = 1e9; //Used in constraint 9-10 
+	int M = 1e20; //Used in constraint 9-10 
 	
 	//Constraint (6): sum_{j \in J} w_j*d_j*h_j*t_j <= WDH
 	{
@@ -415,7 +415,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 }
 
 /**
- * Set up the constraints 
+ * Set up the balncing constraints (14) e (15) 
  * @param env
  * @param lp
  * @param instance
@@ -424,6 +424,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
  */
 void setupLPBalancingConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map){
 	int N = instance.N;
+	//(14)
 	for(int delta = 0; delta < 3; delta++){
 		vector< int > idVar(N + N*6 + N);
 		vector< double > coeff(N + N*6 + N);

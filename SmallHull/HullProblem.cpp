@@ -20,6 +20,7 @@ void setupLPBalancingConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVa
 	char name[NAME_SIZE];
 	int N = instance.N;
 	int K = instance.K;
+	//(59) - Exntesion with K knapsack of 14
 	for(int k = 0; k < K; k++){
 		for(int delta = 0; delta < 3; delta++){
 			vector< int > idVar(N + N*6 + N);
@@ -52,7 +53,7 @@ void setupLPBalancingConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVa
 		}
 	}
 		
-	// (15)
+	//(60) - Exntesion with K knapsack of 15
 	for(int k = 0; k < K; k++){
 		for(int delta = 0; delta < 3; delta++){
 			vector< int > idVar(N + N*6 + N);
@@ -106,6 +107,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map, opt
 	/*
 	 * Adding z variables
 	 * z_k = 1 if the k-th knapsack is used, 0 otherwise
+	 * + (56)
 	 */
 	 for(int k = 0; k < K; k++){
 		char xtype = 'B';
@@ -121,7 +123,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map, opt
 	  * Adding Sigma variables
 	  * Sigma_k^\delta 
 	  * dimension of the knapsack kth in the delta direction
-	  * 
+	  * (57)
 	  */
 	 for(int k = 0; k < K; k++){
 			for(int delta = 0; delta < 3; delta++){
@@ -140,7 +142,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map, opt
 	 * 
 	 * adding \chi_ki^\delta variables
 	 * the coordinate of the bottom-left-back point of item i along dimension \delta in knapsack k
-	 * + constraint(17)
+	 * + constraint(52)
 	 * 
 	 */
 	 for(int k = 0; k < K; k++){
@@ -161,7 +163,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map, opt
 	/* 
 	 * adding t variables
 	 * t_kj := binary value {1 if j-th item is loaded in the KP 0 otherwise} 
-	 * + constraint(18)
+	 * + constraint(53)
 	 */ 
 	 for(int k = 0; k < K; k++){
 		for(int j = 0; j < N; j++){
@@ -179,7 +181,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map, opt
 	/* 
 	 * adding b_kij^\delta variables
 	 * b_{ijk}^\delta 1 if item i comes before item j in k-th knapsack in dimension \delta.
-	 * + constraint(19)
+	 * + constraint(54)
 	 */ 
 	for(int k = 0; k < K; k++){
 		for(int i = 0; i < N; i++){
@@ -201,7 +203,7 @@ void setupLPVariables(CEnv env, Prob lp, Instance3BKP instance, mapVar &map, opt
 	/* 
 	 * adding rho_{ir} variables
 	 * rho_{ir} {1 if item i is rotated with rotation r, 0 otherwise}.
-	 * + constraint 20
+	 * + constraint (55)
 	 */ 
 	for(int i = 0; i < N; i++){
 		for(int r = 0; r < 6; r++){
@@ -237,13 +239,12 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 	int N = instance.N;
 	int K = instance.K;
 	int R = 6; //Cardinality of the set R
-	//int DELTA = 3; //Cardinality of the set \Delta
-	int M = 1e6; //Used in constraint 9-10 
+	double M = 1e20; //Used in constraint 9-10 
 	
 	unsigned int number_of_constraint = 0;
 	
 	
-	//Constraint (7) : (\sum_{\delta \in \Delta} b_kij^\delta + b_kij^\delta) -t_ki -t_kj >= -1
+	//Constraint (41) : (\sum_{\delta \in \Delta} b_kij^\delta + b_kij^\delta) -t_ki -t_kj >= -1
 	for(int k = 0; k < K; k++){
 		for(int i = 0; i < N; i++){
 			for(int j = 0; j < N; j++){
@@ -282,7 +283,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 		}
 	}
 		
-	/* (8) */
+	/* (42) */
 	for(int k = 0; k < K; k++){
 		for(int i = 0; i < N; i++){
 			for(int delta = 0; delta < 3; delta++){
@@ -316,7 +317,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 		}
 	}
 	
-	/* (9) */
+	/* (43) */
 	for(int k = 0; k < K; k++){
 		for(int i = 0; i < N; i++){
 			for(int j = 0; j < N; j++){
@@ -356,7 +357,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 	}
 	
 	
-	/* (10) */
+	/* (44) */
 	for(int k = 0; k < K; k++){
 		for(int i = 0; i < N; i++){
 			for(int j = 0; j < N; j++){
@@ -399,7 +400,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 	}
 		
 		
-	//Constraint (11) 
+	//Constraint (45) 
 	for(int k = 0; k < K; k++){
 		for(int i = 0; i < N; i++){
 			for(int delta = 0; delta < 3; delta++){
@@ -419,7 +420,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 			}
 		}
 	}
-	//Constraint (12): b_{kij}^\delta <= t_i ==> b_{ij}^\delta - t_i = 0
+	//Constraint (46): b_{kij}^\delta <= t_i ==> b_{ij}^\delta - t_i = 0
 	
 	for(int k = 0; k < K; k++){
 		for(int i = 0; i < N; i++){
@@ -444,7 +445,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 	}
 	
 	
-	//Constraint (13): b_{ji}^\delta <= t_j ==> b_{ji}^\delta - t_j = 0
+	//Constraint (47): b_{ji}^\delta <= t_j ==> b_{ji}^\delta - t_j = 0
 	/*for(int k = 0; k < K; k++){
 		for(int i = 0; i < N; i++){
 			for(int j = 0;  j < N; j++){
@@ -468,20 +469,17 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 	}*/
 	
 	
-	/* Constraint (16) */
+	/* Constraint (48) */
 	for(int i = 0; i < N; i++){
-		vector < int > idVar(R); //+K
-		vector < double > coeff(R);//+K
+		vector < int > idVar(R); 
+		vector < double > coeff(R);
 		
 		for(int r = 0; r < R; r++){
 			idVar[r] = map.Rho[i][r];
 			coeff[r] = 1.0;
 		}
-		/*for(int k = 0; k < K; k++){
-			idVar[R+k] = map.T[k][i];
-			coeff[R+k] = -1.0;
-		}*/
-		double rhs = 1.0; //0
+		
+		double rhs = 1.0; 
 		char sense = 'E';
 		int matbeg = 0;
 		
@@ -491,7 +489,7 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 		number_of_constraint++;
 	}
 	
-	/* Constraint (Multi) */
+	/* Constraint (Multi): (49) */
 	for(int k = 0; k < K; k++){
 		for(int j = 0; j < N; j++){
 			
@@ -513,7 +511,25 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 		}
 	}
 	
-	/* */
+	
+	/* (50) */
+	for(int i = 0; i < N; i++){
+		vector< int > idVar(K);
+		vector< double > coeff(K);
+		for(int k = 0; k < K; k++){
+			idVar[k] = map.T[k][i];
+			coeff[k] = 1.0;
+		}
+		double rhs = 1.0;
+		char sense = 'E';
+		int matbeg = 0;
+		snprintf(name, NAME_SIZE, "HULL (2) %d ", i);
+		char * cname = (char*) (&name[0]);
+		CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
+		number_of_constraint++;
+	}
+	
+	/* (51) */
 	for(int k = 0; k < K; k++){
 		for(int delta = 0; delta < 3; delta++){
 			vector< int > idVar(2);
@@ -530,41 +546,8 @@ void setupLPConstraints(CEnv env, Prob lp, Instance3BKP instance, mapVar map, op
 			CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
 			number_of_constraint++;
 		}
-	}
-	/* */
-	for(int i = 0; i < N; i++){
-		vector< int > idVar(K);
-		vector< double > coeff(K);
-		for(int k = 0; k < K; k++){
-			idVar[k] = map.T[k][i];
-			coeff[k] = 1.0;
-		}
-		double rhs = 1.0;
-		char sense = 'E';
-		int matbeg = 0;
-		snprintf(name, NAME_SIZE, "HULL (2) %d ", i);
-		char * cname = (char*) (&name[0]);
-		CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
-		number_of_constraint++;
-	}
-	//Constraint -- new
-	for(int k = 0; k < K; k++){
-			for(int delta = 0; delta < 3; delta++){
-				vector< int > idVar(2);
-				vector< double > coeff(2);
-				idVar[0] = map.Sigma[k][delta];
-				coeff[0] = 1.0;
-				idVar[1] = map.Z[k];
-				coeff[1] = -(instance.S[k][delta] + 1);
-				char sense = 'L';
-				int matbeg = 0;
-				double rhs = 0;
-				snprintf(name, NAME_SIZE, "(SIGMA) %d %d",k,delta);
-				char* cname = (char*)(&name[0]);
-				CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idVar.size(), &rhs, &sense, &matbeg, &idVar[0], &coeff[0], 0, &cname);
-				number_of_constraint++;
-			}
-	}
+	} 
+	
 	if(!oFlag.benchmark)
 	printf("Number of constraints (not considering the variable bounds): %d\n", number_of_constraint);
 }
